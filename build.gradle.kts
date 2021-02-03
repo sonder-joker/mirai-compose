@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.21-2"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
     id("org.jetbrains.compose") version "0.3.0-build147"
 }
 
@@ -19,16 +18,10 @@ repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
 }
 
-val CORE_VERSION = "2.0.0"
-val CONSOLE_VERSION = "2.0.0"
-
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("net.mamoe:mirai-core:$CORE_VERSION") // mirai-core 的 API
-    implementation("net.mamoe:mirai-console:$CONSOLE_VERSION") // 后端
-
-    testImplementation("net.mamoe:mirai-console-terminal:$CONSOLE_VERSION")
-//    runtimeOnly("net.mamoe:mirai-login-solver-selenium:1.0-dev-15")
+    implementation("net.mamoe:mirai-core:2.0.0") // mirai-core 的 API
+    implementation("net.mamoe:mirai-console:2.0.0") // 后端
 }
 
 tasks.test {
@@ -52,7 +45,7 @@ compose.desktop {
         mainClass = "com.youngerhousea.miraidesktop.MainKt"
 
         nativeDistributions {
-            targetFormats(/*TargetFormat.Dmg, */TargetFormat.Msi/*, TargetFormat.Deb*/)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MiraiCompose"
             version = "0.1.0"
             vendor = "Noire"

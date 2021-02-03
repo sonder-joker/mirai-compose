@@ -20,7 +20,7 @@ import com.youngerhousea.miraicompose.theme.ResourceImage
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 
 fun MiraiComposeView() {
-
+    MiraiCompose.start()
     Window(
         title = "Mirai Compose",
         size = IntSize(1280, 768),
