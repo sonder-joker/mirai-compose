@@ -20,8 +20,8 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("net.mamoe:mirai-core:2.0.0") // mirai-core 的 API
-    implementation("net.mamoe:mirai-console:2.0.0") // 后端
+    implementation("net.mamoe:mirai-core:2.3.2") // mirai-core 的 API
+    implementation("net.mamoe:mirai-console:2.3.2") // 后端
 }
 
 tasks.test {
@@ -43,12 +43,21 @@ kotlin.sourceSets.all {
 compose.desktop {
     application {
         mainClass = "com.youngerhousea.miraidesktop.MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MiraiCompose"
             version = "0.1.0"
             vendor = "Noire"
+
+            macOS {
+                iconFile.set(project.file("mirai.ico"))
+            }
+            windows {
+                iconFile.set(project.file("mirai.ico"))
+            }
+            linux {
+                iconFile.set(project.file("mirai.png"))
+            }
         }
     }
 }
