@@ -1,4 +1,4 @@
-#mirai-compose  
+# mirai-compose   
 ____
-»ùÓÚ[compose-jb](https://github.com/jetbrains/compose-jb)  ÊµÏÖµÄ[mirai-console](https://github.com/mamoe/mirai-console)  Ç°¶Ë  
-Ä¿Ç°Õı´¦ÓÚ²âÊÔ½×¶Î¡£
+åŸºäº[compose-jb](https://github.com/jetbrains/compose-jb)  å®ç°çš„[mirai-console](https://github.com/mamoe/mirai-console)  å‰ç«¯  
+ç›®å‰æ­£å¤„äºæµ‹è¯•é˜¶æ®µã€‚
