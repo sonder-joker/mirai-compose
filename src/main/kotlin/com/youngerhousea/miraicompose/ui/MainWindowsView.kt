@@ -75,6 +75,7 @@ fun MainWindowsView(model: Model) {
             else
                 SettingWindow(
                     Modifier
+                        .fillMaxSize()
                         .padding(top = 20.dp)
                 )
             Icon(

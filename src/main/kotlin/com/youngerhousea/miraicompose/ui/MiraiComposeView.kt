@@ -4,8 +4,11 @@ package com.youngerhousea.miraicompose.ui
 import androidx.compose.desktop.Window
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.IntSize
 import com.youngerhousea.miraicompose.MiraiCompose
 import com.youngerhousea.miraicompose.model.Model
@@ -25,6 +28,10 @@ fun MiraiComposeView() {
         ) {
             val model = remember { Model() }
             Surface {
+//                val hasTopBar by remember { mutableStateOf(false) }
+//                if(hasTopBar) {
+//                    TopAppBar {  }
+//                }
                 MainWindowsView(model)
             }
         }
