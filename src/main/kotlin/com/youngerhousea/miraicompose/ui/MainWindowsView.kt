@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
@@ -18,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.model.Model
-import com.youngerhousea.miraicompose.ui.botlistwindows.BotListView
-import com.youngerhousea.miraicompose.ui.botlistwindows.TopView
-import com.youngerhousea.miraicompose.ui.botwindows.BotWindow
-import com.youngerhousea.miraicompose.ui.botwindows.SettingWindow
+import com.youngerhousea.miraicompose.ui.botlistview.BotListView
+import com.youngerhousea.miraicompose.ui.botlistview.TopView
+import com.youngerhousea.miraicompose.ui.botview.BotWindow
+import com.youngerhousea.miraicompose.ui.botview.SettingWindow
 import com.youngerhousea.miraicompose.utils.SplitterState
 import com.youngerhousea.miraicompose.utils.VerticalSplittable
 
@@ -40,32 +39,48 @@ fun MainWindowsView(model: Model) {
         ).value
 
     VerticalSplittable(
-        Modifier.fillMaxSize(),
+        Modifier
+            .fillMaxSize(),
         panelState.splitter,
         onResize = {
             panelState.expandedSize =
                 (panelState.expandedSize + it).coerceAtLeast(panelState.expandedSizeMin)
         }
     ) {
-        ResizablePanel(Modifier
-            .width(animatedSize)
-            .fillMaxHeight(), panelState) {
+        ResizablePanel(
+            Modifier
+                .width(animatedSize)
+                .fillMaxHeight(), panelState
+        ) {
             Column {
-                TopView()
-                BotListView(model)
+                TopView(
+                    Modifier
+                        .padding(8.dp)
+                )
+                BotListView(
+                    model,
+                    Modifier
+                        .fillMaxSize()
+                        .padding(30.dp)
+                )
             }
         }
 
-        Box(Modifier
-            .fillMaxSize()) {
+        Box(
+            Modifier
+                .fillMaxSize()
+        ) {
             if (inBotWindow)
                 BotWindow(model.currentBot)
             else
-                SettingWindow()
+                SettingWindow(
+                    Modifier
+                        .padding(top = 20.dp)
+                )
             Icon(
                 if (inBotWindow) Icons.Default.ArrowForward else Icons.Default.ArrowBack,
                 contentDescription = "Setting",
-                modifier = Modifier
+                Modifier
                     .align(Alignment.CenterEnd)
                     .clickable { inBotWindow = !inBotWindow }
             )
@@ -94,21 +109,23 @@ private fun ResizablePanel(
     ).value
 
     Box(modifier) {
-        Box(Modifier.fillMaxSize().graphicsLayer(alpha = alpha)) {
+        Box(Modifier
+            .fillMaxSize()
+            .graphicsLayer(alpha = alpha)) {
             content()
         }
         Icon(
             if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
             contentDescription = "Arrow",
-            tint = LocalContentColor.current,
-            modifier = Modifier
+            Modifier
                 .padding(top = 4.dp)
                 .width(24.dp)
                 .clickable {
                     state.isExpanded = !state.isExpanded
                 }
                 .padding(4.dp)
-                .align(Alignment.TopEnd)
+                .align(Alignment.TopEnd),
+            tint = LocalContentColor.current,
         )
     }
 }

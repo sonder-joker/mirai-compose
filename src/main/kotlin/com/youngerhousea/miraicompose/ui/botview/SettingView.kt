@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botwindows
+package com.youngerhousea.miraicompose.ui.botview
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,10 +18,10 @@ private val itemHeight = 50.dp
 private val itemWidth = 130.dp
 
 @Composable
-fun SettingWindow() = LazyColumn(
+fun SettingWindow(modifier: Modifier) = LazyColumn(
+    modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
-    modifier = Modifier.padding(top = 20.dp)
 ) {
 //    var inSetting by mutableStateOf(false)
     item {

@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botlistwindows
+package com.youngerhousea.miraicompose.ui.botlistview
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.VerticalScrollbar
@@ -24,26 +24,23 @@ import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.utils.withoutWidthConstraints
 
 @Composable
-fun BotListView(model: Model) = Surface(
-    modifier = Modifier
-        .fillMaxSize()
-        .padding(30.dp)
+fun BotListView(model: Model, modifier: Modifier = Modifier) = Surface(modifier
 ) {
     Box(Modifier.fillMaxSize()) {
         val scrollState = rememberLazyListState()
         val itemHeight = 100.dp
 
         LazyColumn(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
                 .withoutWidthConstraints(),
             state = scrollState
         ) {
             itemsIndexed(model.bots) { index, item ->
                 BotItem(
+                    item,
                     Modifier
                         .preferredHeight(100.dp),
-                    item,
                     updateAction = {
                         model.currentIndex = index
                     },

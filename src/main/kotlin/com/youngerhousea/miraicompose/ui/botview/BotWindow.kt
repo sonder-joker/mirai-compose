@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botwindows
+package com.youngerhousea.miraicompose.ui.botview
 
 import androidx.compose.runtime.Composable
 import com.youngerhousea.miraicompose.model.BotState
@@ -10,17 +10,17 @@ import net.mamoe.mirai.console.MiraiConsole
 fun BotWindow(model: ComposeBot) =
     when (model.state) {
         BotState.None -> {
-            BotLoginWindow(model.loginWindowState) {
+            BotLoginView(model.loginWindowState) {
                 MiraiConsole.launch {
                     model.login()
                 }
             }
         }
         BotState.Loading -> {
-            BotLoadingWindow()
+            BotLoadingView()
         }
         BotState.Login -> {
-            BotStateWindow(model)
+            BotStateView(model)
         }
     }
 

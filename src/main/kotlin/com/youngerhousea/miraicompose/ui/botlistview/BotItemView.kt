@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botlistwindows
+package com.youngerhousea.miraicompose.ui.botlistview
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -16,8 +16,8 @@ import com.youngerhousea.miraicompose.theme.AppTheme
 
 @Composable
 fun BotItem(
-    modifier: Modifier = Modifier,
     bot: ComposeBot,
+    modifier: Modifier = Modifier,
     updateAction: () -> Unit,
     removeAction: () -> Unit,
 ) {

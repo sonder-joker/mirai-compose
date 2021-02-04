@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botlistwindows
+package com.youngerhousea.miraicompose.ui.botlistview
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -12,9 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TopView() = Surface {
-    Row(
-        Modifier.padding(8.dp),
+fun TopView(modifier: Modifier) = Surface {
+    Row(modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

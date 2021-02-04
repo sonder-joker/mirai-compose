@@ -1,5 +1,5 @@
 
-package com.youngerhousea.miraicompose.ui.botwindows
+package com.youngerhousea.miraicompose.ui.botview
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,7 +16,7 @@ import com.youngerhousea.miraicompose.theme.ResourceImage
 import net.mamoe.mirai.network.WrongPasswordException
 
 @Composable
-fun BotLoginWindow(loginWindowState: LoginWindowState, onClick: () -> Unit) =
+fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) =
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

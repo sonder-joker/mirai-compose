@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botwindows
+package com.youngerhousea.miraicompose.ui.botview
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +17,7 @@ import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.ConsoleCommandSender
 
 @Composable
-fun BotStateWindow(model: ComposeBot) = Box(
+fun BotStateView(model: ComposeBot) = Box(
     Modifier
         .fillMaxSize(),
     contentAlignment = Alignment.BottomCenter

@@ -1,6 +1,6 @@
 
 
-package com.youngerhousea.miraicompose.ui.botwindows
+package com.youngerhousea.miraicompose.ui.botview
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun BotLoadingWindow() = Box(
+fun BotLoadingView() = Box(
     Modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {
