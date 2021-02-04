@@ -15,8 +15,6 @@ fun BotWindow(model: ComposeBot) =
                     model.login()
                 }
             }
-
-//            BotStateWindow(model)
         }
         BotState.Loading -> {
             BotLoadingWindow()

@@ -20,8 +20,8 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("net.mamoe:mirai-core:2.3.2") // mirai-core µÄ API
-    implementation("net.mamoe:mirai-console:2.3.2") // ºó¶Ë
+    implementation("net.mamoe:mirai-core:2.3.2")
+    implementation("net.mamoe:mirai-console:2.3.2")
 }
 
 tasks.test {

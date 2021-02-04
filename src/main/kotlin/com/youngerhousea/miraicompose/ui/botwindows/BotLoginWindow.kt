@@ -44,9 +44,9 @@ fun BotLoginWindow(loginWindowState: LoginWindowState, onClick: () -> Unit) =
             isErrorValue = loginWindowState.invalidInputAccount,
             label = {
                 if (loginWindowState.invalidInputAccount)
-                    Text("ÕËºÅÖ»ÄÜÓÉÊý×Ö×é³É")
+                    Text("è´¦å·åªèƒ½ç”±æ•°å­—ç»„æˆ")
                 else
-                    Text("ÕËºÅ")
+                    Text("è´¦å·")
             })
 
         TextField(
@@ -62,7 +62,7 @@ fun BotLoginWindow(loginWindowState: LoginWindowState, onClick: () -> Unit) =
             ),
             singleLine = true,
             label = {
-                Text("ÃÜÂë")
+                Text("å¯†ç ")
             },
 //            trailingIcon = {}
         )
@@ -74,14 +74,14 @@ fun BotLoginWindow(loginWindowState: LoginWindowState, onClick: () -> Unit) =
                 }.onFailure {
                     loginWindowState.exceptionPrompt = when (it) {
                         is WrongPasswordException -> {
-                            "ÃÜÂë´íÎó"
+                            "å¯†ç é”™è¯¯ï¼"
                         }
                         is NumberFormatException -> {
-                            "ÕËºÅÖ»ÄÜÓÉÊý×Ö×é³É"
+                            "æ ¼å¼é”™è¯¯ï¼"
                         }
                         else -> {
                             it.printStackTrace()
-                            "Î´Öª´íÎó"
+                            "å‘œå‘œå‘œ"
                         }
                     }
                     loginWindowState.isException = true
@@ -89,7 +89,7 @@ fun BotLoginWindow(loginWindowState: LoginWindowState, onClick: () -> Unit) =
             }, modifier = Modifier
                 .preferredHeight(100.dp)
         ) {
-            Text("µÇÂ¼")
+            Text("ç™»å½•")
         }
 
         if (loginWindowState.isException) {

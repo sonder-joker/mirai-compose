@@ -49,7 +49,7 @@ private fun LogBoxs(bot: ComposeBot, modifier: Modifier = Modifier) {
         ) {
             items(bot.messages) {
                 Text(
-                    "${it.sender.nick} ‘⁄ ${it.time} say: ${it.message}",
+                    "${it.sender.nick} in ${it.time} say: ${it.message}",
                     modifier = Modifier
                         .padding(vertical = 5.dp)
                 )
@@ -84,7 +84,7 @@ private fun CommandSendBox(bot: ComposeBot, modifier: Modifier = Modifier) {
                 .weight(2f),
             backgroundColor = AppTheme.colors.backgroundDark
         ) {
-            Text("∑¢ÀÕ")
+            Text("ÂèëÈÄÅ")
         }
     }
 }

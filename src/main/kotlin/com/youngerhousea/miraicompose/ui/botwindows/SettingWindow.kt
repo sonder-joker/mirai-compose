@@ -25,7 +25,7 @@ fun SettingWindow() = LazyColumn(
 ) {
 //    var inSetting by mutableStateOf(false)
     item {
-        SplitText("≤Âº˛¡–±Ì")
+        SplitText("Êèí‰ª∂ÂàóË°®")
     }
     item {
         Row(
@@ -58,7 +58,7 @@ fun SettingWindow() = LazyColumn(
             if (it.dependencies.isNotEmpty())
                 SplitText(it.dependencies.joinToString { "," })
             else
-                SplitText("Œﬁ“¿¿µ")
+                SplitText("Êó†‰æùËµñ")
 
             Box(
                 modifier = Modifier
@@ -67,12 +67,10 @@ fun SettingWindow() = LazyColumn(
             ) {
                 Icon(
                     Icons.Default.Settings,
-                    "…Ë÷√",
+                    "Setting",
                     modifier = Modifier
                         .padding(end = 70.dp)
                         .clickable {
-                            it.isEnabled
-                            Runtime.getRuntime().exec("code ")
                         }
                         .matchParentSize()
                 )

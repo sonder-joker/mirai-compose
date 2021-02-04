@@ -35,7 +35,7 @@ fun BotItem(
             shape = CircleShape,
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
         ) {
-            Image(bot.avatar, "Í·Ïñ")
+            Image(bot.avatar, "avatar")
         }
 
         Column(
@@ -50,7 +50,7 @@ fun BotItem(
         }
 //        Icon(
 //            Icons.Default.Delete,
-//            contentDescription = "É¾³ý",
+//            contentDescription = "Delete",
 //            modifier = Modifier
 //                .weight(1f)
 //                .clickable(onClick = removeAction)

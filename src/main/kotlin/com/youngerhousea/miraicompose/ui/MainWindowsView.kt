@@ -64,7 +64,7 @@ fun MainWindowsView(model: Model) {
                 SettingWindow()
             Icon(
                 if (inBotWindow) Icons.Default.ArrowForward else Icons.Default.ArrowBack,
-                contentDescription = "ÇÐ»»",
+                contentDescription = "Setting",
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .clickable { inBotWindow = !inBotWindow }

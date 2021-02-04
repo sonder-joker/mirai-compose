@@ -61,7 +61,7 @@ fun BotListView(model: Model) = Surface(
                     Modifier
                         .preferredHeight(100.dp)
                 ) {
-                    Text("添加一个机器人", fontWeight = FontWeight.Bold)
+                    Text("娣诲姞涓�涓満鍣ㄤ汉", fontWeight = FontWeight.Bold)
                 }
             }
         }
