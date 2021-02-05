@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.ui.bot.BotsWindow
+import com.youngerhousea.miraicompose.ui.log.LogWindow
 import com.youngerhousea.miraicompose.ui.plugin.PluginsWindow
 import com.youngerhousea.miraicompose.ui.setting.SettingWindow
 
@@ -49,6 +50,10 @@ fun MainWindowsView(model: Model) {
                 "关于",
                 if (currentWindow == CurrentWindow.About) AppTheme.colors.backgroundDark else Color.DarkGray
             ) { currentWindow = CurrentWindow.About }
+            SelectText(
+                "日志",
+                if (currentWindow == CurrentWindow.Log) AppTheme.colors.backgroundDark else Color.DarkGray
+            ) { currentWindow = CurrentWindow.Log }
         }
         Crossfade(targetState = currentWindow) { screen ->
             when (screen) {
@@ -56,6 +61,7 @@ fun MainWindowsView(model: Model) {
                 CurrentWindow.Plugin -> PluginsWindow(Modifier.fillMaxSize())
                 CurrentWindow.Setting -> SettingWindow(Modifier.fillMaxSize())
                 CurrentWindow.About -> AboutWindow(Modifier.fillMaxSize())
+                CurrentWindow.Log -> LogWindow(Modifier.fillMaxSize())
             }
         }
     }
@@ -82,5 +88,5 @@ private fun SelectText(text: String, color: Color, onClick: () -> Unit) {
 }
 
 private enum class CurrentWindow {
-    Bot, Setting, About, Plugin
+    Bot, Setting, About, Plugin, Log
 }

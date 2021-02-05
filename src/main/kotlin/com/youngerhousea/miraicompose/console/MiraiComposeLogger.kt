@@ -1,4 +1,3 @@
-
 package com.youngerhousea.miraicompose.console
 
 import net.mamoe.mirai.utils.MiraiInternalApi
@@ -11,8 +10,7 @@ private val LoggerStorage = ArrayList<String>()
 object MiraiComposeLogger
     : PlatformLogger("MiraiCompose", {
     LoggerStorage.add(it)
-    println(it)
 }) {
-    private val logs: MutableList<String> get() = LoggerStorage
+    val logs: MutableList<String> get() = LoggerStorage
     fun clearLog() = logs.clear()
 }

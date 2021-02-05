@@ -13,7 +13,6 @@ import com.youngerhousea.miraicompose.ui.MainWindowsView
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 
 fun MiraiComposeView() {
-    MiraiCompose.start()
     Window(
         title = "Mirai Compose",
         size = IntSize(1280, 768),
@@ -28,5 +27,6 @@ fun MiraiComposeView() {
             }
         }
     }
+    MiraiCompose.start()
 }
 

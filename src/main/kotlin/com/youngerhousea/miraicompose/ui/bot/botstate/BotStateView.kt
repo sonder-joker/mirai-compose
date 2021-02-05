@@ -23,7 +23,7 @@ fun BotStateView(model: ComposeBot) = Box(
     contentAlignment = Alignment.BottomCenter
 ) {
     Column {
-        LogBoxs(
+        LogBox(
             model,
             Modifier
                 .weight(8f)
@@ -35,13 +35,13 @@ fun BotStateView(model: ComposeBot) = Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 40.dp /*vertical = 20.dp*/)
+                .padding(horizontal = 40.dp)
         )
     }
 }
 
 @Composable
-private fun LogBoxs(bot: ComposeBot, modifier: Modifier = Modifier) {
+private fun LogBox(bot: ComposeBot, modifier: Modifier = Modifier) {
     Box(modifier) {
         LazyColumn(
             Modifier
