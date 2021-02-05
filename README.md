@@ -1,5 +1,5 @@
 <div align="center">
-   <img width="160" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.png" alt="logo">
+   <img width="160" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.png" alt="logo"></br>
 
 
    <img width="95" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.svg" alt="title">
@@ -13,8 +13,7 @@ Mirai 是一个在全平台下运行，提供 QQ 协议支持的高效率机器�
 图标以及形象由画师<a href = "">DazeCake</a>绘制
 </div>
 
-# mirai-compose   
-____
+# mirai-compose
 基于[compose-jb](https://github.com/jetbrains/compose-jb)  实现的[mirai-console](https://github.com/mamoe/mirai-console)  前端  
 目前正处于测试阶段。
 
