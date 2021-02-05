@@ -47,13 +47,13 @@ fun MainWindowsView(model: Model) {
                 if (currentWindow == CurrentWindow.Setting) AppTheme.colors.backgroundDark else Color.DarkGray
             ) { currentWindow = CurrentWindow.Setting }
             SelectText(
-                "关于",
-                if (currentWindow == CurrentWindow.About) AppTheme.colors.backgroundDark else Color.DarkGray
-            ) { currentWindow = CurrentWindow.About }
-            SelectText(
                 "日志",
                 if (currentWindow == CurrentWindow.Log) AppTheme.colors.backgroundDark else Color.DarkGray
             ) { currentWindow = CurrentWindow.Log }
+            SelectText(
+                "关于",
+                if (currentWindow == CurrentWindow.About) AppTheme.colors.backgroundDark else Color.DarkGray
+            ) { currentWindow = CurrentWindow.About }
         }
         Crossfade(targetState = currentWindow) { screen ->
             when (screen) {
