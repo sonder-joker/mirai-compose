@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.ui.bot.BotsWindow
+import com.youngerhousea.miraicompose.ui.plugin.PluginsWindow
+import com.youngerhousea.miraicompose.ui.setting.SettingWindow
 
 @Composable
 fun MainWindowsView(model: Model) {

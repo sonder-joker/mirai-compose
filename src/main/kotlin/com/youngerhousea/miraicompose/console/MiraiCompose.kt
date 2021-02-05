@@ -20,7 +20,7 @@ import java.util.*
 
 @OptIn(ConsoleExperimentalApi::class)
 @ConsoleFrontEndImplementation
-object MiraiComposeImplementation : MiraiConsoleImplementation, CoroutineScope by CoroutineScope(
+object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScope(
     NamedSupervisorJob("All") + CoroutineExceptionHandler { _, throwable ->
         if (throwable is CancellationException) {
             return@CoroutineExceptionHandler
@@ -35,19 +35,19 @@ object MiraiComposeImplementation : MiraiConsoleImplementation, CoroutineScope b
         listOf(lazy { JvmPluginLoader })
 
     override val frontEndDescription =
-        ComposeDescription
+        MiraiComposeDescription
 
     override val dataStorageForJvmPluginLoader =
-        MultiFilePluginDataStorage(rootPath.resolve("data"))
+        MultiFilePluginDataStorage(rootPath.resolve("data")).toMiraiCompose()
 
     override val dataStorageForBuiltIns =
-        MultiFilePluginDataStorage(rootPath.resolve("data"))
+        MultiFilePluginDataStorage(rootPath.resolve("data")).toMiraiCompose()
 
     override val configStorageForJvmPluginLoader =
-        MultiFilePluginDataStorage(rootPath.resolve("config"))
+        MultiFilePluginDataStorage(rootPath.resolve("config")).toMiraiCompose()
 
     override val configStorageForBuiltIns =
-        MultiFilePluginDataStorage(rootPath.resolve("config"))
+        MultiFilePluginDataStorage(rootPath.resolve("config")).toMiraiCompose()
 
     override val consoleInput: ConsoleInput =
         MiraiComposeInput
@@ -64,7 +64,7 @@ object MiraiComposeImplementation : MiraiConsoleImplementation, CoroutineScope b
 }
 
 
-object ComposeDescription : MiraiConsoleFrontEndDescription {
+object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val name: String
         get() = "MiraiCompose"
     override val vendor: String

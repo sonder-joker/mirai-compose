@@ -28,7 +28,6 @@ fun BotsWindow(model: Model) {
 
     val panelState = remember { PanelState() }
 
-
     val animatedSize = if (panelState.splitter.isResizing)
         if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
     else
@@ -105,7 +104,7 @@ private fun ResizablePanel(
 
 private class PanelState {
     val collapsedSize = 24.dp
-    var expandedSize by mutableStateOf(300.dp)
+    var expandedSize by mutableStateOf(250.dp)
     val expandedSizeMin = 90.dp
     var isExpanded by mutableStateOf(true)
     val splitter = SplitterState()

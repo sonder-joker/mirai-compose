@@ -7,6 +7,7 @@ fun main() {
     MiraiComposeView()
 }
 
+
 internal fun configureUserDir() {
     val projectDir = runCatching {
         File(".")
@@ -18,4 +19,3 @@ internal fun configureUserDir() {
         println("[Mirai Console] Set user.dir = ${run.absolutePath}")
     }
 }
-

@@ -1,6 +1,6 @@
 package com.youngerhousea.miraicompose.utils
 
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Box
@@ -93,9 +93,10 @@ fun Modifier.cursorForHorizontalResize(): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {
-        AppWindowAmbient.current!!.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
+
+        LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
     } else {
-        AppWindowAmbient.current!!.window.cursor = Cursor.getDefaultCursor()
+        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
     }
 
     pointerMoveFilter(

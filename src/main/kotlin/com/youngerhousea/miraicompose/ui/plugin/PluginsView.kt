@@ -1,57 +1,58 @@
-package com.youngerhousea.miraicompose.ui
+package com.youngerhousea.miraicompose.ui.plugin
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.youngerhousea.miraicompose.console.getPluginData
+import net.mamoe.mirai.console.data.AbstractPluginData
 import net.mamoe.mirai.console.plugin.*
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PluginsWindow(modifier: Modifier) = LazyColumn(
+fun PluginsWindow(modifier: Modifier) = LazyVerticalGrid(
+    cells = GridCells.Adaptive(400.dp),
     modifier,
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Top,
+    contentPadding = PaddingValues(20.dp)
 ) {
-    item {
-        Text(
-            text = "插件列表",
-            modifier = Modifier
-                .preferredHeight(40.dp)
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center,
-        )
-    }
-
     items(PluginManager.plugins) {
-        PluginColumn(
+        PluginCard(
             Modifier
-                .preferredHeight(40.dp)
+                .padding(20.dp)
+                .preferredHeight(200.dp)
                 .fillMaxWidth(), it
         )
     }
 }
 
+
+@Suppress("UNCHECKED_CAST")
 @Composable
-private fun PluginColumn(modifier: Modifier, plugin: Plugin) {
-    Row(
-        modifier,
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        Text(plugin.id)
-        Text(plugin.name)
-        Text(plugin.author)
-        Text(plugin.info)
-        Text(plugin.version.toString())
-        Text("无依赖")
-        Icon(Icons.Default.Settings, "设置")
+private fun PluginCard(modifier: Modifier, plugin: Plugin) {
+    Card(modifier) {
+        Column(
+            Modifier
+                .padding(20.dp)
+                .fillMaxSize()
+        ) {
+            Text(plugin.name, fontWeight = FontWeight.Bold, fontSize = 30.sp)
+            Text("author: ${plugin.author}", fontSize = 15.sp)
+            Text("info: ${plugin.info}", fontSize = 20.sp)
+            Icon(Icons.Default.Settings, "Ban")
+            PluginSettingView(plugin.getPluginData() as MutableList<AbstractPluginData>)
+        }
     }
 }
+

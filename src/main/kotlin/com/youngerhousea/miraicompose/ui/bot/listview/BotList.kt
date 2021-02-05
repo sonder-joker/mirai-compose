@@ -39,7 +39,7 @@ fun BotListView(model: Model, modifier: Modifier = Modifier) = Surface(modifier
                 BotItem(
                     item,
                     Modifier
-                        .preferredHeight(100.dp),
+                        .preferredHeight(itemHeight),
                     updateAction = {
                         model.currentIndex = index
                     },
@@ -55,9 +55,9 @@ fun BotListView(model: Model, modifier: Modifier = Modifier) = Surface(modifier
                         model.bots.add(ComposeBot())
                     },
                     Modifier
-                        .preferredHeight(100.dp)
+                        .preferredHeight(itemHeight)
                 ) {
-                    Text("添加一个机器人", fontWeight = FontWeight.Bold)
+                    Text("添加一个Bot", fontWeight = FontWeight.Bold)
                 }
             }
         }

@@ -5,11 +5,11 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.21-2"
-    id("org.jetbrains.compose") version "0.3.0-build147"
+    kotlin("jvm") version "1.4.30"
+    id("org.jetbrains.compose") version "0.3.0-build149"
 }
 
-group = "com.younger"
+group = "com.youngerhousea"
 version = "1.0"
 
 repositories {
@@ -24,13 +24,9 @@ dependencies {
     implementation("net.mamoe:mirai-console:2.3.2")
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
-
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "15"
+        jvmTarget = "11"
         freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         freeCompilerArgs += "-Xjvm-default=enable"
     }
@@ -42,21 +38,16 @@ kotlin.sourceSets.all {
 
 compose.desktop {
     application {
-        mainClass = "com.youngerhousea.miraidesktop.MainKt"
+        mainClass = "com.youngerhousea.miraicompose.MainKt"
         nativeDistributions {
+
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MiraiCompose"
             version = "0.1.0"
             vendor = "Noire"
 
-            macOS {
-                iconFile.set(project.file("mirai.ico"))
-            }
             windows {
-                iconFile.set(project.file("mirai.ico"))
-            }
-            linux {
-                iconFile.set(project.file("mirai.png"))
+                upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
             }
         }
     }

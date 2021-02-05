@@ -1,12 +1,12 @@
-package com.youngerhousea.miraicompose.ui
+package com.youngerhousea.miraicompose.ui.setting
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
 fun SettingWindow(modifier: Modifier) {
-    Box(modifier) {
+    Column(modifier) {
 
     }
 }
