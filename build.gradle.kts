@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.youngerhousea"
-version = "1.0"
+version = "0.1.0"
 
 repositories {
     jcenter()
@@ -18,10 +18,11 @@ repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
 }
 
+val mirai_version = "2.3.2"
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("net.mamoe:mirai-core:2.3.2")
-    implementation("net.mamoe:mirai-console:2.3.2")
+    implementation("net.mamoe:mirai-core:$mirai_version")
+    implementation("net.mamoe:mirai-console:$mirai_version")
 }
 
 tasks.withType<KotlinCompile> {
@@ -40,13 +41,19 @@ compose.desktop {
     application {
         mainClass = "com.youngerhousea.miraicompose.MainKt"
         nativeDistributions {
-
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MiraiCompose"
             version = "0.1.0"
             vendor = "Noire"
 
+            macOS {
+                iconFile.set(project.file("icons/mirai.icns"))
+            }
+            linux {
+                iconFile.set(project.file("icons/mirai.png"))
+            }
             windows {
+                iconFile.set(project.file("icons/mirai.ico"))
                 upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
             }
         }

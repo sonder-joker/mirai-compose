@@ -13,9 +13,9 @@ internal fun configureUserDir() {
         File(".")
     }.getOrElse { return }
     if (projectDir.isDirectory) {
-        val run = projectDir.resolve("run")
-        run.mkdir()
-        System.setProperty("user.dir", run.absolutePath)
-        println("[Mirai Console] Set user.dir = ${run.absolutePath}")
+        val console = projectDir.resolve("console")
+        console.mkdir()
+        System.setProperty("user.dir", console.absolutePath)
+        println("[Mirai Console] Set user.dir = ${console.absolutePath}")
     }
 }
