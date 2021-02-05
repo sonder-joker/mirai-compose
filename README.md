@@ -1,5 +1,5 @@
 <div align="center">
-   <img width="160" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.png" alt="logo"></br>
+   <img width="160" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.png" alt="logo">
 
 
    <img width="95" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.svg" alt="title">
@@ -18,7 +18,7 @@ ____
 基于[compose-jb](https://github.com/jetbrains/compose-jb)  实现的[mirai-console](https://github.com/mamoe/mirai-console)  前端  
 目前正处于测试阶段。
 
-##使用
+## 使用
 下载对应平台的安装包后启动 
 
 
