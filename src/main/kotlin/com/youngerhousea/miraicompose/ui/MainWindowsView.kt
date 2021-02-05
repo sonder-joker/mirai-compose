@@ -27,10 +27,26 @@ fun MainWindowsView(model: Model) {
                 .background(Color.DarkGray),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            SelectText({ currentWindow = CurrentWindow.Bot }) { Text("机器人") }
-            SelectText({ currentWindow = CurrentWindow.Plugin }) { Text("插件") }
-            SelectText({ currentWindow = CurrentWindow.Setting }) { Text("设置") }
-            SelectText({ currentWindow = CurrentWindow.About }) { Text("关于") }
+            SelectText(
+                "机器人",
+                if (currentWindow == CurrentWindow.Bot) AppTheme.colors.backgroundDark else Color.DarkGray
+            ) {
+                currentWindow = CurrentWindow.Bot
+            }
+            SelectText(
+                "插件",
+                if (currentWindow == CurrentWindow.Plugin) AppTheme.colors.backgroundDark else Color.DarkGray
+            ) {
+                currentWindow = CurrentWindow.Plugin
+            }
+            SelectText(
+                "设置",
+                if (currentWindow == CurrentWindow.Setting) AppTheme.colors.backgroundDark else Color.DarkGray
+            ) { currentWindow = CurrentWindow.Setting }
+            SelectText(
+                "关于",
+                if (currentWindow == CurrentWindow.About) AppTheme.colors.backgroundDark else Color.DarkGray
+            ) { currentWindow = CurrentWindow.About }
         }
         Crossfade(targetState = currentWindow) { screen ->
             when (screen) {
@@ -40,28 +56,25 @@ fun MainWindowsView(model: Model) {
                 CurrentWindow.About -> AboutWindow(Modifier.fillMaxSize())
             }
         }
-
     }
 
 }
 
 
 @Composable
-private fun SelectText(onClick: () -> Unit, content: @Composable () -> Unit) {
+private fun SelectText(text: String, color: Color, onClick: () -> Unit) {
     val singleHeight = 80.dp
-    var currentColorTrue by remember(onClick) { mutableStateOf(false) }
     Box(
         Modifier
             .clickable {
                 onClick()
-                currentColorTrue = !currentColorTrue
             }
             .fillMaxWidth()
             .preferredHeight(singleHeight)
-            .background(if (currentColorTrue) AppTheme.colors.backgroundDark else Color.DarkGray),
+            .background(color),
         contentAlignment = Alignment.Center
     ) {
-        content()
+        Text(text)
     }
     Divider(color = AppTheme.colors.backgroundDark)
 }
