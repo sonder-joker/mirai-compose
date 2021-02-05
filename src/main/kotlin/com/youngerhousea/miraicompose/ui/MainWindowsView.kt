@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,11 +32,13 @@ fun MainWindowsView(model: Model) {
             SelectText({ currentWindow = CurrentWindow.Setting }) { Text("设置") }
             SelectText({ currentWindow = CurrentWindow.About }) { Text("关于") }
         }
-        when (currentWindow) {
-            CurrentWindow.Bot -> BotsWindow(model)
-            CurrentWindow.Plugin -> PluginsWindow(Modifier.fillMaxSize())
-            CurrentWindow.Setting -> SettingWindow(Modifier.fillMaxSize())
-            CurrentWindow.About -> AboutWindow(Modifier.fillMaxSize())
+        Crossfade(targetState = currentWindow) { screen ->
+            when (screen) {
+                CurrentWindow.Bot -> BotsWindow(model)
+                CurrentWindow.Plugin -> PluginsWindow(Modifier.fillMaxSize())
+                CurrentWindow.Setting -> SettingWindow(Modifier.fillMaxSize())
+                CurrentWindow.About -> AboutWindow(Modifier.fillMaxSize())
+            }
         }
 
     }
@@ -44,7 +47,7 @@ fun MainWindowsView(model: Model) {
 
 
 @Composable
-private fun SelectText(onClick: () -> Unit, content: @Composable() () -> Unit) {
+private fun SelectText(onClick: () -> Unit, content: @Composable () -> Unit) {
     val singleHeight = 80.dp
     var currentColorTrue by remember(onClick) { mutableStateOf(false) }
     Box(
