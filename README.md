@@ -1,5 +1,5 @@
 <div align="center">
-   <img width="160" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.png" alt="logo"></br>
+   <img width="160" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.png" alt="logo">
 
 
    <img width="95" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.svg" alt="title">
@@ -19,6 +19,7 @@ ____
 目前正处于测试阶段。
 
 ##使用
+____
 下载对应平台的安装包后启动 
 
 
