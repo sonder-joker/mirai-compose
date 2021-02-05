@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botlistview
+package com.youngerhousea.miraicompose.ui.bot.listview
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

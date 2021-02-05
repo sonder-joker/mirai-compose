@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botview
+package com.youngerhousea.miraicompose.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,7 +16,7 @@ import net.mamoe.mirai.console.plugin.*
 
 
 @Composable
-fun SettingWindow(modifier: Modifier) = LazyColumn(
+fun PluginsWindow(modifier: Modifier) = LazyColumn(
     modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,

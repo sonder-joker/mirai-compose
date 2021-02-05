@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botview
+package com.youngerhousea.miraicompose.ui.bot.botstate
 
 import androidx.compose.runtime.Composable
 import com.youngerhousea.miraicompose.model.BotState
@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.MiraiConsole
 
 @Composable
-fun BotWindow(model: ComposeBot) =
+fun BotChooseWindow(model: ComposeBot) =
     when (model.state) {
         BotState.None -> {
             BotLoginView(model.loginWindowState) {

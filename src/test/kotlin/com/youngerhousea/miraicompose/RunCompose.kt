@@ -1,9 +1,7 @@
 package com.youngerhousea.miraicompose
 
-import com.youngerhousea.miraicompose.ui.MiraiComposeView
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import java.io.File
 
 fun main() {
