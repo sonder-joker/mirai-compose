@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.theme.AppTheme
+import com.youngerhousea.miraicompose.ui.about.AboutWindow
 import com.youngerhousea.miraicompose.ui.bot.BotsWindow
 import com.youngerhousea.miraicompose.ui.log.LogWindow
 import com.youngerhousea.miraicompose.ui.plugin.PluginsWindow

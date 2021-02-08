@@ -1,21 +1,35 @@
 package com.youngerhousea.miraicompose
 
-import java.io.File
+import com.youngerhousea.miraicompose.console.BufferedOutputStream
+import com.youngerhousea.miraicompose.console.MiraiCompose
+import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
+import net.mamoe.mirai.utils.MiraiLogger
+import java.io.PrintStream
 
 fun main() {
-    configureUserDir()
+    MiraiCompose.start()
+    setSystemOut()
     MiraiComposeView()
 }
 
-
-internal fun configureUserDir() {
-    val projectDir = runCatching {
-        File(".")
-    }.getOrElse { return }
-    if (projectDir.isDirectory) {
-        val console = projectDir.resolve("console")
-        console.mkdir()
-        System.setProperty("user.dir", console.absolutePath)
-        println("[Mirai Console] Set user.dir = ${console.absolutePath}")
-    }
+internal fun setSystemOut() {
+    System.setOut(
+        PrintStream(
+            BufferedOutputStream(
+                logger = MiraiLogger.create("stdout").run { ({ line: String? -> info(line) }) }
+            ),
+            false,
+            "UTF-8"
+        )
+    )
+    System.setErr(
+        PrintStream(
+            BufferedOutputStream(
+                logger = MiraiLogger.create("stderr").run { ({ line: String? -> warning(line) }) }
+            ),
+            false,
+            "UTF-8"
+        )
+    )
 }
+

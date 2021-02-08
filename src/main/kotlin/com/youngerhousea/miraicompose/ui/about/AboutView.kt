@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui
+package com.youngerhousea.miraicompose.ui.about
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

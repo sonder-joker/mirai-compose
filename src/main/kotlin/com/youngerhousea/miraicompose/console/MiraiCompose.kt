@@ -13,9 +13,12 @@ import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.*
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 
 
 @OptIn(ConsoleExperimentalApi::class)
@@ -29,7 +32,7 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     }
 ) {
     override val rootPath: Path =
-        Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
+        Paths.get(System.getProperty("user.dir", ".")).resolve("console").toAbsolutePath()
 
     override val builtInPluginLoaders =
         listOf(lazy { JvmPluginLoader })
@@ -61,6 +64,9 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     @OptIn(MiraiExperimentalApi::class)
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
+
+    @OptIn(ExperimentalPathApi::class)
+    val logFiles = rootPath.resolve("composelog").createDirectories()
 }
 
 
