@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose
+package com.youngerhousea.miraicompose.ui
 
 import androidx.compose.desktop.Window
 import androidx.compose.material.MaterialTheme

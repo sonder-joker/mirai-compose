@@ -33,3 +33,11 @@ fun MultiFilePluginDataStorage.toMiraiCompose(): MiraiComposeDataStorageForJvmPl
 @OptIn(ConsoleExperimentalApi::class)
 fun Plugin.getPluginData(): MutableList<PluginData> =
     MiraiCompose.dataStorageForJvmPluginLoader.data.getOrDefault(this as PluginDataHolder, mutableListOf())
+
+@OptIn(ConsoleExperimentalApi::class)
+fun  Plugin.getAllConfig()=
+    MiraiCompose.configStorageForJvmPluginLoader.data.getOrDefault(this as PluginDataHolder, mutableListOf())
+
+@OptIn(ConsoleExperimentalApi::class)
+fun Plugin.getPluginConfig() =
+    MiraiCompose.configStorageForJvmPluginLoader.data.getOrDefault(this as PluginDataHolder, mutableListOf())

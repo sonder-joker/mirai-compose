@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.4.30"
     id("org.jetbrains.compose") version "0.3.0-build149"
+    kotlin("plugin.serialization") version "1.4.30"
 }
 
 group = "com.youngerhousea"
@@ -15,7 +16,7 @@ version = "0.1.0"
 repositories {
     jcenter()
     mavenCentral()
-    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 val mirai_version = "2.3.2"
@@ -24,6 +25,7 @@ dependencies {
     implementation("net.mamoe:mirai-core:$mirai_version")
     implementation("net.mamoe:mirai-console:$mirai_version")
     implementation(kotlin("stdlib-jdk8"))
+    implementation("net.mamoe.yamlkt:yamlkt:0.7.5")
 }
 
 tasks.withType<KotlinCompile> {

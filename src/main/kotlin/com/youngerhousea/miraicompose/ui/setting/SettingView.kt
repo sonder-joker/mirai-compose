@@ -7,6 +7,6 @@ import androidx.compose.ui.Modifier
 @Composable
 fun SettingWindow(modifier: Modifier) {
     Column(modifier) {
-
+        
     }
 }

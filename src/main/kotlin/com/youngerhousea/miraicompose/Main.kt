@@ -2,6 +2,7 @@ package com.youngerhousea.miraicompose
 
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
 import com.youngerhousea.miraicompose.console.MiraiCompose
+import com.youngerhousea.miraicompose.ui.MiraiComposeView
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.utils.MiraiLogger
 import java.io.PrintStream
