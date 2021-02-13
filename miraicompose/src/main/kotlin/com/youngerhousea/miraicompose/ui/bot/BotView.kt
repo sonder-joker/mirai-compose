@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.ui.bot.botstate.BotChooseWindow
+import com.youngerhousea.miraicompose.ui.bot.botstate.BotEmptyWindow
 import com.youngerhousea.miraicompose.ui.bot.listview.BotListView
 import com.youngerhousea.miraicompose.ui.bot.listview.TopView
 import com.youngerhousea.miraicompose.utils.SplitterState
@@ -63,7 +64,14 @@ fun BotsWindow(model: Model) {
                 )
             }
         }
-        BotChooseWindow(model.currentBot)
+
+
+
+        if (model.currentIndex < 0)
+            BotEmptyWindow()
+        else
+            BotChooseWindow(model.currentBot)
+
     }
 }
 

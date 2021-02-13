@@ -3,7 +3,7 @@ object Versions {
 
     const val kotlin = "1.4.30"
 
-    const val mirai = "2.3.2"
+    const val mirai = "2.5.0-dev-1"
 
     const val yamlkt = "0.7.5"
 

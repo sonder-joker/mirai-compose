@@ -27,28 +27,27 @@ import net.mamoe.mirai.console.command.parse.CommandCall
 import net.mamoe.mirai.console.command.parse.CommandValueArgument
 import net.mamoe.mirai.console.util.cast
 import net.mamoe.mirai.console.util.safeCast
-import net.mamoe.mirai.event.events.BotOfflineEvent
 import net.mamoe.mirai.utils.warning
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 @Composable
-fun BotStateView(model: ComposeBot) = Box(
+fun BotStateView(bot: ComposeBot) = Box(
     Modifier
         .fillMaxSize(),
     contentAlignment = Alignment.BottomCenter
 ) {
-
     Column {
+        // TODO: 2021/2/14 重定向bot日志到此处 
         LogBox(
-            model,
+            bot,
             Modifier
                 .weight(8f)
                 .padding(horizontal = 40.dp)
                 .fillMaxWidth()
         )
         CommandSendBox(
-            model,
+            bot,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
@@ -71,13 +70,13 @@ private fun LogBox(bot: ComposeBot, modifier: Modifier = Modifier) {
                         .padding(vertical = 5.dp)
                 )
             }
-            items(bot.event) {
-                when(it) {
-                    is BotOfflineEvent -> {
-
-                    }
-                }
-            }
+//            items(bot.event) {
+//                when(it) {
+//                    is BotOfflineEvent -> {
+//
+//                    }
+//                }
+//            }
         }
     }
 }
@@ -105,8 +104,9 @@ private fun CommandSendBox(bot: ComposeBot, modifier: Modifier = Modifier) {
             {
                 MiraiConsole.launch {
                     solveCommandResult(currentCommand, bot)
+                }.invokeOnCompletion {
+                    currentCommand = ""
                 }
-                currentCommand = ""
             }, modifier = Modifier
                 .weight(2f),
             backgroundColor = AppTheme.colors.backgroundDark
@@ -126,7 +126,7 @@ private suspend fun solveCommandResult(
         is CommandExecuteResult.Success -> {
 
         }
-        is CommandExecuteResult.IllegalArgument -> { // user wouldn't want stacktrace for a parser error unless it is in debugging mode (to do).
+        is CommandExecuteResult.IllegalArgument -> {
             val message = result.exception.message
             if (message != null) {
                 bot.logger.identity

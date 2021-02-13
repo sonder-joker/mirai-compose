@@ -1,4 +1,3 @@
-
 package com.youngerhousea.miraicompose.ui.bot.botstate
 
 import androidx.compose.foundation.layout.*
@@ -68,23 +67,22 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) =
 
         BotLoginButton(
             {
-                kotlin.runCatching {
-                    onClick()
-                }.onFailure {
-                    loginWindowState.exceptionPrompt = when (it) {
-                        is WrongPasswordException -> {
-                            "密码错误！"
+                runCatching(onClick)
+                    .onFailure {
+                        loginWindowState.exceptionPrompt = when (it) {
+                            is WrongPasswordException -> {
+                                "密码错误！"
+                            }
+                            is NumberFormatException -> {
+                                "格式错误！"
+                            }
+                            else -> {
+                                it.printStackTrace()
+                                "呜呜呜"
+                            }
                         }
-                        is NumberFormatException -> {
-                            "格式错误！"
-                        }
-                        else -> {
-                            it.printStackTrace()
-                            "呜呜呜"
-                        }
+                        loginWindowState.isException = true
                     }
-                    loginWindowState.isException = true
-                }
             }, modifier = Modifier
                 .requiredHeight(100.dp)
         ) {
@@ -99,7 +97,7 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) =
 
 @Composable
 fun BotLoginButton(
-    onClick:  () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {

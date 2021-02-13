@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun BotChooseWindow(model: ComposeBot) {
     val loginWindowState = remember(model) { LoginWindowState() }
+
     when (model.state) {
         BotState.None -> {
             BotLoginView(loginWindowState) {

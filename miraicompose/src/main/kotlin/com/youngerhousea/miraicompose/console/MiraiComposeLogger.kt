@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.console
 
+import androidx.compose.runtime.mutableStateListOf
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.PlatformLogger
 import java.io.ByteArrayOutputStream
@@ -10,7 +11,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
-private val LoggerStorage = ArrayList<String>()
+private val LoggerStorage = mutableStateListOf<String>()
 private val time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
 
 internal fun writeToFile(it: String) {

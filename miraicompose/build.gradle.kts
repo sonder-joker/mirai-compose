@@ -17,6 +17,7 @@ dependencies {
 
     implementation(`mirai-core`)
     implementation(`mirai-console`)
+    runtimeOnly("net.mamoe:mirai-login-solver-selenium:1.0-dev-16")
 
     implementation(yamlkt)
 }

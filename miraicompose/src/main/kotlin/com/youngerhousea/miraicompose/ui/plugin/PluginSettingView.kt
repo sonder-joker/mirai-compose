@@ -1,6 +1,7 @@
 package com.youngerhousea.miraicompose.ui.plugin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -42,7 +43,11 @@ fun PluginSettingView(pluginDatas: List<PluginData>) {
                     else -> "未知类型数据"
                 }
             }
-            Text("$kind:${pluginData.saveName}", Modifier.padding(bottom = 40.dp), fontSize = 20.sp)
+            Text(
+                "$kind:${pluginData.saveName}", Modifier
+                    .padding(bottom = 40.dp),
+                fontSize = 20.sp
+            )
             var value by remember(pluginData) {
                 mutableStateOf(
                     yaml.encodeToString(

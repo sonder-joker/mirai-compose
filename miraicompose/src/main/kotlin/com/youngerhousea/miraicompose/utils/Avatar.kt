@@ -10,7 +10,9 @@ private val client = HttpClient()
 
 suspend fun String.toAvatarImage(): ImageBitmap {
     return org.jetbrains.skija.Image.makeFromEncoded(
-        client.get(this@toAvatarImage)
+        client.get(this@toAvatarImage) {
+            header("Connection", "close")
+        }
     ).asImageBitmap()
 }
 

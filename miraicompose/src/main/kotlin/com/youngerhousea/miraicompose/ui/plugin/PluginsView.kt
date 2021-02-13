@@ -5,30 +5,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.console.getPluginConfig
 import com.youngerhousea.miraicompose.console.getPluginData
+import com.youngerhousea.miraicompose.model.PluginState
 import net.mamoe.mirai.console.plugin.*
 
 
 @Composable
-fun PluginsWindow() {
-    var isSingleCard by remember { mutableStateOf(false) }
-    var currentIndex by remember { mutableStateOf(0) }
+fun PluginsWindow(pluginState: PluginState) {
 
-    if (isSingleCard) {
+    if (pluginState.isSingleCard) {
         DetailedPluginCard(
-            PluginManager.plugins[currentIndex]
+            PluginManager.plugins[pluginState.currentIndex]
         ) {
-            isSingleCard = false
+            pluginState.isSingleCard = false
         }
     } else {
         LazyVerticalGrid(
@@ -40,8 +40,8 @@ fun PluginsWindow() {
                     Modifier
                         .padding(20.dp)
                         .clickable {
-                            currentIndex = index
-                            isSingleCard = true
+                            pluginState.currentIndex = index
+                            pluginState.isSingleCard = true
                         }
                         .requiredHeight(200.dp)
                         .fillMaxWidth(),
