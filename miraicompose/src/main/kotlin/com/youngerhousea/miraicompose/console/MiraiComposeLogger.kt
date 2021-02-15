@@ -1,35 +1,96 @@
 package com.youngerhousea.miraicompose.console
 
 import androidx.compose.runtime.mutableStateListOf
-import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.PlatformLogger
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import com.youngerhousea.miraicompose.model.getLog
+import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
+import net.mamoe.mirai.utils.SimpleLogger
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 
-private val LoggerStorage = mutableStateListOf<String>()
-private val time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
+val LoggerStorage = mutableStateListOf<AnnotatedString>()
+
+private val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.SIMPLIFIED_CHINESE)
+private val currentTimeFormatted: String get() = timeFormat.format(Date())
+
 
 internal fun writeToFile(it: String) {
     Files.write(
         MiraiCompose.logFiles.resolve(
-            "$time.txt"
+            "$currentTimeFormatted.txt"
         ),
         "$it\n".toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND
     )
 }
 
-@OptIn(MiraiInternalApi::class)
-object MiraiComposeLogger
-    : PlatformLogger("MiraiCompose", {
-    writeToFile(it)
-    LoggerStorage.add(it)
-}, isColored = false) {
-    val logs: MutableList<String> get() = LoggerStorage
+class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBase() {
+
+    private val currentTimeFormatted: String get() = timeFormat.format(Date())
+
+
+    private val SimpleLogger.LogPriority.color: Color
+        get() = when (this) {
+            SimpleLogger.LogPriority.VERBOSE -> Color.Blue
+            SimpleLogger.LogPriority.INFO -> Color.Gray
+            SimpleLogger.LogPriority.WARNING -> Color.Green
+            SimpleLogger.LogPriority.ERROR -> Color.Red
+            SimpleLogger.LogPriority.DEBUG -> Color.Yellow
+        }
+
+    private fun printLog(message: String?, priority: SimpleLogger.LogPriority) {
+        if (message != null) {
+            val annotatedLog =
+                AnnotatedString("$currentTimeFormatted ${priority.simpleName}/$identity: $message", SpanStyle(priority.color))
+
+            LoggerStorage.add(annotatedLog)
+            writeToFile(message)
+
+            if (identity?.matches("^Bot.[0-9]+$".toRegex()) == true) {
+                // no exception
+
+            }
+        }
+    }
+
+    public override fun verbose0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.VERBOSE)
+
+    public override fun verbose0(message: String?, e: Throwable?) {
+        if (e != null) verbose((message ?: e.toString()) + "\n${e.stackTraceString}")
+        else verbose(message.toString())
+    }
+
+    public override fun info0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.INFO)
+    public override fun info0(message: String?, e: Throwable?) {
+        if (e != null) info((message ?: e.toString()) + "\n${e.stackTraceString}")
+        else info(message.toString())
+    }
+
+    public override fun warning0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.WARNING)
+    public override fun warning0(message: String?, e: Throwable?) {
+        if (e != null) warning((message ?: e.toString()) + "\n${e.stackTraceString}")
+        else warning(message.toString())
+    }
+
+    public override fun error0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.ERROR)
+    public override fun error0(message: String?, e: Throwable?) {
+        if (e != null) error((message ?: e.toString()) + "\n${e.stackTraceString}")
+        else error(message.toString())
+    }
+
+    public override fun debug0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.DEBUG)
+    public override fun debug0(message: String?, e: Throwable?) {
+        if (e != null) debug((message ?: e.toString()) + "\n${e.stackTraceString}")
+        else debug(message.toString())
+    }
+
 }
 
 
@@ -101,3 +162,6 @@ internal class BufferedOutputStream constructor(
     }
 }
 
+@get:JvmSynthetic
+internal val Throwable.stackTraceString
+    get() = this.stackTraceToString()

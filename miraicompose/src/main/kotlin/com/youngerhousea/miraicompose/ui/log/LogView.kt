@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.youngerhousea.miraicompose.console.LoggerStorage
 import com.youngerhousea.miraicompose.console.MiraiComposeLogger
 
 @Composable
@@ -16,7 +17,7 @@ fun LogWindow() {
         Modifier
             .fillMaxWidth()
     ) {
-        items(MiraiComposeLogger.logs) {
+        items(LoggerStorage) {
             Text(
                 it,
                 modifier = Modifier

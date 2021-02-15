@@ -38,7 +38,7 @@ fun BotStateView(bot: ComposeBot) = Box(
     contentAlignment = Alignment.BottomCenter
 ) {
     Column {
-        // TODO: 2021/2/14 重定向bot日志到此处 
+        // TODO: 2021/2/14 重定向bot日志到此处
         LogBox(
             bot,
             Modifier
@@ -63,20 +63,9 @@ private fun LogBox(bot: ComposeBot, modifier: Modifier = Modifier) {
             Modifier
                 .fillMaxWidth()
         ) {
-            items(bot.messages) {
-                Text(
-                    "${it.sender.nick} in ${it.time} say: ${it.message}",
-                    modifier = Modifier
-                        .padding(vertical = 5.dp)
-                )
+            items(bot.log) {
+                Text(it, modifier = Modifier.padding(vertical = 5.dp))
             }
-//            items(bot.event) {
-//                when(it) {
-//                    is BotOfflineEvent -> {
-//
-//                    }
-//                }
-//            }
         }
     }
 }
@@ -176,7 +165,8 @@ private fun List<CommandValueParameter<*>>.anyStringConstantUnmatched(arguments:
 @OptIn(ExperimentalCommandDescriptors::class)
 internal fun UnmatchedCommandSignature.render(command: Command): String {
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-    val usage = net.mamoe.mirai.console.internal.command.CommandReflector.generateUsage(command, null, listOf(this.signature))
+    val usage =
+        net.mamoe.mirai.console.internal.command.CommandReflector.generateUsage(command, null, listOf(this.signature))
     return usage.trim() + "    (${failureReason.render()})"
 }
 

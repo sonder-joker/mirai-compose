@@ -40,13 +40,13 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
         MultiFilePluginDataStorage(rootPath.resolve("data")).toMiraiCompose()
 
     override val dataStorageForBuiltIns =
-        MultiFilePluginDataStorage(rootPath.resolve("data")).toMiraiCompose()
+        MultiFilePluginDataStorage(rootPath.resolve("data"))
 
     override val configStorageForJvmPluginLoader =
         MultiFilePluginDataStorage(rootPath.resolve("config")).toMiraiCompose()
 
     override val configStorageForBuiltIns =
-        MultiFilePluginDataStorage(rootPath.resolve("config")).toMiraiCompose()
+        MultiFilePluginDataStorage(rootPath.resolve("config"))
 
     override val consoleInput: ConsoleInput =
         MiraiComposeInput
@@ -55,13 +55,13 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
         MiraiComposeSender
 
     override fun createLogger(identity: String?): MiraiLogger =
-        MiraiComposeLogger
+        MiraiComposeLogger(identity)
 
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-
     val logFiles = rootPath.resolve("composelog").createDirectories()
+
 }
 
 

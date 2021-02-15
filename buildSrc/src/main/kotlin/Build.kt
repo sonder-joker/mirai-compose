@@ -3,5 +3,6 @@ import org.gradle.api.Project
 
 class Build : Plugin<Project> {
     override fun apply(target: Project) {
+        
     }
 }

@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose
 
+import net.mamoe.mirai.BotFactory
 import java.io.File
 
 fun main() {

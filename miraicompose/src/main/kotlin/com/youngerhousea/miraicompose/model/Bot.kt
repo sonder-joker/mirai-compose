@@ -6,23 +6,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.text.AnnotatedString
 import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.utils.toAvatarImage
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.alsoLogin
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
 
 interface ComposeBot {
     var state: BotState
 
     val logger: MiraiLogger
-
-    val messages: SnapshotStateList<MessageEvent>
 
     val event: SnapshotStateList<BotEvent>
 
@@ -31,6 +28,8 @@ interface ComposeBot {
     val id: String
 
     val avatar: ImageBitmap
+
+    val log: SnapshotStateList<AnnotatedString>
 
     suspend fun login(account: String, password: String)
 
@@ -48,8 +47,6 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
 
     override val logger: MiraiLogger get() = _bot!!.logger
 
-    override val messages = mutableStateListOf<MessageEvent>()
-
     override val event = mutableStateListOf<BotEvent>()
 
     override val nick
@@ -65,9 +62,10 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
             BotState.Login -> _bot!!.id.toString()
         }
 
-
     override val avatar
         get() = _avatar
+
+    override val log: SnapshotStateList<AnnotatedString> = mutableStateListOf()
 
 
     override suspend fun login(account: String, password: String) {
@@ -75,9 +73,9 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
             _bot!!.login()
         else {
             state = BotState.Loading
-            _bot = BotFactory.newBot(account.toLong(), password, BotConfiguration().apply {
+            _bot = MiraiConsole.addBot(account.toLong(), password) {
                 fileBasedDeviceInfo()
-            }).alsoLogin()
+            }.alsoLogin()
             state = BotState.Login
             loadResource()
         }
@@ -94,10 +92,6 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
 
     private suspend fun loadResource() {
         _avatar = _bot!!.avatarUrl.toAvatarImage()
-
-        _bot!!.eventChannel.subscribeAlways<MessageEvent> {
-            messages.add(this)
-        }
 
         _bot!!.eventChannel.subscribeAlways<BotEvent> {
             event.add(this)
