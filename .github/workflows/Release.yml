@@ -1,8 +1,8 @@
-name: Build
+name: Release
 
 on:
   push:
-    branches: [ dev, master ]
+    branches: [ master ]
     paths-ignore:
       - README.md
       - icons/*
@@ -26,6 +26,8 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew runDistributable
 
+      - name: Build Deb
+        run: ./gradlew packageDeb
 
   job_windows:
     runs-on: windows-latest
@@ -44,6 +46,21 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew runDistributable
 
+      - name: Build Msi
+        run: ./gradlew packageMsi
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            发布！
+          draft: false
+          prerelease: false
 
   job_macos:
     runs-on: macos-latest
@@ -61,3 +78,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew runDistributable
+
+      - name: Build Dmg
+        run: ./gradlew packageDmg
