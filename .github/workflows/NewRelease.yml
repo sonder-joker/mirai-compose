@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  job_create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Mirai compose ${{ github.ref }}
+          body: |
+            正式发布，请通过解压使用
+          draft: false
+          prerelease: false
+
+  job_upload_release:
+    name: Build
+    needs: job_create_release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest, macOS-latest ]
+        include:
+          - os: windows-latest
+            package_path: tar -a -c -f mirai-compose-package.zip ./miraicompose/build/compose/binaries/main/app/*
+            install_path: tar -a -c -f mirai-compose-install.zip ./miraicompose/build/compose/binaries/main/msi/*
+            assert_p: mirai-compose-package.zip
+            assert_i: mirai-compose-install.zip
+
+          - os: ubuntu-latest
+            package_path: tar -zcvf mirai-compose-package.tar.gz ./miraicompose/build/compose/binaries/main/app/*
+            install_path: tar -a -c -f mirai-compose-install.tar.gz ./miraicompose/build/compose/binaries/main/deb/*
+            assert_p: mirai-compose-package.tar.gz
+            assert_i: mirai-compose-install.tar.gz
+
+          - os: macOS-latest
+            package_path: zip -r mirai-compose-package.zip ./miraicompose/build/compose/binaries/main/app/* -x "*.DS_Store"
+            install_path: zip -r mirai-compose-install.zip ./miraicompose/build/compose/binaries/main/dmg/* -x "*.DS_Store"
+            assert_p: mirai-compose-package.zip
+            assert_i: mirai-compose-install.zip
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 15
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      - name: Init gradle project
+        run: ./gradlew clean
+
+      - name: Build Package
+        run: ./gradlew package
+
+      - name: Build Distributable
+        run: ./gradlew createDistributable
+
+      - name: Package Distributable
+        run: |
+          ${{ matrix.package_path }}
+          ${{ matrix.install_path }}
+
+      - name: Upload package
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.job_create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.assert_p }}
+          asset_name: ${{ matrix.os }}-${{ matrix.assert_p }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload Install
+        id: upload-release-install
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.job_create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.assert_i }}
+          asset_name: ${{ matrix.os }}-${{ matrix.assert_i }}
+          asset_content_type: application/octet-stream

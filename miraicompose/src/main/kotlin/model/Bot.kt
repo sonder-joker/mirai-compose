@@ -29,6 +29,7 @@ interface ComposeBot {
 
     val avatar: ImageBitmap
 
+    fun toBot(): Bot
 
     suspend fun login(account: String, password: String)
 
@@ -36,6 +37,7 @@ interface ComposeBot {
         operator fun invoke(bot: Bot? = null): ComposeBot = ComposeBotImpl(bot)
     }
 }
+
 
 internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
     private var _bot: Bot? = bot
@@ -50,8 +52,8 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
 
     override val nick
         get() = when (state) {
-            BotState.None -> "Î´µÇÂ¼"
-            BotState.Loading -> "¼ÓÔØÖÐ"
+            BotState.None -> "æœªç™»å½•"
+            BotState.Loading -> "åŠ è½½ä¸­"
             BotState.Login -> _bot!!.nick
         }
 
@@ -63,6 +65,13 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
 
     override val avatar
         get() = _avatar
+
+    override fun toBot(): Bot {
+        if(_bot != null)
+            return _bot as Bot
+        else
+            error("Don't have a bot")
+    }
 
     override suspend fun login(account: String, password: String) {
         if (state == BotState.Login)
@@ -95,6 +104,8 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
     }
 
 }
+
+
 
 enum class BotState {
     None, Loading, Login

@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.bot.botstate
+package com.youngerhousea.miraicompose.ui.botstate
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +29,7 @@ import net.mamoe.mirai.console.command.parse.CommandCall
 import net.mamoe.mirai.console.command.parse.CommandValueArgument
 import net.mamoe.mirai.console.util.cast
 import net.mamoe.mirai.console.util.safeCast
+import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.warning
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -93,13 +94,14 @@ private fun CommandSendBox(bot: ComposeBot, modifier: Modifier = Modifier) {
         FloatingActionButton(
             {
                 MiraiConsole.launch {
-                    solveCommandResult(currentCommand, bot)
+                    SolveCommandResult(currentCommand, bot.logger)
                 }.invokeOnCompletion {
                     currentCommand = ""
                 }
             }, modifier = Modifier
                 .weight(2f),
-            backgroundColor = AppTheme.Colors.backgroundDark
+            backgroundColor = AppTheme.Colors.backgroundDark,
+
         ) {
             Text("发送")
         }
@@ -108,9 +110,9 @@ private fun CommandSendBox(bot: ComposeBot, modifier: Modifier = Modifier) {
 
 
 @OptIn(ExperimentalCommandDescriptors::class)
-private suspend fun solveCommandResult(
+private suspend fun SolveCommandResult(
     currentCommand: String,
-    bot: ComposeBot
+    logger: MiraiLogger
 ) {
     when (val result = ConsoleCommandSender.executeCommand(currentCommand)) {
         is CommandExecuteResult.Success -> {
@@ -119,24 +121,24 @@ private suspend fun solveCommandResult(
         is CommandExecuteResult.IllegalArgument -> {
             val message = result.exception.message
             if (message != null) {
-                bot.logger.identity
-                bot.logger.warning(message)
-            } else bot.logger.warning(result.exception)
+                logger.identity
+                logger.warning(message)
+            } else logger.warning(result.exception)
         }
         is CommandExecuteResult.ExecutionFailed -> {
-            bot.logger.error(result.exception)
+            logger.error(result.exception)
         }
         is CommandExecuteResult.UnresolvedCommand -> {
-            bot.logger.warning { "未知指令: ${currentCommand}, 输入 ? 获取帮助" }
+            logger.warning { "未知指令: ${currentCommand}, 输入 ? 获取帮助" }
         }
         is CommandExecuteResult.PermissionDenied -> {
-            bot.logger.warning { "权限不足." }
+            logger.warning { "权限不足." }
         }
         is CommandExecuteResult.UnmatchedSignature -> {
-            bot.logger.warning { "参数不匹配, 你是否想执行: \n" + result.failureReasons.render(result.command, result.call) }
+            logger.warning { "参数不匹配, 你是否想执行: \n" + result.failureReasons.render(result.command, result.call) }
         }
         is CommandExecuteResult.Failure -> {
-            bot.logger.warning { result.toString() }
+            logger.warning { result.toString() }
         }
     }
 }

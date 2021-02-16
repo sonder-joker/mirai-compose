@@ -29,7 +29,7 @@ fun VerticalSplittable(
 ) = Layout({
     children()
     VerticalSplitter(splitterState, onResize)
-}, modifier, measureBlock = { measurables, constraints ->
+}, modifier, measurePolicy = { measurables, constraints ->
     require(measurables.size == 3)
 
     val firstPlaceable = measurables[0].measure(constraints.copy(minWidth = 0))
@@ -93,7 +93,6 @@ fun Modifier.cursorForHorizontalResize(): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {
-
         LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
     } else {
         LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
@@ -104,3 +103,4 @@ fun Modifier.cursorForHorizontalResize(): Modifier = composed {
         onExit = { isHover = false; true }
     )
 }
+

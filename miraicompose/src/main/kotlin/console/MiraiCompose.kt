@@ -1,8 +1,13 @@
 package com.youngerhousea.miraicompose.console
 
+import androidx.compose.runtime.ProvidedValue
+import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.model.Model
+import com.youngerhousea.miraicompose.ui.MiraiComposeView
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
@@ -12,6 +17,7 @@ import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.*
+import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
@@ -60,10 +66,47 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    val logFiles = rootPath.resolve("composelog").createDirectories()
+    val composeFile = rootPath.resolve("compose").createDirectories()
 
+    val logFiles = composeFile.resolve("log").createDirectories()
+
+    val model = Model()
+
+    override fun preStart() {
+        setSystemOut()
+        MiraiComposeView(model)
+    }
+
+    override fun postPhase(phase: String) {
+        if (phase == "auto-login bots") {
+            Bot.instances.forEach {
+                model.bots.add(ComposeBot(it))
+            }
+        }
+    }
 }
 
+
+internal fun setSystemOut() {
+    System.setOut(
+        PrintStream(
+            BufferedOutputStream(
+                logger = MiraiLogger.create("stdout").run { ({ line: String? -> info(line) }) }
+            ),
+            false,
+            "UTF-8"
+        )
+    )
+    System.setErr(
+        PrintStream(
+            BufferedOutputStream(
+                logger = MiraiLogger.create("stdout").run { ({ line: String? -> info(line) }) }
+            ),
+            false,
+            "UTF-8"
+        )
+    )
+}
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val name: String
@@ -71,5 +114,5 @@ object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val vendor: String
         get() = "Noire"
     override val version: SemVersion
-        get() = SemVersion("0.1.0")
+        get() = SemVersion("1.0.0")
 }

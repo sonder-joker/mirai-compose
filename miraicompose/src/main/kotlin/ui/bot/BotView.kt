@@ -26,7 +26,6 @@ import com.youngerhousea.miraicompose.utils.VerticalSplittable
 
 @Composable
 fun BotsWindow(model: Model) {
-
     val panelState = remember { PanelState() }
 
     val animatedSize = if (panelState.splitter.isResizing)
@@ -65,13 +64,12 @@ fun BotsWindow(model: Model) {
             }
         }
 
-
-
-        if (model.currentIndex < 0)
+        if (model.currentIndex == -1) {
             BotEmptyWindow()
-        else
+        }
+        else {
             BotChooseWindow(model.currentBot)
-
+        }
     }
 }
 

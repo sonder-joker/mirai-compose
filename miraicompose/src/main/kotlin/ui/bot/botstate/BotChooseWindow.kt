@@ -1,12 +1,14 @@
 package com.youngerhousea.miraicompose.ui.bot.botstate
 
+import androidx.compose.desktop.LocalAppWindow
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.model.BotState
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.LoginWindowState
+import com.youngerhousea.miraicompose.ui.botstate.BotStateView
 import kotlinx.coroutines.launch
 
 @Composable

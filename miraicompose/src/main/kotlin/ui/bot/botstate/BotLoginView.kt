@@ -15,7 +15,7 @@ import com.youngerhousea.miraicompose.theme.ResourceImage
 import net.mamoe.mirai.network.WrongPasswordException
 
 @Composable
-fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) =
+fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -40,7 +40,7 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) =
             },
             modifier = Modifier
                 .padding(40.dp),
-            isErrorValue = loginWindowState.invalidInputAccount,
+            isError = loginWindowState.invalidInputAccount,
             label = {
                 if (loginWindowState.invalidInputAccount)
                     Text("账号只能由数字组成")
@@ -94,6 +94,7 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) =
             loginWindowState.isException = false
         }
     }
+}
 
 @Composable
 fun BotLoginButton(
