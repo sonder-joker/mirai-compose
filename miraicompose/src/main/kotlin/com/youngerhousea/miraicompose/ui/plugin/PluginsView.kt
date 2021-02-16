@@ -38,7 +38,7 @@ fun PluginsWindow(pluginState: PluginState) {
             itemsIndexed(PluginManager.plugins) { index, plugin ->
                 PluginCard(
                     Modifier
-                        .padding(20.dp)
+                        .padding(40.dp)
                         .clickable {
                             pluginState.currentIndex = index
                             pluginState.isSingleCard = true

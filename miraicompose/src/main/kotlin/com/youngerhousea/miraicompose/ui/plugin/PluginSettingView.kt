@@ -1,7 +1,6 @@
 package com.youngerhousea.miraicompose.ui.plugin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youngerhousea.miraicompose.theme.AppTheme
 import net.mamoe.mirai.console.data.*
-import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.yamlkt.Yaml
 
 private val yaml = Yaml.default
@@ -77,7 +75,7 @@ fun PluginSettingView(pluginDatas: List<PluginData>) {
                     },
                     Modifier
                         .requiredWidth(100.dp)
-                        .background(AppTheme.colors.backgroundDark)
+                        .background(AppTheme.Colors.backgroundDark)
                 ) {
                     Text("修改")
                 }

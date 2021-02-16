@@ -11,6 +11,9 @@ import javax.imageio.ImageIO
 object ResourceImage {
     val mirai = loadImageVector("ic_mirai.xml")
     val icon = loadImageResource("mirai.png")
+    val close = loadImageVector("ic_close.xml")
+    val max = loadImageVector("ic_max.xml")
+    val min = loadImageVector("ic_min.xml")
 }
 
 @Suppress("SameParameterValue")

@@ -59,7 +59,7 @@ class SplitterState {
 fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
-    color: Color = AppTheme.colors.backgroundDark
+    color: Color = AppTheme.Colors.backgroundDark
 ) = Box {
     Box(
         Modifier

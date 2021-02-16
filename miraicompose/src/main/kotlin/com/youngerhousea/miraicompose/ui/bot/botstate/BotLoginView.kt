@@ -106,7 +106,7 @@ fun BotLoginButton(
         modifier = modifier
             .aspectRatio(2f)
             .padding(24.dp),
-        backgroundColor = AppTheme.colors.backgroundDark,
+        backgroundColor = AppTheme.Colors.backgroundDark,
         content = content
     )
 }

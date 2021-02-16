@@ -1,5 +1,3 @@
-
-
 package com.youngerhousea.miraicompose.ui.bot.botstate
 
 import androidx.compose.foundation.layout.Box

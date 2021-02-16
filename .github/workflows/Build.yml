@@ -18,6 +18,5 @@ jobs:
         with:
           java-version: 15
       - name: Build with Gradle
-        run: ./gradlew package
-
+        run: ./gradlew run
 

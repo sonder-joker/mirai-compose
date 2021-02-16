@@ -18,6 +18,6 @@ fun BotEmptyWindow() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(ResourceImage.mirai, "mirai")
-        Text("¿ìÈ¥Ìí¼ÓÒ»¸öbot°Ñ£¡")
+        Text("å¿«å»æ·»åŠ ä¸€ä¸ªæœºå™¨äººå§")
     }
 }

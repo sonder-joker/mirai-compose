@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.console.LoggerStorage
-import com.youngerhousea.miraicompose.console.MiraiComposeLogger
 
 @Composable
 fun LogWindow() {
     LazyColumn(
         Modifier
             .fillMaxWidth()
+            .padding(20.dp)
     ) {
         items(LoggerStorage) {
             Text(

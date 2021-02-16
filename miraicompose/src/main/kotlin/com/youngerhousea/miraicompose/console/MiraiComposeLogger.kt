@@ -4,7 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import com.youngerhousea.miraicompose.model.getLog
+import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.theme.AppTheme
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.ByteArrayOutputStream
@@ -18,9 +19,10 @@ import java.util.*
 
 val LoggerStorage = mutableStateListOf<AnnotatedString>()
 
+val ComposeBot.logs get() = LoggerStorage.filter { it.text.contains("Bot.${this.id}") || it.text.contains("stdout")    }
+
 private val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.SIMPLIFIED_CHINESE)
 private val currentTimeFormatted: String get() = timeFormat.format(Date())
-
 
 internal fun writeToFile(it: String) {
     Files.write(
@@ -35,28 +37,25 @@ class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBa
 
     private val currentTimeFormatted: String get() = timeFormat.format(Date())
 
-
     private val SimpleLogger.LogPriority.color: Color
         get() = when (this) {
-            SimpleLogger.LogPriority.VERBOSE -> Color.Blue
-            SimpleLogger.LogPriority.INFO -> Color.Gray
-            SimpleLogger.LogPriority.WARNING -> Color.Green
-            SimpleLogger.LogPriority.ERROR -> Color.Red
-            SimpleLogger.LogPriority.DEBUG -> Color.Yellow
+            SimpleLogger.LogPriority.VERBOSE -> AppTheme.LogColor.verbose
+            SimpleLogger.LogPriority.INFO -> AppTheme.LogColor.info
+            SimpleLogger.LogPriority.WARNING -> AppTheme.LogColor.warning
+            SimpleLogger.LogPriority.ERROR -> AppTheme.LogColor.error
+            SimpleLogger.LogPriority.DEBUG -> AppTheme.LogColor.debug
         }
 
     private fun printLog(message: String?, priority: SimpleLogger.LogPriority) {
         if (message != null) {
             val annotatedLog =
-                AnnotatedString("$currentTimeFormatted ${priority.simpleName}/$identity: $message", SpanStyle(priority.color))
+                AnnotatedString(
+                    "$currentTimeFormatted ${priority.simpleName}/$identity: $message",
+                    SpanStyle(priority.color)
+                )
 
             LoggerStorage.add(annotatedLog)
             writeToFile(message)
-
-            if (identity?.matches("^Bot.[0-9]+$".toRegex()) == true) {
-                // no exception
-
-            }
         }
     }
 

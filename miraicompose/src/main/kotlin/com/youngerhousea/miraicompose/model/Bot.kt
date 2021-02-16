@@ -29,7 +29,6 @@ interface ComposeBot {
 
     val avatar: ImageBitmap
 
-    val log: SnapshotStateList<AnnotatedString>
 
     suspend fun login(account: String, password: String)
 
@@ -64,9 +63,6 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
 
     override val avatar
         get() = _avatar
-
-    override val log: SnapshotStateList<AnnotatedString> = mutableStateListOf()
-
 
     override suspend fun login(account: String, password: String) {
         if (state == BotState.Login)

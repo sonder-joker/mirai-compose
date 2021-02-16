@@ -3,6 +3,7 @@ package com.youngerhousea.miraicompose.ui.bot.botstate
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Card
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -14,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.youngerhousea.miraicompose.console.logs
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -38,19 +40,18 @@ fun BotStateView(bot: ComposeBot) = Box(
     contentAlignment = Alignment.BottomCenter
 ) {
     Column {
-        // TODO: 2021/2/14 重定向bot日志到此处
         LogBox(
             bot,
             Modifier
-                .weight(8f)
-                .padding(horizontal = 40.dp)
                 .fillMaxWidth()
+                .weight(8f)
+                .padding(horizontal = 40.dp, vertical = 20.dp)
         )
         CommandSendBox(
             bot,
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .weight(1f)
                 .padding(horizontal = 40.dp)
         )
     }
@@ -58,12 +59,12 @@ fun BotStateView(bot: ComposeBot) = Box(
 
 @Composable
 private fun LogBox(bot: ComposeBot, modifier: Modifier = Modifier) {
-    Box(modifier) {
+    Card(modifier, elevation = 0.dp) {
         LazyColumn(
             Modifier
                 .fillMaxWidth()
         ) {
-            items(bot.log) {
+            items(bot.logs) {
                 Text(it, modifier = Modifier.padding(vertical = 5.dp))
             }
         }
@@ -98,7 +99,7 @@ private fun CommandSendBox(bot: ComposeBot, modifier: Modifier = Modifier) {
                 }
             }, modifier = Modifier
                 .weight(2f),
-            backgroundColor = AppTheme.colors.backgroundDark
+            backgroundColor = AppTheme.Colors.backgroundDark
         ) {
             Text("发送")
         }
