@@ -1,96 +1,61 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("SuspiciousCollectionReassignment")
 
-import org.jetbrains.kotlin.gradle.dsl.*
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version Versions.kotlin
-    kotlin("plugin.serialization") version Versions.kotlin
-    id("org.jetbrains.compose") version Versions.compose
+    kotlin("jvm") version "1.4.30"
+    id("org.jetbrains.compose") version "0.3.0-build149"
 }
 
-allprojects {
-    group = "com.youngerhousea"
+group = "com.youngerhousea"
+version = "0.1.0"
 
-    repositories {
-        jcenter()
-        mavenLocal()
-        mavenCentral()
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
+}
+
+val mirai_version = "2.3.2"
+dependencies {
+    implementation(compose.desktop.currentOs)
+    implementation("net.mamoe:mirai-core:$mirai_version")
+    implementation("net.mamoe:mirai-console:$mirai_version")
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "11"
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs += "-Xjvm-default=enable"
     }
 }
 
-subprojects {
-    afterEvaluate {
-        configureJvmTarget()
-        configureEncoding()
-        configureKotlinExperimentalUsages()
-        configureKotlinCompilerSettings()
-    }
+kotlin.sourceSets.all {
+    languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
 }
 
-val experimentalAnnotations = arrayOf(
-    "kotlin.Experimental",
-    "kotlin.RequiresOptIn",
-    "kotlin.ExperimentalUnsignedTypes",
-    "kotlin.ExperimentalStdlibApi",
-    "kotlin.experimental.ExperimentalTypeInference",
-    "kotlin.io.path.ExperimentalPathApi",
+compose.desktop {
+    application {
+        mainClass = "com.youngerhousea.miraicompose.MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "MiraiCompose"
+            version = "0.1.0"
+            vendor = "Noire"
 
-    "net.mamoe.mirai.console.ConsoleFrontEndImplementation",
-    "net.mamoe.mirai.console.util.ConsoleExperimentalApi",
-    "net.mamoe.mirai.utils.MiraiExperimentalApi",
-
-    "androidx.compose.foundation.ExperimentalFoundationApi"
-)
-
-fun Project.configureJvmTarget() {
-    tasks.withType(KotlinJvmCompile::class.java) {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-
-    extensions.findByType(JavaPluginExtension::class.java)?.run {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
-
-fun Project.configureEncoding() {
-    tasks.withType(JavaCompile::class.java) {
-        options.encoding = "UTF8"
-    }
-}
-
-fun Project.configureKotlinExperimentalUsages() {
-    val sourceSets = kotlinSourceSets ?: return
-
-    for (target in sourceSets) target.languageSettings.run {
-        progressiveMode = true
-        experimentalAnnotations.forEach { a ->
-            useExperimentalAnnotation(a)
+            macOS {
+                iconFile.set(project.file("icons/mirai.icns"))
+            }
+            linux {
+                iconFile.set(project.file("icons/mirai.png"))
+            }
+            windows {
+                iconFile.set(project.file("icons/mirai.ico"))
+                upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
+            }
         }
     }
 }
-
-fun Project.configureKotlinCompilerSettings() {
-    val kotlinCompilations = kotlinCompilations ?: return
-    for (kotlinCompilation in kotlinCompilations) with(kotlinCompilation) {
-        if (isKotlinJvmProject) {
-            @Suppress("UNCHECKED_CAST")
-            this as org.jetbrains.kotlin.gradle.plugin.KotlinCompilation<KotlinJvmOptions>
-        }
-        kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
-    }
-}
-
-val Project.kotlinSourceSets get() = extensions.findByName("kotlin").safeAs<KotlinProjectExtension>()?.sourceSets
-
-val Project.isKotlinJvmProject: Boolean get() = extensions.findByName("kotlin") is KotlinJvmProjectExtension
-
-
-val Project.kotlinTargets
-    get() =
-        extensions.findByName("kotlin").safeAs<KotlinSingleTargetExtension>()?.target?.let { listOf(it) }
-            ?: extensions.findByName("kotlin").safeAs<KotlinMultiplatformExtension>()?.targets
-
-val Project.kotlinCompilations
-    get() = kotlinTargets?.flatMap { it.compilations }
