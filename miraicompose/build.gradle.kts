@@ -30,7 +30,7 @@ compose.desktop {
             modules(*jdkModules)
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MiraiCompose"
-            version = Versions.compose
+            version = Versions.mirai_compose
             vendor = "Noire"
 
             macOS {
