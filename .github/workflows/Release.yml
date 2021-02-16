@@ -73,7 +73,7 @@ jobs:
           prerelease: false
 
       - name: Upload Release Msi
-        id: upload-release-asset
+        id: upload-release-msi
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,7 +84,7 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload Release Zip
-        id: upload-release-asset
+        id: upload-release-zip
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
