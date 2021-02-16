@@ -1,5 +1,5 @@
 object Versions {
-    const val mirai_compose = "0.1.0"
+    const val mirai_compose = "1.0.0"
 
     const val kotlin = "1.4.30"
 

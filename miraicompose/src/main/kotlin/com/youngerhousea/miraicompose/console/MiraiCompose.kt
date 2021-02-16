@@ -71,5 +71,5 @@ object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val vendor: String
         get() = "Noire"
     override val version: SemVersion
-        get() = SemVersion("0.1.0")
+        get() = SemVersion("1.0.0")
 }

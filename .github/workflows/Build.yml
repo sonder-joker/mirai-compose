@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ dev, master ]
+    branches: [ dev ]
     paths-ignore:
       - README.md
       - icons/*
@@ -23,8 +23,8 @@ jobs:
       - name: Init gradle project
         run: ./gradlew clean
 
-      - name: Build with Gradle
-        run: ./gradlew runDistributable --scan
+      - name: Package
+        run: ./gradlew packageDeb
 
 
   job_windows:
@@ -41,9 +41,8 @@ jobs:
       - name: Init gradle project
         run: ./gradlew clean
 
-      - name: Build with Gradle
-        run: ./gradlew runDistributable --scan
-
+      - name: Package
+        run: ./gradlew packageMsi
 
   job_macos:
     runs-on: macos-latest
@@ -59,5 +58,5 @@ jobs:
       - name: Init gradle project
         run: ./gradlew clean
 
-      - name: Build with Gradle
-        run: ./gradlew runDistributable --scan
+      - name: Package
+        run: ./gradlew packageDmg
