@@ -50,8 +50,8 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
 
     override val nick
         get() = when (state) {
-            BotState.None -> "Î´µÇÂ¼"
-            BotState.Loading -> "¼ÓÔØÖÐ"
+            BotState.None -> "æœªç™»å½•"
+            BotState.Loading -> "åŠ è½½ä¸­"
             BotState.Login -> _bot!!.nick
         }
 

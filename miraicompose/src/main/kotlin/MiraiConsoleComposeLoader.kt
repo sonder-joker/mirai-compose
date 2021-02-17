@@ -9,7 +9,7 @@ import java.io.PrintStream
 
 object MiraiConsoleComposeLoader {
     @JvmStatic
-    fun main(arg:Array<String>) {
+    fun main(vararg arg:String) {
         MiraiCompose.start()
         setSystemOut()
         MiraiComposeView()
