@@ -67,8 +67,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.create_release.outputs.tag }}
+          release_name: Release ${{ steps.create_release.outputs.tag }}
           draft: false
           prerelease: false
 
@@ -79,7 +79,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./miraicompose/build/compose/binaries/main/msi/*.msi
+          asset_path: ./miraicompose/build/compose/binaries/main/msi/
           asset_name: mirai-compose-${{ steps.create_release.outputs.tag }}-windows-x64.msi
           asset_content_type: application/octet-stream
 
