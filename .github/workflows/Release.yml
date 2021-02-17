@@ -59,7 +59,7 @@ jobs:
         run: ./gradlew createDistributable
 
       - name: Package Distributable
-        run: tar -r mirai-compose-package.zip ./miraicompose/build/compose/binaries/main/app/*
+        run: tar -cvzf mirai-compose-package.zip ./miraicompose/build/compose/binaries/main/app/*
 
       - name: Create Windows Release
         id: create_release
