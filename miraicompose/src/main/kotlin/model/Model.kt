@@ -1,19 +1,13 @@
 package com.youngerhousea.miraicompose.model
 
-import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.ImageBitmap
-import com.youngerhousea.miraicompose.utils.toAvatarImage
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.BotFactory
-import net.mamoe.mirai.alsoLogin
-import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.utils.BotConfiguration
 
 
 class Model {
-
     val bots = mutableStateListOf<ComposeBot>()
 
     var currentIndex by mutableStateOf(-1)
@@ -22,7 +16,7 @@ class Model {
 
     init {
         Bot.instances.forEach {
-            bots.add(ComposeBot(it))
+            this.bots.add(ComposeBot(it))
         }
     }
 }

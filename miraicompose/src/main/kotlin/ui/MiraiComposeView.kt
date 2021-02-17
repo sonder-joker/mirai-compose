@@ -5,7 +5,10 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,51 +26,16 @@ import com.youngerhousea.miraicompose.ui.plugin.PluginsWindow
 import com.youngerhousea.miraicompose.ui.setting.SettingWindow
 
 fun MiraiComposeView() {
-//    var windowsPos by mutableStateOf(IntOffset.Zero)
-//    var windowsSize by mutableStateOf(IntSize(0))
-
     Window(
         title = "Mirai Compose",
         size = IntSize(1280, 768),
         icon = ResourceImage.icon,
-//        undecorated = true,
-//        events = WindowEvents(
-//            onRelocate = { location ->
-//                windowsPos = location
-//            },
-//            onResize = {
-//
-//            }
-//        )
     ) {
         MaterialTheme(
             colors = AppTheme.Colors.material
         ) {
             Surface {
                 Column {
-//                    TopAppBar(Modifier.height(20.dp)) {
-//
-//                        Icon(
-//                            ResourceImage.min,
-//                            null,
-//                            Modifier.clickable { AppManager.windows[0].minimize() }.padding(horizontal = 5.dp)
-//                        )
-//                        Icon(ResourceImage.max, null, Modifier.clickable {
-//                            if (AppManager.windows[0].isMaximized) {
-//                                AppManager.windows[0]
-//                                    .setSize(windowsSize)
-//                                AppManager.windows[0]
-//                                    .setLocation(windowsPos.x, windowsPos.y)
-//                            } else {
-//                                AppManager.windows[0].maximize()
-//                            }
-//                        }.padding(horizontal = 5.dp))
-//                        Icon(
-//                            ResourceImage.close,
-//                            null,
-//                            Modifier.clickable { AppManager.windows[0].close() }.padding(horizontal = 5.dp)
-//                        )
-//                    }
                     MainWindowsView()
                 }
             }

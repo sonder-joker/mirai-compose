@@ -60,7 +60,9 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    val logFiles = rootPath.resolve("composelog").createDirectories()
+    val composeFile = rootPath.resolve("compose").createDirectories()
+
+    val logFiles = composeFile.resolve("log").createDirectories()
 
 }
 

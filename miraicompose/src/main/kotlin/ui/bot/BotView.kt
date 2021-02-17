@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.ui.bot.botstate.BotChooseWindow
 import com.youngerhousea.miraicompose.ui.bot.botstate.BotEmptyWindow
@@ -23,10 +24,12 @@ import com.youngerhousea.miraicompose.ui.bot.listview.BotListView
 import com.youngerhousea.miraicompose.ui.bot.listview.TopView
 import com.youngerhousea.miraicompose.utils.SplitterState
 import com.youngerhousea.miraicompose.utils.VerticalSplittable
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.Mirai
+import net.mamoe.mirai.console.MiraiConsole
 
 @Composable
 fun BotsWindow(model: Model) {
-
     val panelState = remember { PanelState() }
 
     val animatedSize = if (panelState.splitter.isResizing)
@@ -65,13 +68,12 @@ fun BotsWindow(model: Model) {
             }
         }
 
-
-
-        if (model.currentIndex < 0)
+        if (model.currentIndex == -1) {
             BotEmptyWindow()
-        else
+        }
+        else {
             BotChooseWindow(model.currentBot)
-
+        }
     }
 }
 
