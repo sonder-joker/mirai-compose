@@ -35,22 +35,22 @@ jobs:
         os: [ windows-latest, ubuntu-latest, macOS-latest ]
         include:
           - os: windows-latest
-            package_path: tar -a -c -f mirai-compose-package.zip ./miraicompose/build/compose/binaries/main/app/*
-            install_path: tar -a -c -f mirai-compose-install.zip ./miraicompose/build/compose/binaries/main/msi/*
-            assert_p: mirai-compose-package.zip
-            assert_i: mirai-compose-install.zip
+            package_path: tar -a -c -f mirai-compose-windows-x64.zip ./miraicompose/build/compose/binaries/main/app/*
+            install_path: tar -a -c -f mirai-compose-msi-x64.zip ./miraicompose/build/compose/binaries/main/msi/*
+            assert_p: mirai-compose-windows-x64.zip
+            assert_i: mirai-compose-msi-x64.zip
 
           - os: ubuntu-latest
-            package_path: tar -zcvf mirai-compose-package.tar.gz ./miraicompose/build/compose/binaries/main/app/*
-            install_path: tar -a -c -f mirai-compose-install.tar.gz ./miraicompose/build/compose/binaries/main/deb/*
-            assert_p: mirai-compose-package.tar.gz
-            assert_i: mirai-compose-install.tar.gz
+            package_path: tar -zcvf mirai-compose-linux-x64.tar.gz ./miraicompose/build/compose/binaries/main/app/*
+            install_path: tar -a -c -f mirai-compose-deb-x64.tar.gz ./miraicompose/build/compose/binaries/main/deb/*
+            assert_p: mirai-compose-linux-x64.tar.gz
+            assert_i: mirai-compose-deb-x64.tar.gz
 
           - os: macOS-latest
-            package_path: zip -r mirai-compose-package.zip ./miraicompose/build/compose/binaries/main/app/* -x "*.DS_Store"
-            install_path: zip -r mirai-compose-install.zip ./miraicompose/build/compose/binaries/main/dmg/* -x "*.DS_Store"
-            assert_p: mirai-compose-package.zip
-            assert_i: mirai-compose-install.zip
+            package_path: zip -r mirai-compose-macos-x64.zip ./miraicompose/build/compose/binaries/main/app/* -x "*.DS_Store"
+            install_path: zip -r mirai-compose-dmg-x64.zip ./miraicompose/build/compose/binaries/main/dmg/* -x "*.DS_Store"
+            assert_p: mirai-compose-macos-x64.zip
+            assert_i: mirai-compose-dmg-x64.zip
 
     steps:
       - name: Checkout code
@@ -94,5 +94,5 @@ jobs:
         with:
           upload_url: ${{ needs.job_create_release.outputs.upload_url }}
           asset_path: ${{ matrix.assert_i }}
-          asset_name: ${{ matrix.os }}-${{ matrix.assert_i }}
+          asset_name: ${{ matrix.assert_i }}
           asset_content_type: application/octet-stream
