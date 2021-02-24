@@ -31,7 +31,7 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) {
         TextField(
             loginWindowState.account,
             onValueChange = {
-                if (it.matches("^[0-9]{0,15}$".toRegex())) {
+                if (it.text.matches("^[0-9]{0,15}$".toRegex())) {
                     loginWindowState.account = it
                     loginWindowState.invalidInputAccount = false
                 } else {

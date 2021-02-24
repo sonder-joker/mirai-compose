@@ -89,6 +89,7 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 }
 
 
+
 internal fun setSystemOut() {
     System.setOut(
         PrintStream(
@@ -116,6 +117,6 @@ object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val vendor: String
         get() = "Noire"
     override val version: SemVersion
-        get() = SemVersion("1.0.0")
+        get() = SemVersion("1.1.0")
 }
 

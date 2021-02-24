@@ -1,8 +1,6 @@
 package com.youngerhousea.miraicompose.ui
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,11 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.model.Model
-import com.youngerhousea.miraicompose.model.PluginState
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.ui.about.AboutWindow
@@ -27,6 +23,7 @@ import com.youngerhousea.miraicompose.ui.bot.BotsWindow
 import com.youngerhousea.miraicompose.ui.log.LogWindow
 import com.youngerhousea.miraicompose.ui.plugin.PluginsWindow
 import com.youngerhousea.miraicompose.ui.setting.SettingWindow
+import net.mamoe.mirai.console.plugin.PluginManager
 
 fun MiraiComposeView(model: Model) {
     Window(
@@ -48,8 +45,8 @@ fun MiraiComposeView(model: Model) {
 
 @Composable
 private fun MainWindowsView(model: Model) {
-    val pluginState = remember { PluginState() }
     var currentWindow by remember { mutableStateOf(CurrentWindow.Bot) }
+    val pluginModel = remember { PluginManager.plugins }
     Row {
         val settingWidth = 160.dp
         Column(
@@ -89,7 +86,7 @@ private fun MainWindowsView(model: Model) {
         Crossfade(targetState = currentWindow) { screen ->
             when (screen) {
                 CurrentWindow.Bot -> BotsWindow(model)
-                CurrentWindow.Plugin -> PluginsWindow(pluginState)
+                CurrentWindow.Plugin -> PluginsWindow(pluginModel)
                 CurrentWindow.Setting -> SettingWindow()
                 CurrentWindow.About -> AboutWindow()
                 CurrentWindow.Log -> LogWindow()
@@ -97,7 +94,6 @@ private fun MainWindowsView(model: Model) {
         }
     }
 }
-
 
 @Composable
 private fun SelectEdgeText(text: String, color: Color, onClick: () -> Unit) {

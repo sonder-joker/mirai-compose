@@ -19,7 +19,7 @@ fun BotChooseWindow(model: ComposeBot) {
         BotState.None -> {
             BotLoginView(loginWindowState) {
                 MiraiCompose.launch {
-                    model.login(loginWindowState.account, loginWindowState.password)
+                    model.login(loginWindowState.account.text, loginWindowState.password.text)
                 }
             }
         }

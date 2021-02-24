@@ -49,3 +49,6 @@ private fun SimpleSetWindows(textValue: String, action: (value: String) -> Unit)
         Button({ action(textFieldValue) }) { Text("修改") }
     }
 }
+
+fun f(){
+}

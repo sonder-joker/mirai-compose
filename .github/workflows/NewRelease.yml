@@ -22,7 +22,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Mirai compose ${{ github.ref }}
           body: |
-            正式发布，请通过解压使用
+            更新依赖，对输入进行了优化
           draft: false
           prerelease: false
 

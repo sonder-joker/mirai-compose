@@ -17,9 +17,11 @@ dependencies {
 
     implementation(`mirai-core`)
     implementation(`mirai-console`)
-//    runtimeOnly("net.mamoe:mirai-login-solver-selenium:1.0-dev-16")
 
     implementation(yamlkt)
+    implementation(decompose)
+    implementation(`decompose-extension`)
+
     testImplementation("org.jetbrains.compose.ui:ui-test-junit4:${Versions.compose}")
 }
 
@@ -30,7 +32,7 @@ compose.desktop {
             modules(*jdkModules)
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MiraiCompose"
-            version = Versions.mirai_compose
+            packageVersion = Versions.mirai_compose
             vendor = "Noire"
 
             macOS {
