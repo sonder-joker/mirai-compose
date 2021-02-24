@@ -1,6 +1,5 @@
 package com.youngerhousea.miraicompose.console
 
-import androidx.compose.runtime.ProvidedValue
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.ui.MiraiComposeView
@@ -11,6 +10,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.data.AutoSavePluginConfig
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
@@ -70,6 +70,8 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
     val logFiles = composeFile.resolve("log").createDirectories()
 
+    val configFiles = composeFile.resolve("config").createDirectories()
+
     val model = Model()
 
     override fun preStart() {
@@ -116,3 +118,4 @@ object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val version: SemVersion
         get() = SemVersion("1.0.0")
 }
+

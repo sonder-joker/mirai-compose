@@ -20,6 +20,7 @@ dependencies {
 //    runtimeOnly("net.mamoe:mirai-login-solver-selenium:1.0-dev-16")
 
     implementation(yamlkt)
+    testImplementation("org.jetbrains.compose.ui:ui-test-junit4:${Versions.compose}")
 }
 
 compose.desktop {

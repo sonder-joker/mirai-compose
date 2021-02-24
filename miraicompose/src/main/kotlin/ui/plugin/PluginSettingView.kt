@@ -30,8 +30,9 @@ fun PluginSettingView(pluginDatas: List<PluginData>) {
         items(pluginDatas) { pluginData ->
             val kind = remember {
                 when (pluginData) {
-                    is AutoSavePluginData ->
+                    is AutoSavePluginData -> {
                         "自动保存数据"
+                    }
                     is AutoSavePluginConfig ->
                         "自动保存配置"
                     is ReadOnlyPluginData ->

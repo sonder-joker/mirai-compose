@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.sp
 import com.youngerhousea.miraicompose.console.getPluginConfig
 import com.youngerhousea.miraicompose.console.getPluginData
 import com.youngerhousea.miraicompose.model.PluginState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import net.mamoe.mirai.console.data.AutoSavePluginDataHolder
 import net.mamoe.mirai.console.plugin.*
 
 
@@ -70,7 +73,7 @@ private fun PluginCard(modifier: Modifier, plugin: Plugin) {
 
 @Suppress("UNCHECKED_CAST")
 @Composable
-private fun DetailedPluginCard(plugin: Plugin, onExit: () -> Unit) {
+internal fun DetailedPluginCard(plugin: Plugin, onExit: () -> Unit) {
     Card {
         Column {
             Icon(
