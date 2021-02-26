@@ -15,8 +15,8 @@ Mirai 是一个在全平台下运行，提供 QQ 协议支持的高效率机器�
 
 
 # mirai-compose
-![](https://img.shields.io/github/v/tag/mamoe/mirai?label=mirai-console)
 ![](https://img.shields.io/github/v/release/sonder-joker/mirai-compose?include_prereleases)  
+console-version:2.5.0-dev-2  
 基于[compose-jb](https://github.com/jetbrains/compose-jb)  实现的[mirai-console](https://github.com/mamoe/mirai-console)  前端  
 可以跨平台运行，无需下载jdk，省去了配置环境的烦恼，只需要双击鼠标  
 目前正处于测试阶段。
