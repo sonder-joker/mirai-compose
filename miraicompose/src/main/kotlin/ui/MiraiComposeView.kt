@@ -15,15 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.ui.about.AboutWindow
 import com.youngerhousea.miraicompose.ui.bot.BotsWindow
 import com.youngerhousea.miraicompose.ui.log.LogWindow
+import com.youngerhousea.miraicompose.ui.plugin.Content
 import com.youngerhousea.miraicompose.ui.plugin.PluginsWindow
 import com.youngerhousea.miraicompose.ui.setting.SettingWindow
-import net.mamoe.mirai.console.plugin.PluginManager
 
 fun MiraiComposeView(model: Model) {
     Window(
@@ -46,7 +47,6 @@ fun MiraiComposeView(model: Model) {
 @Composable
 private fun MainWindowsView(model: Model) {
     var currentWindow by remember { mutableStateOf(CurrentWindow.Bot) }
-    val pluginModel = remember { PluginManager.plugins }
     Row {
         val settingWidth = 160.dp
         Column(
@@ -86,7 +86,7 @@ private fun MainWindowsView(model: Model) {
         Crossfade(targetState = currentWindow) { screen ->
             when (screen) {
                 CurrentWindow.Bot -> BotsWindow(model)
-                CurrentWindow.Plugin -> PluginsWindow(pluginModel)
+                CurrentWindow.Plugin -> PluginsWindow()
                 CurrentWindow.Setting -> SettingWindow()
                 CurrentWindow.About -> AboutWindow()
                 CurrentWindow.Log -> LogWindow()
@@ -97,12 +97,9 @@ private fun MainWindowsView(model: Model) {
 
 @Composable
 private fun SelectEdgeText(text: String, color: Color, onClick: () -> Unit) {
-
     Box(
         Modifier
-            .clickable {
-                onClick()
-            }
+            .clickable(onClick = onClick)
             .fillMaxWidth()
             .requiredHeight(80.dp)
             .background(color),
@@ -115,4 +112,12 @@ private fun SelectEdgeText(text: String, color: Color, onClick: () -> Unit) {
 
 private enum class CurrentWindow {
     Bot, Setting, About, Plugin, Log
+}
+
+class Roo(val component:ComponentContext):Content, ComponentContext by component {
+
+    override fun render() {
+        TODO("Not yet implemented")
+    }
+
 }

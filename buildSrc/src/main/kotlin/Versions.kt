@@ -9,7 +9,7 @@ object Versions {
 
     const val compose = "0.3.0"
 
-    const val decompose = "0.1.8"
+    const val decompose = "0.1.9"
 }
 
 const val `mirai-core` = "net.mamoe:mirai-core:${Versions.mirai}"
