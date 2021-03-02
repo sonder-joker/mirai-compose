@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.console
 
+import androidx.compose.ui.window.Notifier
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.ui.MiraiComposeView
@@ -10,7 +11,6 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
-import net.mamoe.mirai.console.data.AutoSavePluginConfig
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
@@ -77,6 +77,7 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
     override fun preStart() {
         setSystemOut(out)
+         Notifier().notify("Mirai Compose加载中...", "")
     }
 
     override fun postPhase(phase: String) {

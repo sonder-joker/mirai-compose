@@ -19,7 +19,7 @@ import java.util.*
 
 val LoggerStorage = mutableStateListOf<AnnotatedString>()
 
-val ComposeBot.logs get() = LoggerStorage.filter { it.text.contains("Bot.${this.id}") || it.text.contains("stdout")    }
+val ComposeBot.logs get() = LoggerStorage.filter { it.text.contains("Bot.${this.id}") }
 
 private val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.SIMPLIFIED_CHINESE)
 private val currentTimeFormatted: String get() = timeFormat.format(Date())

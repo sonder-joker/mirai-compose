@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.utils.MiraiLogger
 
@@ -29,7 +30,7 @@ interface ComposeBot {
 
     val avatar: ImageBitmap
 
-    fun toBot(): Bot
+    fun asBot(): Bot
 
     suspend fun login(account: String, password: String)
 
@@ -66,8 +67,8 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
     override val avatar
         get() = _avatar
 
-    override fun toBot(): Bot {
-        if(_bot != null)
+    override fun asBot(): Bot {
+        if (_bot != null)
             return _bot as Bot
         else
             error("Don't have a bot")
@@ -104,7 +105,6 @@ internal class ComposeBotImpl(bot: Bot? = null) : ComposeBot {
     }
 
 }
-
 
 
 enum class BotState {

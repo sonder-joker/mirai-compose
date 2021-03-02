@@ -3,18 +3,20 @@ package com.youngerhousea.miraicompose.ui.common
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.console.logs
 import com.youngerhousea.miraicompose.theme.AppTheme
+import com.youngerhousea.miraicompose.utils.VerticalScrollbar
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.descriptor.AbstractCommandValueParameter
 import net.mamoe.mirai.console.command.descriptor.CommandReceiverParameter
@@ -30,35 +32,52 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 @Composable
-fun LogWindow(logs: List<AnnotatedString>, logger: MiraiLogger) {
+internal fun LogWindow(logs: List<AnnotatedString>, logger: MiraiLogger) {
     Column {
         LogBox(
             logs,
             Modifier
-                .fillMaxWidth()
                 .weight(8f)
-                .padding(horizontal = 40.dp, vertical = 20.dp)
         )
         CommandSendBox(
             logger,
-            modifier = Modifier
-                .fillMaxWidth()
+            Modifier
                 .weight(1f)
-                .padding(horizontal = 40.dp)
         )
     }
 }
 
 @Composable
-internal fun LogBox(logs:List<AnnotatedString>, modifier: Modifier = Modifier) {
-    Card(modifier, elevation = 0.dp) {
-        LazyColumn(
-            Modifier
-                .fillMaxWidth()
-        ) {
-            items(logs) {
-                Text(it, modifier = Modifier.padding(vertical = 5.dp))
+internal fun LogBox(logs: List<AnnotatedString>, modifier: Modifier = Modifier) {
+    Surface(
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp, vertical = 20.dp),
+    ) {
+        val state = rememberLazyListState()
+
+        Box {
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth(),
+                state = state
+            ) {
+                items(logs) {
+                    Box(
+                        modifier = Modifier
+                            .height(35.dp)
+                            .padding(vertical = 5.dp)
+                    ) {
+                        Text(it /*modifier = Modifier.padding(vertical = 5.dp)*/)
+                    }
+                }
             }
+            VerticalScrollbar(
+                Modifier.align(Alignment.CenterEnd),
+                state,
+                logs.size,
+                30.dp
+            )
         }
     }
 }
@@ -66,15 +85,31 @@ internal fun LogBox(logs:List<AnnotatedString>, modifier: Modifier = Modifier) {
 @OptIn(ExperimentalCommandDescriptors::class)
 @Composable
 internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) {
+    // TODO:引入route后提升作用域
+    val scope = rememberCoroutineScope()
     var currentCommand by remember(logger) { mutableStateOf("") }
-    Row(modifier) {
+
+    val onClick = {
+        scope.launch {
+            SolveCommandResult(currentCommand, logger)
+        }.invokeOnCompletion {
+            currentCommand = ""
+        }
+    }
+
+    Row(modifier.padding(horizontal = 40.dp)) {
         TextField(
             currentCommand,
             onValueChange = {
                 currentCommand = it
             },
             modifier = Modifier
-                .weight(13f),
+                .weight(13f)
+                .shortcuts {
+                    on(Key.Enter) {
+                        onClick()
+                    }
+                },
             singleLine = true,
         )
 
@@ -83,20 +118,17 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
         )
 
         FloatingActionButton(
-            {
-                MiraiConsole.launch {
-                    SolveCommandResult(currentCommand, logger)
-                }.invokeOnCompletion {
-                    currentCommand = ""
-                }
-            }, modifier = Modifier
+            onClick = {
+                onClick()
+            },
+            modifier = Modifier
                 .weight(2f),
             backgroundColor = AppTheme.Colors.backgroundDark,
-
-            ) {
+        ) {
             Text("发送")
         }
     }
+
 }
 
 
@@ -111,7 +143,6 @@ private suspend fun SolveCommandResult(
         is CommandExecuteResult.IllegalArgument -> {
             val message = result.exception.message
             if (message != null) {
-                logger.identity
                 logger.warning(message)
             } else logger.warning(result.exception)
         }
