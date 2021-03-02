@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.botstate
+package com.youngerhousea.miraicompose.ui.feature.bot.botstate
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -116,7 +116,7 @@ private suspend fun SolveCommandResult(
 ) {
     when (val result = ConsoleCommandSender.executeCommand(currentCommand)) {
         is CommandExecuteResult.Success -> {
-
+            logger.info("OK")
         }
         is CommandExecuteResult.IllegalArgument -> {
             val message = result.exception.message

@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.setting
+package com.youngerhousea.miraicompose.ui.feature.setting
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -10,24 +10,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.AppTheme
-import net.mamoe.mirai.console.data.AutoSavePluginConfig
-import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
-import net.mamoe.mirai.utils.MiraiLogger
+import com.youngerhousea.miraicompose.utils.Component
 
-@Composable
-fun SettingWindow() {
-    Column(
-        Modifier
-            .padding(20.dp)
-            .fillMaxSize()
-    ) {
-        Text("自定义配色(未实现)")
-        SimpleSetWindows("VERBOSE") { AppTheme.LogColor.verbose = Color(it.toLong(16)) }
-        SimpleSetWindows("INFO") { AppTheme.LogColor.info = Color(it.toLong(16)) }
-        SimpleSetWindows("WARING") { AppTheme.LogColor.warning = Color(it.toLong(16)) }
-        SimpleSetWindows("ERROR") { AppTheme.LogColor.error = Color(it.toLong(16)) }
-        SimpleSetWindows("DEBUG") { AppTheme.LogColor.debug = Color(it.toLong(16)) }
+
+class Setting(componentContext: ComponentContext) : Component , ComponentContext by componentContext {
+    @Composable
+    override fun render() {
+        Column(
+            Modifier
+                .padding(20.dp)
+                .fillMaxSize()
+        ) {
+            Text("自定义配色(未实现)")
+            SimpleSetWindows("VERBOSE") { AppTheme.LogColor.verbose = Color(it.toLong(16)) }
+            SimpleSetWindows("INFO") { AppTheme.LogColor.info = Color(it.toLong(16)) }
+            SimpleSetWindows("WARING") { AppTheme.LogColor.warning = Color(it.toLong(16)) }
+            SimpleSetWindows("ERROR") { AppTheme.LogColor.error = Color(it.toLong(16)) }
+            SimpleSetWindows("DEBUG") { AppTheme.LogColor.debug = Color(it.toLong(16)) }
+        }
     }
 }
 
@@ -48,7 +50,4 @@ private fun SimpleSetWindows(textValue: String, action: (value: String) -> Unit)
         }, Modifier.weight(2f).padding(end = 20.dp))
         Button({ action(textFieldValue) }) { Text("修改") }
     }
-}
-
-fun f(){
 }

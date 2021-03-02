@@ -76,7 +76,6 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
     override fun preStart() {
         setSystemOut()
-        MiraiComposeView(model)
     }
 
     override fun postPhase(phase: String) {
@@ -84,6 +83,10 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
             Bot.instances.forEach {
                 model.bots.add(ComposeBot(it))
             }
+        }
+        if(phase == "finally post") {
+            MiraiComposeView(model)
+
         }
     }
 }

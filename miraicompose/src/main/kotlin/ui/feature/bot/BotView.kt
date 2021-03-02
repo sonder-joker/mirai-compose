@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.bot
+package com.youngerhousea.miraicompose.ui.feature.bot
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
@@ -16,13 +16,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.router
 import com.youngerhousea.miraicompose.model.Model
-import com.youngerhousea.miraicompose.ui.bot.botstate.BotChooseWindow
-import com.youngerhousea.miraicompose.ui.bot.botstate.BotEmptyWindow
-import com.youngerhousea.miraicompose.ui.bot.listview.BotListView
-import com.youngerhousea.miraicompose.ui.bot.listview.TopView
-import com.youngerhousea.miraicompose.utils.SplitterState
-import com.youngerhousea.miraicompose.utils.VerticalSplittable
+import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotChooseWindow
+import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotEmptyWindow
+import com.youngerhousea.miraicompose.ui.feature.bot.listview.BotListView
+import com.youngerhousea.miraicompose.ui.feature.bot.listview.TopView
+import com.youngerhousea.miraicompose.utils.Component
+import ui.common.SplitterState
+import ui.common.VerticalSplittable
+
+class Bot(componentContext: ComponentContext, val model: Model) : Component, ComponentContext by componentContext {
+
+//    private val router = router<BotState, Component>(
+//        initialConfiguration = BotState.No(),
+//        componentFactory =  { configuration:BotState, componentContext ->
+//            when(configuration) {
+//                is BotState.Loading -> TODO()
+//                is BotState.Login -> TODO()
+//                is BotState.No -> TODO()
+//            }
+//        }
+//    )
+
+    sealed class BotState{
+        class No:BotState()
+        class Loading:BotState()
+        class Login:BotState()
+    }
+
+    @Composable
+    override fun render() {
+        BotsWindow(model)
+    }
+}
 
 @Composable
 fun BotsWindow(model: Model) {
@@ -41,14 +69,14 @@ fun BotsWindow(model: Model) {
             .fillMaxSize(),
         panelState.splitter,
         onResize = {
-            panelState.expandedSize =
-                (panelState.expandedSize + it).coerceAtLeast(panelState.expandedSizeMin)
+            panelState.expandedSize = (panelState.expandedSize + it).coerceAtLeast(panelState.expandedSizeMin)
         }
     ) {
         ResizablePanel(
             Modifier
                 .width(animatedSize)
-                .fillMaxHeight(), panelState
+                .fillMaxHeight(),
+            panelState
         ) {
             Column {
                 TopView(
@@ -66,8 +94,7 @@ fun BotsWindow(model: Model) {
 
         if (model.currentIndex == -1) {
             BotEmptyWindow()
-        }
-        else {
+        } else {
             BotChooseWindow(model.currentBot)
         }
     }

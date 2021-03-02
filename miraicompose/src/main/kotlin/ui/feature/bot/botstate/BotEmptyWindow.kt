@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.about
+package com.youngerhousea.miraicompose.ui.feature.bot.botstate
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import com.youngerhousea.miraicompose.theme.ResourceImage
 
 @Composable
-fun AboutWindow() {
+fun BotEmptyWindow() {
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(ResourceImage.mirai, "mirai")
-        Text("Mirai Compose 2021!")
+        Text("快去添加一个机器人吧")
     }
 }

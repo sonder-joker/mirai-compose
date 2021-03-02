@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.bot.botstate
+package com.youngerhousea.miraicompose.ui.feature.bot.botstate
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

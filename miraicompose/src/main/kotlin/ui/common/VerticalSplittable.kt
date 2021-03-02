@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.utils
+package ui.common
 
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.background
@@ -21,7 +21,7 @@ import com.youngerhousea.miraicompose.theme.AppTheme
 import java.awt.Cursor
 
 @Composable
-fun VerticalSplittable(
+internal fun VerticalSplittable(
     modifier: Modifier,
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
@@ -56,7 +56,7 @@ class SplitterState {
 }
 
 @Composable
-fun VerticalSplitter(
+internal fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
     color: Color = AppTheme.Colors.backgroundDark
@@ -89,7 +89,7 @@ fun VerticalSplitter(
     )
 }
 
-fun Modifier.cursorForHorizontalResize(): Modifier = composed {
+internal fun Modifier.cursorForHorizontalResize(): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {
