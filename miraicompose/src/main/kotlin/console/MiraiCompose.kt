@@ -74,9 +74,9 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
     val model = Model()
 
+
     override fun preStart() {
-        setSystemOut()
-        MiraiComposeView(model)
+        setSystemOut(out)
     }
 
     override fun postPhase(phase: String) {
@@ -85,19 +85,19 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
                 model.bots.add(ComposeBot(it))
             }
         }
-        if(phase == "finally post") {
-
+        if (phase == "finally post") {
+            MiraiComposeView(model)
         }
     }
 }
 
+val MiraiCompose.out get() = MiraiLogger.create("stdout")
 
-
-internal fun setSystemOut() {
+internal fun setSystemOut(out: MiraiLogger) {
     System.setOut(
         PrintStream(
             BufferedOutputStream(
-                logger = MiraiLogger.create("stdout").run { ({ line: String? -> info(line) }) }
+                logger = out.run { ({ line: String? -> info(line) }) }
             ),
             false,
             "UTF-8"
@@ -106,7 +106,7 @@ internal fun setSystemOut() {
     System.setErr(
         PrintStream(
             BufferedOutputStream(
-                logger = MiraiLogger.create("stdout").run { ({ line: String? -> info(line) }) }
+                logger = out.run { ({ line: String? -> warning(line) }) }
             ),
             false,
             "UTF-8"

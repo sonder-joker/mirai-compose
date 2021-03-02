@@ -72,7 +72,6 @@ class NavHost(
         },
     )
 
-
     @Composable
     override fun render() {
         Children(router.state) { child, config ->

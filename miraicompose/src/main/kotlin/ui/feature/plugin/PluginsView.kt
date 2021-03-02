@@ -18,18 +18,18 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arkivanov.decompose.*
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.pop
+import com.arkivanov.decompose.push
+import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.arkivanov.decompose.statekeeper.consume
-import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.console.getPluginConfig
 import com.youngerhousea.miraicompose.console.getPluginData
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.utils.Component
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.*
-import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.yamlkt.Yaml
 
 
@@ -86,13 +86,13 @@ class PluginList(
     componentContext: ComponentContext,
     val onItemSelected: (plugin: Plugin) -> Unit
 ) : Component, ComponentContext by componentContext {
-    var state = stateKeeper.consume("state") ?: Model(PluginManager.plugins)
-
-    data class Model(val plugins: List<Plugin>) : Parcelable
-
-    init {
-        stateKeeper.register("state") { state }
-    }
+//    var state = stateKeeper.consume("state") ?: Model(PluginManager.plugins)
+//
+//    data class Model(val plugins: List<Plugin>) : Parcelable
+//
+//    init {
+//        stateKeeper.register("state") { state }
+//    }
 
     @Composable
     override fun render() {
@@ -100,7 +100,7 @@ class PluginList(
             cells = GridCells.Adaptive(400.dp),
             Modifier.fillMaxSize(),
         ) {
-            items(state.plugins) { plugin ->
+            items(PluginManager.plugins) { plugin ->
                 Card(
                     Modifier
                         .padding(40.dp)
