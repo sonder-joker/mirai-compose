@@ -73,11 +73,9 @@ class NavHost(
     )
 
 
-    val routerState get() = router.state
-
     @Composable
     override fun render() {
-        Children(routerState) { child, config ->
+        Children(router.state) { child, config ->
             Surface {
                 Row {
                     Column(

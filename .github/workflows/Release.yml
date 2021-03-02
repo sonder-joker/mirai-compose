@@ -4,6 +4,10 @@ on:
   push:
     tags:
       - '*'
+    paths-ignore:
+      - README.md
+      - icons/*
+      - LICENSE
 
 jobs:
   job_create_release:

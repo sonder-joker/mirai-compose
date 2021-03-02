@@ -14,15 +14,13 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation(decompose)
+    implementation(`decompose-extension`)
 
     implementation(`mirai-core`)
     implementation(`mirai-console`)
 
     implementation(yamlkt)
-    implementation(decompose)
-    implementation(`decompose-extension`)
-
-    testImplementation("org.jetbrains.compose.ui:ui-test-junit4:${Versions.compose}")
 }
 
 compose.desktop {
