@@ -11,7 +11,6 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
-import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
@@ -42,17 +41,13 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     override val frontEndDescription =
         MiraiComposeDescription
 
-    override val dataStorageForJvmPluginLoader =
-        MultiFilePluginDataStorage(rootPath.resolve("data")).toMiraiCompose()
+    override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath.resolve("data"))
 
-    override val dataStorageForBuiltIns =
-        MultiFilePluginDataStorage(rootPath.resolve("data"))
+    override val dataStorageForBuiltIns = ReadablePluginDataStorage(rootPath.resolve("data"))
 
-    override val configStorageForJvmPluginLoader =
-        MultiFilePluginDataStorage(rootPath.resolve("config")).toMiraiCompose()
+    override val configStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath.resolve("config"))
 
-    override val configStorageForBuiltIns =
-        MultiFilePluginDataStorage(rootPath.resolve("config"))
+    override val configStorageForBuiltIns = ReadablePluginDataStorage(rootPath.resolve("config"))
 
     override val consoleInput: ConsoleInput =
         MiraiComposeInput
@@ -72,27 +67,30 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
     val configFiles = composeFile.resolve("config").createDirectories()
 
-    val model = Model()
-
 
     override fun preStart() {
         setSystemOut(out)
-         Notifier().notify("Mirai Compose加载中...", "")
+        Notifier().notify("Mirai Compose加载中...", "")
     }
 
     override fun postPhase(phase: String) {
+
         if (phase == "auto-login bots") {
             Bot.instances.forEach {
                 model.bots.add(ComposeBot(it))
             }
         }
+
         if (phase == "finally post") {
-            MiraiComposeView(model)
+            MiraiComposeView()
         }
     }
 }
 
-val MiraiCompose.out get() = MiraiLogger.create("stdout")
+internal val MiraiCompose.model: Model get() = Model()
+
+internal val MiraiCompose.out get() = MiraiLogger.create("stdout")
+
 
 internal fun setSystemOut(out: MiraiLogger) {
     System.setOut(

@@ -22,6 +22,7 @@ dependencies {
     implementation(`mirai-console`)
 
     implementation(yamlkt)
+    implementation(koin)
 }
 
 compose.desktop {

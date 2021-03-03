@@ -42,8 +42,10 @@ internal fun LogWindow(logs: List<AnnotatedString>, logger: MiraiLogger) {
         CommandSendBox(
             logger,
             Modifier
-                .weight(1f)
-        )
+                .weight(1f),
+        ) {
+
+        }
     }
 }
 
@@ -56,22 +58,22 @@ internal fun LogBox(logs: List<AnnotatedString>, modifier: Modifier = Modifier) 
     ) {
         val state = rememberLazyListState()
 
-        Box {
+        BoxWithConstraints {
             LazyColumn(
                 Modifier
                     .fillMaxWidth(),
                 state = state
             ) {
                 items(logs) {
-                    Box(
+                    Text(
+                        it,
                         modifier = Modifier
                             .height(35.dp)
                             .padding(vertical = 5.dp)
-                    ) {
-                        Text(it /*modifier = Modifier.padding(vertical = 5.dp)*/)
-                    }
+                    )
                 }
             }
+
             VerticalScrollbar(
                 Modifier.align(Alignment.CenterEnd),
                 state,
@@ -84,7 +86,7 @@ internal fun LogBox(logs: List<AnnotatedString>, modifier: Modifier = Modifier) 
 
 @OptIn(ExperimentalCommandDescriptors::class)
 @Composable
-internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) {
+internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier, onClick:() -> Unit) {
     // TODO:引入route后提升作用域
     val scope = rememberCoroutineScope()
     var currentCommand by remember(logger) { mutableStateOf("") }

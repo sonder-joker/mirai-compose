@@ -2,16 +2,26 @@
 
 package com.youngerhousea.miraicompose.console
 
-import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
-import net.mamoe.mirai.console.data.PluginData
-import net.mamoe.mirai.console.data.PluginDataHolder
-import net.mamoe.mirai.console.data.PluginDataStorage
+import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.Plugin
+import java.nio.file.Path
 
-class MiraiComposeDataStorage(
+interface ReadablePluginDataStorage : PluginDataStorage {
+    val data: MutableMap<PluginDataHolder, MutableList<PluginData>>
+
+    companion object {
+        /**
+         * 创建一个 [ReadablePluginDataStorage] 实例，实现为[MultiFilePluginDataStorage].
+         */
+        operator fun invoke(directory: Path): ReadablePluginDataStorage =
+            ReadablePluginDataStorageImpl(MultiFilePluginDataStorage(directory))
+    }
+}
+
+private class ReadablePluginDataStorageImpl(
     private val delegete: PluginDataStorage
-) : PluginDataStorage {
-    internal val data = mutableMapOf<PluginDataHolder, MutableList<PluginData>>()
+) : PluginDataStorage, ReadablePluginDataStorage {
+    override val data = mutableMapOf<PluginDataHolder, MutableList<PluginData>>()
 
     override fun load(holder: PluginDataHolder, instance: PluginData) {
         delegete.load(holder, instance)
@@ -22,11 +32,6 @@ class MiraiComposeDataStorage(
         delegete.store(holder, instance)
     }
 }
-
-@Suppress("NOTHING_TO_INLINE")
-inline fun MultiFilePluginDataStorage.toMiraiCompose(): MiraiComposeDataStorage =
-    MiraiComposeDataStorage(this)
-
 
 fun Plugin.getPluginData(): MutableList<PluginData> =
     MiraiCompose.dataStorageForJvmPluginLoader.data.getOrDefault(

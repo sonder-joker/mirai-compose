@@ -11,6 +11,7 @@ import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.utils.toAvatarImage
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.contact.Contact
@@ -37,6 +38,53 @@ interface ComposeBot {
     companion object {
         operator fun invoke(bot: Bot? = null): ComposeBot = ComposeBotImpl(bot)
     }
+}
+
+interface ComposBot {
+    var state: BotState
+
+    val event: SnapshotStateList<BotEvent>
+
+    val avatar: ImageBitmap
+
+    suspend fun login(account: String, password: String)
+
+    companion object {
+        operator fun invoke(bot: Bot? = null): ComposeBot = ComposeBotImpl(bot)
+    }
+}
+
+class D(bot: Bot) : Bot by bot, ComposBot {
+
+    private var _avatar by mutableStateOf(ImageBitmap(200, 200))
+
+    override var state: BotState by mutableStateOf(BotState.None)
+
+    override val event = mutableStateListOf<BotEvent>()
+
+
+    override val avatar
+        get() = _avatar
+
+    override suspend fun login(account: String, password: String) {
+        bot.login()
+    }
+
+    init {
+        state = BotState.Login
+        bot.launch {
+            loadResource()
+        }
+    }
+
+    private suspend fun loadResource() {
+        _avatar = bot.avatarUrl.toAvatarImage()
+
+        bot.eventChannel.subscribeAlways<BotEvent> {
+            event.add(this)
+        }
+    }
+
 }
 
 

@@ -9,10 +9,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.model.LoginWindowState
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.theme.ResourceImage
+import com.youngerhousea.miraicompose.utils.Component
 import net.mamoe.mirai.network.WrongPasswordException
+
+//class BotLogin(componentContext:ComponentContext): Component, ComponentContext by componentContext {
+//    override fun render() {
+//        BotL
+//    }
+//
+//}
 
 @Composable
 fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) {
