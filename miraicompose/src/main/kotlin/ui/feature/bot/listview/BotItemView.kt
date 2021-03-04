@@ -1,10 +1,12 @@
-package com.youngerhousea.miraicompose.ui.bot.listview
+package com.youngerhousea.miraicompose.ui.feature.bot.listview
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -18,13 +20,13 @@ import com.youngerhousea.miraicompose.theme.AppTheme
 fun BotItem(
     bot: ComposeBot,
     modifier: Modifier = Modifier,
-    updateAction: () -> Unit,
-    removeAction: () -> Unit,
+    onItemClick: () -> Unit,
+    onItemRemove: () -> Unit,
 ) {
     Row(
         modifier = modifier
             .aspectRatio(2f)
-            .clickable(onClick = updateAction),
+            .clickable(onClick = onItemClick),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -35,7 +37,7 @@ fun BotItem(
             shape = CircleShape,
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
         ) {
-            Image(bot.avatar, "avatar")
+            Image(bot.avatar, null)
         }
 
         Column(
@@ -45,24 +47,20 @@ fun BotItem(
         ) {
             Text(bot.nick, fontWeight = FontWeight.Bold)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(bot.id, style = MaterialTheme.typography.body2)
+                Text(bot.id.toString(), style = MaterialTheme.typography.body2)
             }
+        }
 
-
-//        Column(
-//            Modifier
-//                .weight(1f)
-//        ) {
-//            Icon(
-//                Icons.Default.Delete,
-//                contentDescription = "Delete",
-//                modifier = Modifier
-//                    .clickable(onClick = removeAction)
-//            )
-//        }
-
-            //TODO:https://github.com/JetBrains/compose-jb/issues/338
-
+        Column(
+            Modifier
+                .weight(1f)
+        ) {
+            Icon(
+                Icons.Default.Delete,
+                contentDescription = "Delete",
+                modifier = Modifier
+                    .clickable(onClick = onItemRemove)
+            )
         }
     }
 }

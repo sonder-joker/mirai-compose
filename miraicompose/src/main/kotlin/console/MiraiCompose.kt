@@ -1,12 +1,11 @@
 package com.youngerhousea.miraicompose.console
 
-import androidx.compose.ui.window.Notifier
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.model.Model
+import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.ui.MiraiComposeView
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
@@ -17,11 +16,11 @@ import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.*
 import java.io.PrintStream
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import kotlin.io.path.createDirectories
-
 
 @ConsoleFrontEndImplementation
 object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScope(
@@ -61,6 +60,7 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
+    //TODO: better create
     val composeFile = rootPath.resolve("compose").createDirectories()
 
     val logFiles = composeFile.resolve("log").createDirectories()
@@ -68,29 +68,27 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     val configFiles = composeFile.resolve("config").createDirectories()
 
 
+    init {
+        this.coroutineContext[Job]?.invokeOnCompletion {
+            Files.write(configFiles.resolve("theme"), Json.encodeToString(AppTheme).toByteArray())
+        }
+    }
+
     override fun preStart() {
         setSystemOut(out)
-        Notifier().notify("Mirai Compose加载中...", "")
+        MiraiComposeView()
     }
 
     override fun postPhase(phase: String) {
-
         if (phase == "auto-login bots") {
             Bot.instances.forEach {
-                model.bots.add(ComposeBot(it))
+                ComposeBot(it)
             }
-        }
-
-        if (phase == "finally post") {
-            MiraiComposeView()
         }
     }
 }
 
-internal val MiraiCompose.model: Model get() = Model()
-
 internal val MiraiCompose.out get() = MiraiLogger.create("stdout")
-
 
 internal fun setSystemOut(out: MiraiLogger) {
     System.setOut(

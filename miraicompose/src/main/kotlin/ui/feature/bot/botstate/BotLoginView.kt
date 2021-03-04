@@ -3,28 +3,69 @@ package com.youngerhousea.miraicompose.ui.feature.bot.botstate
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.ShortcutsBuilderScope
+import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.model.LoginWindowState
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.Component
 import net.mamoe.mirai.network.WrongPasswordException
 
-//class BotLogin(componentContext:ComponentContext): Component, ComponentContext by componentContext {
-//    override fun render() {
-//        BotL
-//    }
-//
-//}
+class BotLogin(
+    componentContext: ComponentContext,
+    private val onClick: (account: Long, password: String) -> Unit
+) : Component, ComponentContext by componentContext {
+    @Composable
+    override fun render() {
+        BotLoginView(onClick)
+    }
+}
+
+
+class LoginWindowState {
+    var invalidInputAccount by mutableStateOf(false)
+
+    var exceptionPrompt by mutableStateOf("")
+
+    var isException by mutableStateOf(false)
+
+    var account by mutableStateOf(TextFieldValue())
+
+    var password by mutableStateOf(TextFieldValue())
+}
+
 
 @Composable
-fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) {
+fun BotLoginView(onClick: (account: Long, password: String) -> Unit) {
+    val loginWindowState = remember { LoginWindowState() }
+
+    fun login() {
+        runCatching { onClick(loginWindowState.account.text.toLong(), loginWindowState.password.text) }
+            .onFailure {
+                loginWindowState.exceptionPrompt = when (it) {
+                    is WrongPasswordException -> {
+                        "密码错误！"
+                    }
+                    is NumberFormatException -> {
+                        "格式错误！"
+                    }
+                    else -> {
+                        it.printStackTrace()
+                        "呜呜呜"
+                    }
+                }
+                loginWindowState.isException = true
+            }
+    }
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -48,7 +89,12 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) {
                 }
             },
             modifier = Modifier
-                .padding(40.dp),
+                .padding(40.dp)
+                .shortcuts {
+                    on(Key.Enter) {
+                        login()
+                    }
+                },
             isError = loginWindowState.invalidInputAccount,
             label = {
                 if (loginWindowState.invalidInputAccount)
@@ -76,22 +122,7 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) {
 
         BotLoginButton(
             {
-                runCatching(onClick)
-                    .onFailure {
-                        loginWindowState.exceptionPrompt = when (it) {
-                            is WrongPasswordException -> {
-                                "密码错误！"
-                            }
-                            is NumberFormatException -> {
-                                "格式错误！"
-                            }
-                            else -> {
-                                it.printStackTrace()
-                                "呜呜呜"
-                            }
-                        }
-                        loginWindowState.isException = true
-                    }
+                login()
             }, modifier = Modifier
                 .requiredHeight(100.dp)
         ) {
@@ -103,6 +134,8 @@ fun BotLoginView(loginWindowState: LoginWindowState, onClick: () -> Unit) {
             loginWindowState.isException = false
         }
     }
+
+
 }
 
 @Composable

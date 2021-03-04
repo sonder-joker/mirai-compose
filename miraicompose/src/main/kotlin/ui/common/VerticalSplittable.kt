@@ -56,7 +56,7 @@ class SplitterState {
 }
 
 @Composable
-internal fun VerticalSplitter(
+private fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
     color: Color = AppTheme.Colors.backgroundDark

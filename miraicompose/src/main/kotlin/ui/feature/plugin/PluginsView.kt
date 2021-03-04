@@ -18,18 +18,21 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arkivanov.decompose.*
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.pop
+import com.arkivanov.decompose.push
+import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.getPluginConfig
 import com.youngerhousea.miraicompose.console.getPluginData
-import com.youngerhousea.miraicompose.model.Model
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.utils.Component
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.data.*
-import net.mamoe.mirai.console.plugin.*
-import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
+import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.console.plugin.author
+import net.mamoe.mirai.console.plugin.info
+import net.mamoe.mirai.console.plugin.name
 import net.mamoe.yamlkt.Yaml
 
 

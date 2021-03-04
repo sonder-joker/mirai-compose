@@ -2,27 +2,26 @@ package com.youngerhousea.miraicompose.ui.feature.bot.listview
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.model.Model
-import com.youngerhousea.miraicompose.ui.bot.listview.BotAddButton
-import com.youngerhousea.miraicompose.ui.bot.listview.BotItem
 import com.youngerhousea.miraicompose.utils.VerticalScrollbar
 import com.youngerhousea.miraicompose.utils.withoutWidthConstraints
 
 @Composable
 fun TopView(modifier: Modifier) = Surface {
-    Row(modifier,
+    Row(
+        modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -35,7 +34,14 @@ fun TopView(modifier: Modifier) = Surface {
 }
 
 @Composable
-fun BotListView(model: Model, modifier: Modifier = Modifier) = Surface(modifier
+fun BotListView(
+    model: SnapshotStateList<ComposeBot>,
+    modifier: Modifier = Modifier,
+    onButtonClick: () -> Unit,
+    onItemClick: (bot: ComposeBot) -> Unit,
+    onItemRemove: (bot: ComposeBot) -> Unit
+) = Surface(
+    modifier
 ) {
     Box(Modifier.fillMaxSize()) {
         val scrollState = rememberLazyListState()
@@ -47,25 +53,24 @@ fun BotListView(model: Model, modifier: Modifier = Modifier) = Surface(modifier
                 .withoutWidthConstraints(),
             state = scrollState
         ) {
-            itemsIndexed(model.bots) { index, item ->
+            items(model) { item ->
                 BotItem(
                     item,
                     Modifier
                         .requiredHeight(itemHeight),
-                    updateAction = {
-                        model.currentIndex = index
+                    onItemClick = {
+                        onItemClick(item)
                     },
-                    removeAction = {
-                        model.bots.removeAt(model.currentIndex)
-                    },
+                    onItemRemove = {
+//                        onItemRemove(item)
+//                        TODO:https://github.com/JetBrains/compose-jb
+                    }
                 )
             }
 
             item {
                 BotAddButton(
-                    {
-                        model.bots.add(ComposeBot())
-                    },
+                    onButtonClick,
                     Modifier
                         .requiredHeight(itemHeight)
                 ) {
@@ -77,7 +82,7 @@ fun BotListView(model: Model, modifier: Modifier = Modifier) = Surface(modifier
         VerticalScrollbar(
             Modifier.align(Alignment.CenterEnd),
             scrollState,
-            model.bots.size + 1,
+            model.size + 1,
             itemHeight
         )
     }

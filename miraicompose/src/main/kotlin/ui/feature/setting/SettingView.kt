@@ -15,7 +15,7 @@ import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.utils.Component
 
 
-class Setting(componentContext: ComponentContext) : Component , ComponentContext by componentContext {
+class Setting(componentContext: ComponentContext, model: AppTheme) : Component , ComponentContext by componentContext {
     @Composable
     override fun render() {
         Column(

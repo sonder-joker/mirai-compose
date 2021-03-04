@@ -4,8 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.theme.AppTheme
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.ByteArrayOutputStream
@@ -19,10 +19,12 @@ import java.util.*
 
 val LoggerStorage = mutableStateListOf<AnnotatedString>()
 
-val ComposeBot.logs get() = LoggerStorage.filter { it.text.contains("Bot.${this.id}") }
+val Bot.logs get() = LoggerStorage.filter { it.text.contains("Bot.${this.id}") }
 
-private val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.SIMPLIFIED_CHINESE)
-private val currentTimeFormatted: String get() = timeFormat.format(Date())
+private val date = Date()
+private val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd-HH：mm：ss", Locale.SIMPLIFIED_CHINESE)
+private val currentTimeFormatted: String = timeFormat.format(date)
+
 
 internal fun writeToFile(it: String) {
     Files.write(

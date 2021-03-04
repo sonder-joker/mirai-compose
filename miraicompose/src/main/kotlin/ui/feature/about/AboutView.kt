@@ -12,7 +12,6 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.Component
 
-
 class About(componentContext: ComponentContext) : Component, ComponentContext by componentContext{
     @Composable
     override fun render() {

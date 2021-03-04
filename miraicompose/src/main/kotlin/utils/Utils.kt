@@ -11,12 +11,13 @@ import androidx.compose.ui.unit.Dp
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
+import net.mamoe.mirai.Bot
 
 private val client = HttpClient()
 
-suspend fun String.toAvatarImage(): ImageBitmap {
+suspend fun Bot.getAvatarImage(): ImageBitmap {
     return org.jetbrains.skija.Image.makeFromEncoded(
-        client.get(this@toAvatarImage) {
+        client.get(this@getAvatarImage.avatarUrl) {
             header("Connection", "close")
         }
     ).asImageBitmap()

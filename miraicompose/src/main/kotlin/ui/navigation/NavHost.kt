@@ -18,11 +18,12 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.LoggerStorage
 import com.youngerhousea.miraicompose.console.MiraiCompose
-import com.youngerhousea.miraicompose.console.model
 import com.youngerhousea.miraicompose.console.out
+import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.ui.common.SelectEdgeText
 import com.youngerhousea.miraicompose.ui.feature.about.About
-import com.youngerhousea.miraicompose.ui.feature.bot.Bot
+import com.youngerhousea.miraicompose.ui.feature.bot.BotV
 import com.youngerhousea.miraicompose.ui.feature.log.Log
 import com.youngerhousea.miraicompose.ui.feature.plugin.PluginV
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
@@ -47,13 +48,14 @@ class NavHost(
         componentFactory = { config, componentContext ->
             when (config) {
                 is Config.Bot ->
-                    Bot(
+                    BotV(
                         componentContext,
-                        model = MiraiCompose.model
+                        model = ComposeBot.instances
                     )
                 is Config.Setting ->
                     Setting(
                         componentContext,
+                        model = AppTheme
                     )
                 is Config.About ->
                     About(

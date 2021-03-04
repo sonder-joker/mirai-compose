@@ -7,7 +7,7 @@ import net.mamoe.mirai.console.plugin.Plugin
 import java.nio.file.Path
 
 interface ReadablePluginDataStorage : PluginDataStorage {
-    val data: MutableMap<PluginDataHolder, MutableList<PluginData>>
+    val dataMap: MutableMap<PluginDataHolder, MutableList<PluginData>>
 
     companion object {
         /**
@@ -16,28 +16,34 @@ interface ReadablePluginDataStorage : PluginDataStorage {
         operator fun invoke(directory: Path): ReadablePluginDataStorage =
             ReadablePluginDataStorageImpl(MultiFilePluginDataStorage(directory))
     }
+
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline operator fun ReadablePluginDataStorage.get(pluginDataHolder: PluginDataHolder): MutableList<PluginData> =
+    this.dataMap[pluginDataHolder] ?: error("No Data!")
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Plugin.getPluginData(): MutableList<PluginData> =
+    if (this is PluginDataHolder) MiraiCompose.dataStorageForJvmPluginLoader[this] else error("")
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Plugin.getPluginConfig(): MutableList<PluginData> =
+    if (this is PluginDataHolder) MiraiCompose.configStorageForJvmPluginLoader[this] else error("")
+
+
 
 private class ReadablePluginDataStorageImpl(
     private val delegete: PluginDataStorage
 ) : PluginDataStorage, ReadablePluginDataStorage {
-    override val data = mutableMapOf<PluginDataHolder, MutableList<PluginData>>()
+    override val dataMap = mutableMapOf<PluginDataHolder, MutableList<PluginData>>()
 
     override fun load(holder: PluginDataHolder, instance: PluginData) {
         delegete.load(holder, instance)
-        data.getOrPut(holder, ::mutableListOf).add(instance)
+        dataMap.getOrPut(holder, ::mutableListOf).add(instance)
     }
 
     override fun store(holder: PluginDataHolder, instance: PluginData) {
         delegete.store(holder, instance)
     }
 }
-
-fun Plugin.getPluginData(): MutableList<PluginData> =
-    MiraiCompose.dataStorageForJvmPluginLoader.data.getOrDefault(
-        this,
-        mutableListOf()
-    )
-
-fun Plugin.getPluginConfig() =
-    MiraiCompose.configStorageForJvmPluginLoader.data.getOrDefault(this, mutableListOf())
