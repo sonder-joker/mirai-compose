@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,10 +21,10 @@ internal fun SelectEdgeText(text: String, isWishWindow: Boolean, onClick: () -> 
             .clickable(onClick = onClick)
             .fillMaxWidth()
             .requiredHeight(80.dp)
-            .background(if (isWishWindow) AppTheme.themColors.backgroundDark else AppTheme.themColors.backgroundDarkGray),
+            .background(if (isWishWindow) MaterialTheme.colors.background else MaterialTheme.colors.primary),
         contentAlignment = Alignment.Center
     ) {
         Text(text)
     }
-    Divider(color = AppTheme.themColors.backgroundDark)
+    Divider(color = MaterialTheme.colors.background)
 }

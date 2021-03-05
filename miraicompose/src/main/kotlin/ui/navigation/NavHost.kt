@@ -55,7 +55,8 @@ class NavHost(
                 is Config.Setting ->
                     Setting(
                         componentContext,
-                        model = AppTheme
+                        logColor = AppTheme.logColors,
+                        internalColor = AppTheme.themeColors
                     )
                 is Config.About ->
                     About(

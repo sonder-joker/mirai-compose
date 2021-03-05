@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -59,7 +60,7 @@ class SplitterState {
 private fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
-    color: Color = AppTheme.themColors.backgroundDark
+    color: Color = MaterialTheme.colors.background
 ) = Box {
     Box(
         Modifier

@@ -123,7 +123,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier, 
             },
             modifier = Modifier
                 .weight(2f),
-            backgroundColor = AppTheme.themColors.backgroundDark,
+            backgroundColor = MaterialTheme.colors.background,
         ) {
             Text("发送")
         }

@@ -69,8 +69,10 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
 
     init {
+
+//        AppTheme = Files.read(configFiles.resolve("theme.yaml"), Json.decodeFromString(AppTheme))
         this.coroutineContext[Job]?.invokeOnCompletion {
-            Files.write(configFiles.resolve("theme"), Json.encodeToString(AppTheme).toByteArray())
+            Files.write(configFiles.resolve("theme.yaml"), Json.encodeToString(AppTheme).toByteArray())
         }
     }
 

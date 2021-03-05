@@ -12,10 +12,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.AppTheme
+import com.youngerhousea.miraicompose.theme.InternalColor
+import com.youngerhousea.miraicompose.theme.LogColor
 import com.youngerhousea.miraicompose.utils.Component
 
 
-class Setting(componentContext: ComponentContext, model: AppTheme) : Component , ComponentContext by componentContext {
+class Setting(componentContext: ComponentContext, val logColor: LogColor, val internalColor: InternalColor) : Component,
+    ComponentContext by componentContext {
     @Composable
     override fun render() {
         Column(
@@ -24,11 +27,13 @@ class Setting(componentContext: ComponentContext, model: AppTheme) : Component ,
                 .fillMaxSize()
         ) {
             Text("自定义配色(未实现)")
-            SimpleSetWindows("VERBOSE") { AppTheme.logColors.verbose = Color(it.toLong(16)) }
-            SimpleSetWindows("INFO") { AppTheme.logColors.info = Color(it.toLong(16)) }
-            SimpleSetWindows("WARING") { AppTheme.logColors.warning = Color(it.toLong(16)) }
-            SimpleSetWindows("ERROR") { AppTheme.logColors.error = Color(it.toLong(16)) }
-            SimpleSetWindows("DEBUG") { AppTheme.logColors.debug = Color(it.toLong(16)) }
+            SimpleSetWindows("VERBOSE") {
+                logColor.verbose = Color(it.toULong(16))
+            }
+            SimpleSetWindows("INFO") { logColor.info = Color(it.toULong(16)) }
+            SimpleSetWindows("WARING") { logColor.warning = Color(it.toULong(16)) }
+            SimpleSetWindows("ERROR") { logColor.error = Color(it.toULong(16)) }
+            SimpleSetWindows("DEBUG") { logColor.debug = Color(it.toULong(16)) }
         }
     }
 }

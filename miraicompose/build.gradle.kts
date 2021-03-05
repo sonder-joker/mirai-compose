@@ -23,6 +23,9 @@ dependencies {
 
     implementation(yamlkt)
     implementation(koin)
+
+    //may remove in future
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
 }
 
 compose.desktop {
