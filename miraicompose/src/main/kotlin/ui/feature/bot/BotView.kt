@@ -57,11 +57,11 @@ class BotV(componentContext: ComponentContext, val model: SnapshotStateList<Comp
 
     private fun onClick(account: Long, password: String) {
         router.push(BotState.Loading)
-        val bot = MiraiConsole.addComposeBot(account, password)
-        bot.launch {
+        val bot = MiraiConsole.addBot(account, password)
+        MiraiConsole.launch {
             bot.login()
         }.invokeOnCompletion {
-            it?.let { router.push(BotState.Login) } ?: router.push(BotState.State(bot))
+            it?.let { router.push(BotState.Login) } ?: router.push(BotState.State(ComposeBot(bot)))
         }
     }
 

@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.ShortcutsBuilderScope
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -17,6 +16,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.Component
+import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
 
 class BotLogin(
@@ -33,7 +33,7 @@ class BotLogin(
 class LoginWindowState {
     var invalidInputAccount by mutableStateOf(false)
 
-    var exceptionPrompt by mutableStateOf("")
+    var invalidPassword by mutableStateOf("")
 
     var isException by mutableStateOf(false)
 
@@ -50,12 +50,15 @@ fun BotLoginView(onClick: (account: Long, password: String) -> Unit) {
     fun login() {
         runCatching { onClick(loginWindowState.account.text.toLong(), loginWindowState.password.text) }
             .onFailure {
-                loginWindowState.exceptionPrompt = when (it) {
+                loginWindowState.invalidPassword = when (it) {
                     is WrongPasswordException -> {
                         "密码错误！"
                     }
                     is NumberFormatException -> {
                         "格式错误！"
+                    }
+                    is RetryLaterException -> {
+                        "请稍后再试"
                     }
                     else -> {
                         it.printStackTrace()
@@ -91,9 +94,7 @@ fun BotLoginView(onClick: (account: Long, password: String) -> Unit) {
             modifier = Modifier
                 .padding(40.dp)
                 .shortcuts {
-                    on(Key.Enter) {
-                        login()
-                    }
+                    on(Key.Enter, callback = ::login)
                 },
             isError = loginWindowState.invalidInputAccount,
             label = {
@@ -121,21 +122,21 @@ fun BotLoginView(onClick: (account: Long, password: String) -> Unit) {
         )
 
         BotLoginButton(
-            {
-                login()
-            }, modifier = Modifier
+            onClick = ::login,
+            modifier = Modifier
                 .requiredHeight(100.dp)
         ) {
             Text("登录")
         }
 
-        if (loginWindowState.isException) {
-            Snackbar { Text(loginWindowState.exceptionPrompt) }
-            loginWindowState.isException = false
-        }
+//        if (loginWindowState.isException) {
+//            Snackbar { Text(loginWindowState.exceptionPrompt) }
+//            LaunchedEffect(Unit) {
+//                delay(2000)
+//                loginWindowState.isException = false
+//            }
+//        }
     }
-
-
 }
 
 @Composable
@@ -143,13 +144,11 @@ fun BotLoginButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
-) {
-    FloatingActionButton(
-        onClick = onClick,
-        modifier = modifier
-            .aspectRatio(2f)
-            .padding(24.dp),
-        backgroundColor = AppTheme.Colors.backgroundDark,
-        content = content
-    )
-}
+) = FloatingActionButton(
+    onClick = onClick,
+    modifier = modifier
+        .aspectRatio(2f)
+        .padding(24.dp),
+    backgroundColor = AppTheme.themColors.backgroundDark,
+    content = content
+)

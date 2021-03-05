@@ -34,13 +34,13 @@ private class ComposeBotImpl(bot: Bot) : Bot by bot, ComposeBot {
 
     private var _avatar by mutableStateOf(ImageBitmap(200, 200))
 
-    private val onlineListener: Listener<BotOnlineEvent> =
-        eventChannel.parentJob(supervisorJob).subscribeAlways(
-            priority = EventPriority.MONITOR,
-            concurrency = ConcurrencyKind.LOCKED
-        ) {
-            loadResource()
-        }
+//    private val onlineListener: Listener<BotOnlineEvent> =
+//        eventChannel.parentJob(supervisorJob).subscribeAlways(
+//            priority = EventPriority.MONITOR,
+//            concurrency = ConcurrencyKind.LOCKED
+//        ) {
+//            loadResource()
+//        }
 
     override val avatar: ImageBitmap get() = _avatar
 

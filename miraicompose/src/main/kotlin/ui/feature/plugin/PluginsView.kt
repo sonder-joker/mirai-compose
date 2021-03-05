@@ -211,7 +211,7 @@ class PluginDetailed(
                 },
                 Modifier
                     .requiredWidth(100.dp)
-                    .background(AppTheme.Colors.backgroundDark)
+                    .background(AppTheme.themColors.backgroundDark)
             ) {
                 Text("修改")
             }

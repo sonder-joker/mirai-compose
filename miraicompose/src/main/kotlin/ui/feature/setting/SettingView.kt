@@ -24,11 +24,11 @@ class Setting(componentContext: ComponentContext, model: AppTheme) : Component ,
                 .fillMaxSize()
         ) {
             Text("自定义配色(未实现)")
-            SimpleSetWindows("VERBOSE") { AppTheme.LogColor.verbose = Color(it.toLong(16)) }
-            SimpleSetWindows("INFO") { AppTheme.LogColor.info = Color(it.toLong(16)) }
-            SimpleSetWindows("WARING") { AppTheme.LogColor.warning = Color(it.toLong(16)) }
-            SimpleSetWindows("ERROR") { AppTheme.LogColor.error = Color(it.toLong(16)) }
-            SimpleSetWindows("DEBUG") { AppTheme.LogColor.debug = Color(it.toLong(16)) }
+            SimpleSetWindows("VERBOSE") { AppTheme.logColors.verbose = Color(it.toLong(16)) }
+            SimpleSetWindows("INFO") { AppTheme.logColors.info = Color(it.toLong(16)) }
+            SimpleSetWindows("WARING") { AppTheme.logColors.warning = Color(it.toLong(16)) }
+            SimpleSetWindows("ERROR") { AppTheme.logColors.error = Color(it.toLong(16)) }
+            SimpleSetWindows("DEBUG") { AppTheme.logColors.debug = Color(it.toLong(16)) }
         }
     }
 }

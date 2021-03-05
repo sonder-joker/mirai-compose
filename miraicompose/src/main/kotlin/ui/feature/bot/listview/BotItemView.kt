@@ -76,7 +76,7 @@ fun BotAddButton(
         modifier = modifier
             .aspectRatio(2f)
             .padding(24.dp),
-        backgroundColor = AppTheme.Colors.backgroundDark,
+        backgroundColor = AppTheme.themColors.backgroundDark,
         content = content
     )
 }

@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -125,7 +123,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier, 
             },
             modifier = Modifier
                 .weight(2f),
-            backgroundColor = AppTheme.Colors.backgroundDark,
+            backgroundColor = AppTheme.themColors.backgroundDark,
         ) {
             Text("发送")
         }

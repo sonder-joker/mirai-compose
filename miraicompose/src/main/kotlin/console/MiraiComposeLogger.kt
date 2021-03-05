@@ -41,11 +41,11 @@ class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBa
 
     private val SimpleLogger.LogPriority.color: Color
         get() = when (this) {
-            SimpleLogger.LogPriority.VERBOSE -> AppTheme.LogColor.verbose
-            SimpleLogger.LogPriority.INFO -> AppTheme.LogColor.info
-            SimpleLogger.LogPriority.WARNING -> AppTheme.LogColor.warning
-            SimpleLogger.LogPriority.ERROR -> AppTheme.LogColor.error
-            SimpleLogger.LogPriority.DEBUG -> AppTheme.LogColor.debug
+            SimpleLogger.LogPriority.VERBOSE -> AppTheme.logColors.verbose
+            SimpleLogger.LogPriority.INFO -> AppTheme.logColors.info
+            SimpleLogger.LogPriority.WARNING -> AppTheme.logColors.warning
+            SimpleLogger.LogPriority.ERROR -> AppTheme.logColors.error
+            SimpleLogger.LogPriority.DEBUG -> AppTheme.logColors.debug
         }
 
     private fun printLog(message: String?, priority: SimpleLogger.LogPriority) {

@@ -20,10 +20,10 @@ internal fun SelectEdgeText(text: String, isWishWindow: Boolean, onClick: () -> 
             .clickable(onClick = onClick)
             .fillMaxWidth()
             .requiredHeight(80.dp)
-            .background(if (isWishWindow) AppTheme.Colors.backgroundDark else AppTheme.Colors.backgroundDarkGray),
+            .background(if (isWishWindow) AppTheme.themColors.backgroundDark else AppTheme.themColors.backgroundDarkGray),
         contentAlignment = Alignment.Center
     ) {
         Text(text)
     }
-    Divider(color = AppTheme.Colors.backgroundDark)
+    Divider(color = AppTheme.themColors.backgroundDark)
 }
