@@ -10,5 +10,5 @@ pluginManagement {
 
 rootProject.name = "mirai-compose"
 
-include (":miraicompose")
+include (":mirai-compose")
 
