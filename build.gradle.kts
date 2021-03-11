@@ -17,11 +17,13 @@ allprojects {
         mavenLocal()
         mavenCentral()
         maven(url = "https://jitpack.io/")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
 subprojects {
     afterEvaluate {
+        apply<Build>()
         configureJvmTarget()
         configureEncoding()
         configureKotlinExperimentalUsages()

@@ -64,7 +64,6 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
     override fun preStart() {
         setSystemOut(MiraiComposeLogger.out)
-        MiraiComposeView()
     }
 
     override fun postPhase(phase: String) {
@@ -83,16 +82,14 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
 
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
-    override val name: String
-        get() = "MiraiCompose"
-    override val vendor: String
-        get() = "Noire"
-    override val version: SemVersion
-        get() = SemVersion("1.1.0")
+    override val name: String = "MiraiCompose"
+    override val vendor: String = "Noire"
+    override val version: SemVersion = SemVersion("1.1.0")
 }
 
 
 // Compose Entry Point
 fun main() {
+    MiraiComposeView()
     MiraiCompose.start()
 }

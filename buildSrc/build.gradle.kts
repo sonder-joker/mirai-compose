@@ -1,12 +1,17 @@
 import org.gradle.kotlin.dsl.`kotlin-dsl`
 
-repositories {
-    jcenter()
-}
-
 plugins {
     `kotlin-dsl`
 }
+
+repositories {
+    jcenter()
+    mavenLocal()
+    mavenCentral()
+    maven(url = "https://jitpack.io/")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
+
 
 kotlin {
     sourceSets.all {
@@ -14,4 +19,7 @@ kotlin {
 //        languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
     }
 }
+
+
+
 

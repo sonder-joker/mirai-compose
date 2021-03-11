@@ -11,19 +11,19 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youngerhousea.miraicompose.utils.items
+import com.youngerhousea.miraicompose.console.dataWithConfig
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.Command.Companion.allNames
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.*
+import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.yamlkt.Yaml
 
 private val yaml = Yaml.default
@@ -70,15 +70,15 @@ internal fun PluginDescription(plugin: Plugin) =
     Text(plugin.annotatedSimple, Modifier.padding(start = 20.dp))
 
 @Composable
-internal fun PluginDataView(modifier: Modifier = Modifier, pluginDatas: List<PluginData>) =
+internal fun PluginDataView(modifier: Modifier = Modifier, plugin: JvmPlugin) =
     LazyColumn(
         modifier,
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(pluginDatas) { pluginData ->
+        items(plugin.dataWithConfig) { pluginData ->
             PluginDataExplanationView(pluginData)
-            EditView(pluginData)
+            EditView(pluginData, plugin)
         }
     }
 
@@ -104,7 +104,7 @@ private fun PluginDataExplanationView(pluginData: PluginData) =
     Text(pluginData.annotatedExplain, Modifier.padding(bottom = 40.dp))
 
 @Composable
-private fun EditView(pluginData: PluginData) {
+private fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
     var value by remember(pluginData) {
         mutableStateOf(
             yaml.encodeToString(
@@ -117,8 +117,6 @@ private fun EditView(pluginData: PluginData) {
 
     var textField by remember(pluginData) { mutableStateOf(TextFieldValue(value)) }
 
-    var isSuccess by remember(pluginData) { mutableStateOf(true) }
-
     Row(
         Modifier.fillMaxWidth().padding(bottom = 40.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -128,13 +126,14 @@ private fun EditView(pluginData: PluginData) {
         })
         Button(
             {
-                kotlin.runCatching {
-                    yaml.decodeFromString(pluginData.updaterSerializer, textField.text)
-                }.onSuccess {
-                    value = textField.text
-                    isSuccess = true
-                }.onFailure {
-                    it.printStackTrace()
+                plugin.launch {
+                    kotlin.runCatching {
+                        yaml.decodeFromString(pluginData.updaterSerializer, textField.text)
+                    }.onSuccess {
+                        value = textField.text
+                    }.onFailure {
+                        it.printStackTrace()
+                    }
                 }
             },
             Modifier

@@ -1,4 +1,3 @@
-import org.gradle.internal.impldep.org.fusesource.jansi.AnsiRenderer.test
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -10,9 +9,6 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-repositories {
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
 
 dependencies {
     implementation(compose.desktop.currentOs)
@@ -31,7 +27,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation ("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
 }
 
 tasks.named<Test>("test") {
@@ -73,6 +69,24 @@ compose.desktop {
                 iconFile.set(project.file("../icons/mirai.ico"))
                 upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
             }
+        }
+    }
+}
+
+tasks {
+    val compileKotlin by getting {}
+
+    register("fillConstant") {
+        doLast {
+            (compileKotlin as KotlinCompile).source.filter{ it.name == "MiraiCompose.kt"}.single()
+                .let { file ->
+                    file.readText()
+                        .replace(
+                            Regex("""override val version: SemVersion = SemVersion\(.*\)""")
+                        ) {
+                            """override val version: SemVersion = SemVersion("${project.version}")"""
+                        }
+                }
         }
     }
 }

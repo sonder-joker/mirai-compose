@@ -16,15 +16,14 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.dataWithConfig
 import com.youngerhousea.miraicompose.ui.common.PluginCommandView
 import com.youngerhousea.miraicompose.ui.common.PluginDataView
 import com.youngerhousea.miraicompose.ui.common.PluginDescription
 import com.youngerhousea.miraicompose.utils.Component
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
-import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 
 class PluginV(component: ComponentContext, val plugins: List<Plugin>) : Component, ComponentContext by component {
@@ -43,11 +42,18 @@ class PluginV(component: ComponentContext, val plugins: List<Plugin>) : Componen
                     )
                 }
                 is Configuration.Detailed -> {
-                    PluginDetailed(
-                        ComponentContext,
-                        configuration.plugin,
-                        onExit = ::onExit
-                    )
+                    when (configuration.plugin) {
+                        is JvmPlugin -> {
+                            PluginDetailed(
+                                ComponentContext,
+                                configuration.plugin,
+                                onExit = ::onExit
+                            )
+                        }
+                        else -> {
+                            TODO()
+                        }
+                    }
                 }
             }
         }
@@ -105,7 +111,7 @@ class PluginList(
 
 class PluginDetailed(
     componentContext: ComponentContext,
-    val plugin: Plugin,
+    val plugin: JvmPlugin,
     val onExit: () -> Unit
 ) : Component, ComponentContext by componentContext {
 
@@ -124,7 +130,7 @@ class PluginDetailed(
                     CommandWindow(componentContext, plugin.registeredCommands, ::onClick)
                 }
                 is Setting.Data -> {
-                    DataWindow(componentContext, plugin.dataWithConfig, ::onReturn)
+                    DataWindow(componentContext, plugin, ::onReturn)
                 }
             }
         }
@@ -170,13 +176,13 @@ class CommandWindow(
 
 class DataWindow(
     componentContext: ComponentContext,
-    private val pluginDatas: List<PluginData>,
+    private val plugin: JvmPlugin,
     private val onReturn: () -> Unit
 ) : Component, ComponentContext by componentContext {
     @Composable
     override fun render() {
         Column(Modifier.fillMaxSize()) {
-            PluginDataView(pluginDatas = pluginDatas)
+            PluginDataView(plugin = plugin)
             Icon(Icons.Default.KeyboardArrowLeft, null, Modifier.clickable(onClick = onReturn))
         }
     }

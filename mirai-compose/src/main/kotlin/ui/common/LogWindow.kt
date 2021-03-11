@@ -13,6 +13,7 @@ import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.utils.VerticalScrollbar
+import com.youngerhousea.miraicompose.utils.chunked
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.descriptor.AbstractCommandValueParameter
@@ -28,70 +29,47 @@ import net.mamoe.mirai.utils.warning
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-@Composable
-internal fun LogWindow(logs: List<AnnotatedString>, logger: MiraiLogger) {
-    Column {
-        LogBox(
-            logs,
-            Modifier
-                .weight(8f)
-        )
-        CommandSendBox(
-            logger,
-            Modifier
-                .weight(1f),
-        )
-    }
-}
 
 @Composable
 internal fun LogBox(logs: List<AnnotatedString>, modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
     Surface(
         modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp, vertical = 20.dp),
     ) {
         val state = rememberLazyListState()
+        val scope = rememberCoroutineScope()
+        BoxWithConstraints {
+            val listLog =  logs.flatMap {
+                it.chunked(constraints.minWidth / 9)
+            }
+            val itemHeight = 35.dp
 
-        Box {
             LazyColumn(
                 Modifier
                     .fillMaxWidth(),
                 state = state
             ) {
                 items(
-                    logs,
-                    key = {
-                        it.text
-                    },
+                    listLog
                 ) {
                     Text(
                         it,
                         modifier = Modifier
-                            .height(35.dp)
-                            .padding(vertical = 5.dp)
+                            .height(itemHeight)
                     )
                 }
+                scope.launch {
+                    state.scrollToItem(listLog.size - 1, 0)
+                }
             }
+
 
             VerticalScrollbar(
                 Modifier.align(Alignment.CenterEnd),
                 state,
-                logs.size,
-                30.dp
+                listLog.size,
+                itemHeight
             )
-
-        }
-
-        Button(
-            modifier = Modifier.requiredSize(40.dp),
-            onClick = {
-                scope.launch {
-                    state.animateScrollToItem(0)
-                }
-            }) {
-            Text("ceshi")
         }
     }
 }
@@ -99,16 +77,13 @@ internal fun LogBox(logs: List<AnnotatedString>, modifier: Modifier = Modifier) 
 @OptIn(ExperimentalCommandDescriptors::class)
 @Composable
 internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) {
-    // TODO:引入route后提升作用域
-    val scope = rememberCoroutineScope()
     var currentCommand by remember(logger) { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
-    val onClick = {
-        scope.launch {
-            SolveCommandResult(currentCommand, logger)
-        }.invokeOnCompletion {
-            currentCommand = ""
-        }
+    fun onClick() = scope.launch {
+        SolveCommandResult(currentCommand, logger)
+    }.invokeOnCompletion {
+        currentCommand = ""
     }
 
     Row(modifier.padding(horizontal = 40.dp)) {
@@ -120,9 +95,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
             modifier = Modifier
                 .weight(13f)
                 .shortcuts {
-                    on(Key.Enter) {
-                        onClick()
-                    }
+                    on(Key.Enter, callback = ::onClick)
                 },
             singleLine = true,
         )
@@ -132,9 +105,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
         )
 
         FloatingActionButton(
-            onClick = {
-                onClick()
-            },
+            onClick = ::onClick,
             modifier = Modifier
                 .weight(2f),
             backgroundColor = MaterialTheme.colors.background,

@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -67,6 +68,7 @@ class BotV(componentContext: ComponentContext, val model: MutableList<ComposeBot
     override fun render() {
         Children(router.state) { child, configuration ->
             val panelState = remember { PanelState() }
+            val scope = rememberCoroutineScope()
             val animatedSize = if (panelState.splitter.isResizing)
                 if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
             else
@@ -105,13 +107,15 @@ class BotV(componentContext: ComponentContext, val model: MutableList<ComposeBot
                             },
                             onItemClick = { bot ->
                                 router.push(BotState.State(bot))
+                            },
+                            onItemRemove = { bot ->
+                                scope.launch {
+                                    bot.closeAndJoin()
+                                }.invokeOnCompletion {
+                                    router.push(BotState.Login)
+                                }
                             }
-                        ) { bot ->
-                            MiraiConsole.launch {
-                                bot.closeAndJoin()
-                                router.push(BotState.Login)
-                            }
-                        }
+                        )
                     }
                 }
                 child.render()

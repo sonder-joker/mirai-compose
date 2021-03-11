@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
@@ -31,6 +32,7 @@ import com.youngerhousea.miraicompose.ui.feature.plugin.PluginV
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
 import com.youngerhousea.miraicompose.utils.Component
 import kotlinx.coroutines.cancel
+import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.plugin.PluginManager
 
 fun MiraiComposeView() =
@@ -42,19 +44,18 @@ fun MiraiComposeView() =
             MiraiCompose.cancel()
         }
     ) {
-        MaterialTheme(
-            colors = ComposeSetting.AppTheme.themeColors.materialDark
-        ) {
-            rememberRootComponent { componentContext ->
-                NavHost(componentContext)
-            }.render()
-        }
+        rememberRootComponent { componentContext ->
+            NavHost(componentContext)
+        }.render()
+
+
     }
 
 
 class NavHost(
     component: ComponentContext,
 ) : Component, ComponentContext by component {
+
 
     sealed class Config : Parcelable {
         object Bot : Config()
@@ -77,7 +78,6 @@ class NavHost(
                 is Config.Setting ->
                     Setting(
                         componentContext,
-                        ComposeSetting.AppTheme
                     )
                 is Config.About ->
                     About(
@@ -101,11 +101,15 @@ class NavHost(
 
     @Composable
     override fun render() {
-        Children(router.state) { child, config ->
-            Surface {
-                Row {
-                    Edge(config)
-                    child.render()
+        MaterialTheme(
+            colors = ComposeSetting.AppTheme.themeColors.materialDark
+        ) {
+            Children(router.state) { child, config ->
+                Surface {
+                    Row {
+                        Edge(config)
+                        child.render()
+                    }
                 }
             }
         }

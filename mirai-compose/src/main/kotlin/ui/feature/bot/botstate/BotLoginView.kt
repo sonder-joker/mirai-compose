@@ -29,7 +29,7 @@ class BotLogin(
 }
 
 
-class LoginWindowState {
+private class LoginWindowState {
     var invalidInputAccount by mutableStateOf(false)
 
     var invalidPassword by mutableStateOf("")

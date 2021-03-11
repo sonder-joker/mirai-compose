@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
@@ -62,6 +63,38 @@ inline fun <T> ColumnScope.items(
         itemContent(item)
     }
 }
+
+public fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
+    return windowed(size, size, partialWindows = true)
+}
+public fun AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): List<AnnotatedString> {
+    return windowed(size, step, partialWindows) { it }
+}
+
+public fun <R> AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false, transform: (AnnotatedString) -> R): List<R> {
+    checkWindowSizeStep(size, step)
+    val thisSize = this.length
+    val resultCapacity = thisSize / step + if (thisSize % step == 0) 0 else 1
+    val result = ArrayList<R>(resultCapacity)
+    var index = 0
+    while (index in 0 until thisSize) {
+        val end = index + size
+        val coercedEnd = if (end < 0 || end > thisSize) { if (partialWindows) thisSize else break } else end
+        result.add(transform(subSequence(index, coercedEnd)))
+        index += step
+    }
+    return result
+}
+
+internal fun checkWindowSizeStep(size: Int, step: Int) {
+    require(size > 0 && step > 0) {
+        if (size != step)
+            "Both size $size and step $step must be greater than zero."
+        else
+            "size $size must be greater than zero."
+    }
+}
+
 
 internal fun setSystemOut(out: MiraiLogger) {
     System.setOut(
