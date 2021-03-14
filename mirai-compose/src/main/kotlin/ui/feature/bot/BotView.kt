@@ -126,7 +126,7 @@ class BotV(componentContext: ComponentContext, val model: MutableList<ComposeBot
         }
     }
 
-    sealed class BotState : Parcelable {
+    private sealed class BotState : Parcelable {
         object Login : BotState()
         object Loading : BotState()
         class State(val bot: ComposeBot) : BotState()
