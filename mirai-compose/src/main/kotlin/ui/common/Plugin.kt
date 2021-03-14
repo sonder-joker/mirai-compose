@@ -4,34 +4,42 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AlignHorizontalCenter
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youngerhousea.miraicompose.console.dataWithConfig
+import com.youngerhousea.miraicompose.theme.ResourceImage
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.Command.Companion.allNames
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.*
+import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
+import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.yamlkt.Yaml
 
 private val yaml = Yaml.default
 
 private inline val Plugin.annotatedName: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 30.sp))
-        append(this@annotatedName.name.ifEmpty { "未知" })
+        pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.White, fontSize = 20.sp))
+        append(name.ifEmpty { "Unknown" })
         pop()
         toAnnotatedString()
     }
@@ -39,35 +47,80 @@ private inline val Plugin.annotatedName: AnnotatedString
 
 private inline val Plugin.annotatedAuthor: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp))
-        append("简介")
-        pop()
-        append(this@annotatedAuthor.author.ifEmpty { "未知" })
+        pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
+        append("Author:")
+        append(this@annotatedAuthor.author.ifEmpty { "Unknown" })
         toAnnotatedString()
     }
 
 private inline val Plugin.annotatedInfo: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp))
-        append("作者")
-        pop()
-        append(this@annotatedInfo.info.ifEmpty { "未知" })
+        pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
+        append("Info:")
+        append(this@annotatedInfo.info.ifEmpty { "Unknown" })
         toAnnotatedString()
     }
 
-private inline val Plugin.annotatedSimple: AnnotatedString
+//private inline val Plugin.annotatedSimple: AnnotatedString
+//    get() = with(AnnotatedString.Builder()) {
+//        append(this@annotatedSimple.annotatedName)
+//        append('\n')
+//        append(this@annotatedSimple.annotatedAuthor)
+//        append('\n')
+//        append(this@annotatedSimple.annotatedInfo)
+//        toAnnotatedString()
+//    }
+
+private inline val Plugin.annotatedKind: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        append(this@annotatedSimple.annotatedName)
-        append('\n')
-        append(this@annotatedSimple.annotatedInfo)
-        append('\n')
-        append(this@annotatedSimple.annotatedAuthor)
+        pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
+        append(
+            when (this@annotatedKind) {
+                is JavaPlugin -> {
+                    "Java"
+                }
+                is KotlinPlugin -> {
+                    "Kotlin"
+                }
+                else -> {
+                    "Help"
+                }
+            }
+        )
         toAnnotatedString()
     }
+
+private val Plugin.kindIcon: ImageVector
+    get() =
+        when (this) {
+            is JavaPlugin -> {
+                ResourceImage.java
+            }
+            is KotlinPlugin -> {
+                ResourceImage.kotlin
+            }
+            else -> {
+                Icons.Default.Help
+            }
+        }
+
 
 @Composable
-internal fun PluginDescription(plugin: Plugin) =
-    Text(plugin.annotatedSimple, Modifier.padding(start = 20.dp))
+internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(plugin.annotatedName, overflow = TextOverflow.Ellipsis, maxLines = 1)
+        Spacer(Modifier.height(20.dp))
+        Text(plugin.annotatedAuthor, overflow = TextOverflow.Ellipsis)
+        Spacer(Modifier.height(10.dp))
+        Text(plugin.annotatedInfo, overflow = TextOverflow.Ellipsis)
+        Spacer(Modifier.height(10.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(plugin.kindIcon, null, tint = Color.White)
+            Text(plugin.annotatedKind)
+        }
+    }
+}
 
 @Composable
 internal fun PluginDataView(modifier: Modifier = Modifier, plugin: JvmPlugin) =
@@ -149,9 +202,21 @@ private fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
 internal fun PluginCommandView(modifier: Modifier = Modifier, registeredCommands: List<Command>) =
     LazyColumn(modifier) {
         items(registeredCommands) { registeredCommand ->
-            Text(registeredCommand.allNames.joinToString { " " } + '\n' + registeredCommand.usage + '\n' + registeredCommand.description)
+            Text(registeredCommand.simpleDescription)
+            Spacer(Modifier.height(20.dp))
         }
     }
+
+private inline val Command.simpleDescription: AnnotatedString
+    get() =
+        with(AnnotatedString.Builder()) {
+            append(allNames.joinToString { " " })
+            append('\n')
+            append(usage)
+            append('\n')
+            append(description)
+            toAnnotatedString()
+        }
 
 
 

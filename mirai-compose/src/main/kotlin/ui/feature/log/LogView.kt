@@ -1,6 +1,7 @@
 package com.youngerhousea.miraicompose.ui.feature.log
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -33,13 +34,14 @@ internal fun LogWindow(logs: List<AnnotatedString>, logger: MiraiLogger) {
         LogBox(
             logs,
             Modifier
-                .padding(horizontal = 40.dp, vertical = 20.dp)
                 .weight(8f)
+                .padding(horizontal = 40.dp, vertical =  20.dp)
         )
         CommandSendBox(
             logger,
             Modifier
-                .weight(1f),
+                .weight(1f)
+                .padding(horizontal = 40.dp),
         )
     }
 }

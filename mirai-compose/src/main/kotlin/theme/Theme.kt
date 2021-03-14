@@ -45,17 +45,17 @@ internal data class InternalColor(
 ) {
     @Transient
     val materialDark: Colors = darkColors(
-        background = background,
-        surface = surface,
-        primary = primary,
-        secondary = secondary
+//        background = background,
+//        surface = surface,
+//        primary = primary,
+//        secondary = secondary
     )
 
     @Transient
     val materialLight: Colors = lightColors(
-//        background = backgroundDark,
+//        background = Color(0xf5FFFFFF),
 //        surface = backgroundMedium,
-        primary = primary,
+        primary = Color(0xf5f5f5f5),
 //        secondary = backgroundLight
     )
 }

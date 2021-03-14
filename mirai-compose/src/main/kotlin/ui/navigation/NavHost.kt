@@ -1,16 +1,17 @@
 package com.youngerhousea.miraicompose.ui.navigation
 
+import androidx.compose.desktop.DesktopMaterialTheme
+import androidx.compose.desktop.DesktopTheme
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -25,6 +26,7 @@ import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.ui.common.SelectEdgeText
+import com.youngerhousea.miraicompose.ui.common.Spacer
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.bot.BotV
 import com.youngerhousea.miraicompose.ui.feature.log.Log
@@ -32,12 +34,12 @@ import com.youngerhousea.miraicompose.ui.feature.plugin.PluginV
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
 import com.youngerhousea.miraicompose.utils.Component
 import kotlinx.coroutines.cancel
-import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.plugin.PluginManager
+
 
 fun MiraiComposeView() =
     Window(
-        title = "Mirai Compose",
+        title = "",
         size = IntSize(1280, 768),
         icon = ResourceImage.icon,
         onDismissRequest = {
@@ -47,15 +49,12 @@ fun MiraiComposeView() =
         rememberRootComponent { componentContext ->
             NavHost(componentContext)
         }.render()
-
-
     }
 
 
 class NavHost(
     component: ComponentContext,
 ) : Component, ComponentContext by component {
-
 
     sealed class Config : Parcelable {
         object Bot : Config()
@@ -101,28 +100,31 @@ class NavHost(
 
     @Composable
     override fun render() {
-        MaterialTheme(
-            colors = ComposeSetting.AppTheme.themeColors.materialDark
+        DesktopMaterialTheme(
+            colors = ComposeSetting.AppTheme.themeColors.materialLight
         ) {
-            Children(router.state) { child, config ->
-                Surface {
-                    Row {
-                        Edge(config)
-                        child.render()
-                    }
+            Children(
+                router.state,
+            ) { child, config ->
+                Row {
+                    Edge(config)
+                    child.render()
                 }
             }
         }
     }
+
 
     @Composable
     private fun Edge(config: Config) {
         Column(
             Modifier
                 .requiredWidth(160.dp)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .background(MaterialTheme.colors.primary),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer()
             SelectEdgeText(
                 "机器人",
                 isWishWindow = config is Config.Bot

@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.loadVectorXmlResource
+import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.Image
 import org.xml.sax.InputSource
@@ -13,11 +14,14 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 object ResourceImage {
+    val emptyIcon = loadImageResource("emptyIcon.png")
     val mirai = loadImageVector("ic_mirai.xml")
     val icon = loadImageResource("mirai.png")
     val close = loadImageVector("ic_close.xml")
     val max = loadImageVector("ic_max.xml")
     val min = loadImageVector("ic_min.xml")
+    val java = loadImageVector("ic_java.xml")
+    val kotlin = loadImageVector("ic_kotlin.xml")
 }
 
 @Suppress("SameParameterValue")

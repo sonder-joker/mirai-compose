@@ -24,10 +24,12 @@ dependencies {
     //may remove in future
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
 
+    implementation("org.jetbrains.compose.material:material-icons-extended:${Versions.compose}")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
+
 }
 
 tasks.named<Test>("test") {
@@ -78,7 +80,7 @@ tasks {
 
     register("fillConstant") {
         doLast {
-            (compileKotlin as KotlinCompile).source.filter{ it.name == "MiraiCompose.kt"}.single()
+            (compileKotlin as KotlinCompile).source.filter { it.name == "MiraiCompose.kt" }.single()
                 .let { file ->
                     file.readText()
                         .replace(

@@ -1,4 +1,4 @@
-package ui.common
+package com.youngerhousea.miraicompose.ui.common
 
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.background
@@ -73,8 +73,7 @@ private fun VerticalSplitter(
                         startDragImmediately = true,
                         onDragStarted = { splitterState.isResizing = true },
                         onDragStopped = { splitterState.isResizing = false },
-                    )
-                        .cursorForHorizontalResize()
+                    ).cursorForHorizontalResize()
                 } else {
                     this
                 }

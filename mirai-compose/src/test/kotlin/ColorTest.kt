@@ -1,6 +1,8 @@
 package com.youngerhousea.miraicompose
 
+import androidx.compose.ui.graphics.Color
 import com.youngerhousea.miraicompose.theme.AppTheme
+import com.youngerhousea.miraicompose.theme.ColorSerializer
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml
@@ -11,6 +13,8 @@ internal class ColorTest {
 
     val yaml = Yaml { }
 
+    val testColor = Color(235, 235, 235)
+
     @Test
     fun appThemeTest() {
         val theme = yaml.encodeToString(ComposeSetting.AppTheme)
@@ -18,6 +22,10 @@ internal class ColorTest {
         assertEquals(ComposeSetting.AppTheme, data)
     }
 
+    @Test
+    fun t() {
+        println(yaml.encodeToString(ColorSerializer, testColor))
+    }
 
 }
 

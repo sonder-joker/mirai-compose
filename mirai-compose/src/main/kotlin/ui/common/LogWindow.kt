@@ -86,7 +86,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
         currentCommand = ""
     }
 
-    Row(modifier.padding(horizontal = 40.dp)) {
+    Row(modifier) {
         TextField(
             currentCommand,
             onValueChange = {

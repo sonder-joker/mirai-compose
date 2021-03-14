@@ -16,10 +16,13 @@ import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.*
+import java.awt.Color
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
-
+import javax.swing.JFrame
+import javax.swing.UIManager
+import javax.swing.plaf.ColorUIResource
 
 
 @ConsoleFrontEndImplementation

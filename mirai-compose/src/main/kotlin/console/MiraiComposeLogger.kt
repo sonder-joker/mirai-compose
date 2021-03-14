@@ -36,7 +36,7 @@ class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBa
 
         val Bot.logs get() = loggerStorage.filter { it.text.contains("Bot.${this.id}") }
 
-        val out get() = MiraiLogger.create("stdout")
+        val out = MiraiLogger.create("stdout")
 
         val logFiles = MiraiCompose.rootPath.resolve("log").createDirectories()
     }

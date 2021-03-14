@@ -1,20 +1,30 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.youngerhousea.miraicompose.ui.feature.bot.botstate
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.RemoveRedEye
+import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.Component
+import com.youngerhousea.miraicompose.utils.HorizontalDottedProgressBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
 
@@ -29,125 +39,190 @@ class BotLogin(
 }
 
 
-private class LoginWindowState {
-    var invalidInputAccount by mutableStateOf(false)
-
-    var invalidPassword by mutableStateOf("")
-
-    var isException by mutableStateOf(false)
-
+private class LoginWindowState(private val _onLogin: (account: Long, password: String) -> Unit) {
     var account by mutableStateOf(TextFieldValue())
 
     var password by mutableStateOf(TextFieldValue())
-}
 
+    var hasAccountError by mutableStateOf(false)
 
-@Composable
-fun BotLoginView(onClick: (account: Long, password: String) -> Unit) {
-    val loginWindowState = remember { LoginWindowState() }
+    var hasPasswordError by mutableStateOf(false)
 
-    fun login() {
-        runCatching { onClick(loginWindowState.account.text.toLong(), loginWindowState.password.text) }
-            .onFailure {
-                loginWindowState.invalidPassword = when (it) {
-                    is WrongPasswordException -> {
-                        "密码错误！"
-                    }
-                    is NumberFormatException -> {
-                        "格式错误！"
-                    }
-                    is RetryLaterException -> {
-                        "请稍后再试"
-                    }
-                    else -> {
-                        it.printStackTrace()
-                        "呜呜呜"
-                    }
+    var errorTip by mutableStateOf("")
+
+    var passwordVisualTransformation by mutableStateOf<VisualTransformation>(
+        PasswordVisualTransformation()
+    )
+
+    var loading by mutableStateOf(false)
+
+    suspend fun onLogin() {
+        runCatching {
+            loading = true
+            this@LoginWindowState._onLogin(account.text.toLong(), password.text)
+        }.onSuccess {
+            loading = false
+        }.onFailure {
+            loading = false
+            errorTip = when (it) {
+                is WrongPasswordException -> {
+                    hasPasswordError = true
+                    "密码错误！"
                 }
-                loginWindowState.isException = true
+                is NumberFormatException -> {
+                    hasAccountError = true
+                    "账号格式错误"
+                }
+                is RetryLaterException -> {
+                    "请稍后再试"
+                }
+                else -> {
+                    it.printStackTrace()
+                    "未知异常，请反馈"
+                }
             }
+            delay(3000)
+            hasAccountError = false
+            hasPasswordError = false
+        }
     }
 
+    fun onAccountTextChange(textFieldValue: TextFieldValue) {
+        if (textFieldValue.text.matches("^[0-9]{0,15}$".toRegex())) {
+            account = textFieldValue
+            hasAccountError = false
+        } else {
+            hasAccountError = true
+        }
+    }
+
+    fun onPasswordTextChange(textFieldValue: TextFieldValue) {
+        password = textFieldValue
+    }
+
+    @Composable
+    fun accountLabel() {
+        if (hasAccountError)
+            Text(errorTip)
+        else
+            Text("账号")
+    }
+
+    @Composable
+    fun passwordLabel() {
+        if (hasPasswordError)
+            Text(errorTip)
+        else
+            Text("密码")
+    }
+
+    fun passwordTrailingIconChange() {
+        passwordVisualTransformation =
+            if (passwordVisualTransformation != VisualTransformation.None)
+                VisualTransformation.None
+            else
+                PasswordVisualTransformation()
+    }
+
+}
+
+@Composable
+fun BotLoginView(onLogin: (account: Long, password: String) -> Unit) {
+    val loginWindowState = remember { LoginWindowState(onLogin) }
+    val scope = rememberCoroutineScope()
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Icon(
+        Image(
             ResourceImage.mirai,
             contentDescription = "Mirai",
             modifier = Modifier
                 .padding(5.dp)
         )
-
-        TextField(
-            loginWindowState.account,
-            onValueChange = {
-                if (it.text.matches("^[0-9]{0,15}$".toRegex())) {
-                    loginWindowState.account = it
-                    loginWindowState.invalidInputAccount = false
-                } else {
-                    loginWindowState.invalidInputAccount = true
-                }
-            },
-            modifier = Modifier
-                .padding(40.dp)
-                .shortcuts {
-                    on(Key.Enter, callback = ::login)
-                },
-            isError = loginWindowState.invalidInputAccount,
-            label = {
-                if (loginWindowState.invalidInputAccount)
-                    Text("账号只能由数字组成")
-                else
-                    Text("账号")
-            })
-
-        TextField(
-            loginWindowState.password,
-            onValueChange = {
-                loginWindowState.password = it
-            },
-            modifier = Modifier
-                .padding(40.dp),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
-            ),
-            singleLine = true,
-            label = {
-                Text("密码")
-            },
-        )
-
-        BotLoginButton(
-            onClick = ::login,
-            modifier = Modifier
-                .requiredHeight(100.dp)
-        ) {
-            Text("登录")
-        }
-
-//        if (loginWindowState.isException) {
-//            Snackbar { Text(loginWindowState.exceptionPrompt) }
-//            LaunchedEffect(Unit) {
-//                delay(2000)
-//                loginWindowState.isException = false
-//            }
-//        }
+        AccountTextField(loginWindowState, scope)
+        PasswordTextField(loginWindowState, scope)
+        LoginButton(loginWindowState, scope)
     }
 }
 
 @Composable
-fun BotLoginButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) = FloatingActionButton(
-    onClick = onClick,
-    modifier = modifier
+private inline fun AccountTextField(
+    loginWindowState: LoginWindowState,
+    scope: CoroutineScope
+) = TextField(
+    value = loginWindowState.account,
+    onValueChange = loginWindowState::onAccountTextChange,
+    modifier = Modifier
+        .padding(40.dp)
+        .shortcuts {
+            on(Key.Enter, callback = { scope.launch { loginWindowState.onLogin() } })
+        },
+    label = {
+        loginWindowState.accountLabel()
+    },
+    leadingIcon = {
+        Icon(
+            imageVector = Icons.Default.AccountBox,
+            null
+        )
+    },
+    isError = loginWindowState.hasAccountError,
+    keyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Text,
+        imeAction = ImeAction.Next
+    ),
+    singleLine = true
+)
+
+@Composable
+private inline fun PasswordTextField(loginWindowState: LoginWindowState, scope: CoroutineScope) =
+    TextField(
+        value = loginWindowState.password,
+        onValueChange = loginWindowState::onPasswordTextChange,
+        modifier = Modifier
+            .padding(40.dp)
+            .shortcuts {
+                on(Key.Enter, callback = { scope.launch { loginWindowState.onLogin() } })
+            },
+        label = { loginWindowState.passwordLabel() },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.VpnKey,
+                contentDescription = null
+            )
+        },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.RemoveRedEye,
+                contentDescription = null,
+                modifier = Modifier.clickable(onClick = loginWindowState::passwordTrailingIconChange)
+            )
+        },
+        isError = loginWindowState.hasPasswordError,
+        visualTransformation = loginWindowState.passwordVisualTransformation,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done
+        ),
+        singleLine = true
+    )
+
+@Composable
+private inline fun LoginButton(
+    loginWindowState: LoginWindowState,
+    scope: CoroutineScope
+) = Button(
+    onClick = { scope.launch { loginWindowState.onLogin() } },
+    modifier = Modifier
+        .requiredHeight(100.dp)
         .aspectRatio(2f)
         .padding(24.dp),
-    backgroundColor = MaterialTheme.colors.background,
-    content = content
-)
+) {
+    if (loginWindowState.loading)
+        HorizontalDottedProgressBar()
+    else
+        Text("登录")
+}
+

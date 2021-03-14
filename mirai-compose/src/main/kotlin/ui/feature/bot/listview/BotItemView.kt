@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.model.ComposeBot
 
+
 @Composable
 fun BotItem(
     bot: ComposeBot,
@@ -64,18 +65,4 @@ fun BotItem(
     }
 }
 
-@Composable
-fun BotAddButton(
-    onClick: () -> Unit,
-    modifier: Modifier,
-    content: @Composable () -> Unit
-) {
-    FloatingActionButton(
-        onClick = onClick,
-        modifier = modifier
-            .aspectRatio(2f)
-            .padding(24.dp),
-        backgroundColor = MaterialTheme.colors.background,
-        content = content
-    )
-}
+//MaterialTheme.colors.background

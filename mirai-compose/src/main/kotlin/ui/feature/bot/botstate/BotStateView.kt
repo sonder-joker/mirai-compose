@@ -10,7 +10,7 @@ import com.youngerhousea.miraicompose.ui.common.LogBox
 import com.youngerhousea.miraicompose.utils.Component
 import net.mamoe.mirai.Bot
 
-class BotState(context: ComponentContext, val bot: Bot):Component, ComponentContext by context{
+class BotState(context: ComponentContext, val bot: Bot) : Component, ComponentContext by context {
     @Composable
     override fun render() {
         BotStateView(bot)
@@ -19,14 +19,8 @@ class BotState(context: ComponentContext, val bot: Bot):Component, ComponentCont
 }
 
 @Composable
-fun BotStateView(bot: Bot) = /*Box(
-    Modifier
-        .fillMaxSize(),
-    contentAlignment = Alignment.BottomCenter
-) {*/
-
+fun BotStateView(bot: Bot) =
     LogBox(
         bot.logs, Modifier.padding(horizontal = 40.dp, vertical = 20.dp)
     )
-//}
 

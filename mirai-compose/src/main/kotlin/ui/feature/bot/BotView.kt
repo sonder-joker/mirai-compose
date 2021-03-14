@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Scaffold
@@ -15,12 +16,15 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.ui.common.SplitterState
+import com.youngerhousea.miraicompose.ui.common.VerticalSplittable
 import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotLoading
 import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotLogin
 import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotState
@@ -29,8 +33,6 @@ import com.youngerhousea.miraicompose.ui.feature.bot.listview.TopView
 import com.youngerhousea.miraicompose.utils.Component
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.MiraiConsole
-import ui.common.SplitterState
-import ui.common.VerticalSplittable
 
 class BotV(componentContext: ComponentContext, val model: MutableList<ComposeBot>) : Component,
     ComponentContext by componentContext {
@@ -116,7 +118,8 @@ class BotV(componentContext: ComponentContext, val model: MutableList<ComposeBot
                                 }
                             }
                         )
-                    }
+                     }
+
                 }
                 child.render()
             }
@@ -152,7 +155,7 @@ private fun ResizablePanel(
         }
         Icon(
             if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
-            contentDescription = "Arrow",
+            contentDescription = null,
             Modifier
                 .padding(top = 4.dp)
                 .width(24.dp)

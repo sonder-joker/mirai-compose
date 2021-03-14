@@ -1,8 +1,6 @@
 package com.youngerhousea.miraicompose.utils
 
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
@@ -13,7 +11,9 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
+import com.arkivanov.decompose.extensions.compose.jetbrains.ChildContent
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
+import com.youngerhousea.miraicompose.ui.feature.plugin.PluginDetailed
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
@@ -64,14 +64,14 @@ inline fun <T> ColumnScope.items(
     }
 }
 
-public fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
+internal fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
     return windowed(size, size, partialWindows = true)
 }
-public fun AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): List<AnnotatedString> {
+internal fun AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): List<AnnotatedString> {
     return windowed(size, step, partialWindows) { it }
 }
 
-public fun <R> AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false, transform: (AnnotatedString) -> R): List<R> {
+internal fun <R> AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false, transform: (AnnotatedString) -> R): List<R> {
     checkWindowSizeStep(size, step)
     val thisSize = this.length
     val resultCapacity = thisSize / step + if (thisSize % step == 0) 0 else 1
@@ -115,4 +115,28 @@ internal fun setSystemOut(out: MiraiLogger) {
             "UTF-8"
         )
     )
+}
+
+fun <T, K> CrossFade(): @Composable (currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) -> Unit =
+    { currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit ->
+        KeyedCrossFade(currentChild, currentKey, children)
+    }
+
+
+
+@Composable
+private fun <T, K> KeyedCrossFade(currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) {
+    androidx.compose.animation.Crossfade(ChildWrapper(currentChild, currentKey)) {
+        children(it.child, it.key)
+    }
+}
+
+
+class ChildWrapper<out T, out C>(val child: T, val key: C) {
+    override fun equals(other: Any?): Boolean = key == (other as? ChildWrapper<*, *>)?.key
+    override fun hashCode(): Int = key.hashCode()
+}
+
+fun Keyed() {
+
 }

@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,51 +37,52 @@ fun BotListView(
     onButtonClick: () -> Unit,
     onItemClick: (bot: ComposeBot) -> Unit,
     onItemRemove: (bot: ComposeBot) -> Unit
-) = Surface(
-    modifier
-) {
-    Box(Modifier.fillMaxSize()) {
-        val scrollState = rememberLazyListState()
-        val itemHeight = 100.dp
+) = Box(modifier) {
+    val scrollState = rememberLazyListState()
+    val itemHeight = 100.dp
 
-        LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .withoutWidthConstraints(),
-            state = scrollState
-        ) {
-            items(model) { item ->
-                BotItem(
-                    item,
-                    Modifier
-                        .requiredHeight(itemHeight),
-                    onItemClick = {
-                        onItemClick(item)
-                    },
-                    onItemRemove = {
-                        onItemRemove(item)
-                    }
-                )
-            }
-
-            item {
-                BotAddButton(
-                    onButtonClick,
-                    Modifier
-                        .requiredHeight(itemHeight)
-                ) {
-                    Text("添加一个Bot", fontWeight = FontWeight.Bold)
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .withoutWidthConstraints(),
+        state = scrollState
+    ) {
+        items(model) { item ->
+            BotItem(
+                item,
+                Modifier
+                    .requiredHeight(itemHeight),
+                onItemClick = {
+                    onItemClick(item)
+                },
+                onItemRemove = {
+                    onItemRemove(item)
                 }
-            }
+            )
         }
 
-        VerticalScrollbar(
-            Modifier.align(Alignment.CenterEnd),
-            scrollState,
-            model.size + 1,
-            itemHeight
-        )
+        item {
+            Button(
+                onClick = onButtonClick,
+                modifier = Modifier
+                    .requiredHeight(itemHeight)
+                    .aspectRatio(2f)
+                    .padding(24.dp),
+                colors = ButtonDefaults.buttonColors(
+                ),
+                content = {
+                    Text("添加一个Bot", fontWeight = FontWeight.Bold)
+                }
+            )
+        }
     }
+
+    VerticalScrollbar(
+        Modifier.align(Alignment.CenterEnd),
+        scrollState,
+        model.size + 1,
+        itemHeight
+    )
 }
 
 
