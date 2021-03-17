@@ -14,7 +14,6 @@ class BotLoading(context: ComponentContext) : Component, ComponentContext by con
     override fun render() {
         BotLoadingView()
     }
-
 }
 
 @Composable

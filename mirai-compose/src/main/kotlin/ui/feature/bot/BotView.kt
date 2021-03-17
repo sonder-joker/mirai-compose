@@ -1,56 +1,46 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.*
+import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.pop
+import com.arkivanov.decompose.push
+import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.ui.common.SplitterState
-import com.youngerhousea.miraicompose.ui.common.VerticalSplittable
 import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotLoading
-import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotLogin
-import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotState
-import com.youngerhousea.miraicompose.ui.feature.bot.listview.BotListView
-import com.youngerhousea.miraicompose.ui.feature.bot.listview.TopView
+import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotNoLogin
+import com.youngerhousea.miraicompose.ui.feature.bot.botstate.BotOnline
 import com.youngerhousea.miraicompose.utils.Component
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.extensions.BotConfigurationAlterer
+import net.mamoe.mirai.utils.BotConfiguration
+import javax.script.ScriptEngineManager
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-class BotV(componentContext: ComponentContext, val model: MutableList<ComposeBot>) : Component,
+class BotV(componentContext: ComponentContext, val model: ComposeBot) : Component,
     ComponentContext by componentContext {
 
     private val router = router<BotState, Component>(
-        initialConfiguration = BotState.Login,
-        key = "BotRouter",
+        initialConfiguration = when (model.state) {
+            ComposeBot.State.NoLogin -> BotState.NoLogin
+            ComposeBot.State.Loading -> BotState.Loading
+            ComposeBot.State.Online -> BotState.Online(model)
+        },
+        key = model.hashCode().toString(),
         handleBackButton = true,
         componentFactory = { configuration: BotState, componentContext ->
             when (configuration) {
-                is BotState.Login -> {
-                    BotLogin(componentContext, onClick = ::onClick)
+                is BotState.NoLogin -> {
+                    BotNoLogin(componentContext, onClick = ::onClick)
                 }
                 is BotState.Loading -> {
                     BotLoading(componentContext)
                 }
-                is BotState.State -> {
-                    BotState(componentContext, configuration.bot)
+                is BotState.Online -> {
+                    BotOnline(componentContext, configuration.bot.toBot())
                 }
             }
         }
@@ -58,121 +48,31 @@ class BotV(componentContext: ComponentContext, val model: MutableList<ComposeBot
 
     private fun onClick(account: Long, password: String) {
         router.push(BotState.Loading)
-        val bot = MiraiConsole.addBot(account, password)
         MiraiConsole.launch {
-            bot.login()
-        }.invokeOnCompletion {
-            it?.let { router.push(BotState.Login) } ?: router.push(BotState.State(ComposeBot(bot)))
-        }
-    }
-
-    @Composable
-    override fun render() {
-        Children(router.state) { child, configuration ->
-            val panelState = remember { PanelState() }
-            val scope = rememberCoroutineScope()
-            val animatedSize = if (panelState.splitter.isResizing)
-                if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
-            else
-                animateDpAsState(
-                    if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
-                    SpringSpec(stiffness = Spring.StiffnessLow)
-                ).value
-
-            VerticalSplittable(
-                Modifier
-                    .fillMaxSize(),
-                panelState.splitter,
-                onResize = {
-                    panelState.expandedSize = (panelState.expandedSize + it).coerceAtLeast(panelState.expandedSizeMin)
-                }
-            ) {
-                ResizablePanel(
-                    Modifier
-                        .width(animatedSize)
-                        .fillMaxHeight(),
-                    panelState
-                ) {
-                    Column {
-                        TopView(
-                            Modifier
-                                .padding(8.dp)
-                        )
-                        BotListView(
-                            model,
-                            Modifier
-                                .fillMaxSize()
-                                .padding(30.dp),
-                            onButtonClick = {
-                                if (configuration !is BotState.Login)
-                                    router.push(BotState.Login)
-                            },
-                            onItemClick = { bot ->
-                                router.push(BotState.State(bot))
-                            },
-                            onItemRemove = { bot ->
-                                scope.launch {
-                                    bot.closeAndJoin()
-                                }.invokeOnCompletion {
-                                    router.push(BotState.Login)
-                                }
-                            }
-                        )
-                     }
-
-                }
-                child.render()
+            kotlin.runCatching {
+                model.login(account, password)
+            }.onSuccess {
+                router.push(BotState.Online(model))
+            }.onFailure {
+                router.pop()
             }
         }
     }
 
-    private sealed class BotState : Parcelable {
-        object Login : BotState()
-        object Loading : BotState()
-        class State(val bot: ComposeBot) : BotState()
-    }
 
-}
-
-@Composable
-private fun ResizablePanel(
-    modifier: Modifier,
-    state: PanelState,
-    content: @Composable () -> Unit,
-) {
-    val alpha = animateFloatAsState(
-        if (state.isExpanded) 1f else 0f,
-        SpringSpec(stiffness = Spring.StiffnessLow)
-    ).value
-
-    Box(modifier) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .graphicsLayer(alpha = alpha)
-        ) {
-            content()
+    @Composable
+    override fun render() {
+        Children(router.state) { child, _ ->
+            child.render()
         }
-        Icon(
-            if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
-            contentDescription = null,
-            Modifier
-                .padding(top = 4.dp)
-                .width(24.dp)
-                .clickable {
-                    state.isExpanded = !state.isExpanded
-                }
-                .padding(4.dp)
-                .align(Alignment.TopEnd),
-            tint = LocalContentColor.current,
-        )
     }
+
+    private sealed class BotState : Parcelable {
+        object NoLogin : BotState()
+        object Loading : BotState()
+        class Online(val bot: ComposeBot) : BotState()
+    }
+
 }
 
-private class PanelState {
-    val collapsedSize = 24.dp
-    var expandedSize by mutableStateOf(250.dp)
-    val expandedSizeMin = 90.dp
-    var isExpanded by mutableStateOf(true)
-    val splitter = SplitterState()
-}
+

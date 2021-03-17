@@ -47,7 +47,7 @@ fun BotItem(
         ) {
             Text(bot.nick, fontWeight = FontWeight.Bold)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(bot.id.toString(), style = MaterialTheme.typography.body2)
+                Text(bot.id, style = MaterialTheme.typography.body2)
             }
         }
 

@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.ui.feature.bot.listview
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,7 +36,7 @@ fun TopView(modifier: Modifier) = Surface {
 fun BotListView(
     model: MutableList<ComposeBot>,
     modifier: Modifier = Modifier,
-    onButtonClick: () -> Unit,
+    onAddButtonClick: () -> Unit,
     onItemClick: (bot: ComposeBot) -> Unit,
     onItemRemove: (bot: ComposeBot) -> Unit
 ) = Box(modifier) {
@@ -63,17 +65,15 @@ fun BotListView(
 
         item {
             Button(
-                onClick = onButtonClick,
+                onClick = onAddButtonClick,
                 modifier = Modifier
                     .requiredHeight(itemHeight)
                     .aspectRatio(2f)
                     .padding(24.dp),
-                colors = ButtonDefaults.buttonColors(
-                ),
-                content = {
-                    Text("添加一个Bot", fontWeight = FontWeight.Bold)
-                }
-            )
+            ) {
+                Text("Add a bot", color = Color.Black)
+            }
+
         }
     }
 

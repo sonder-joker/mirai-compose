@@ -7,33 +7,31 @@ import com.youngerhousea.miraicompose.utils.setSystemOut
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
-import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
-import net.mamoe.mirai.console.plugin.PluginManager
+import net.mamoe.mirai.console.extensions.BotConfigurationAlterer
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
+import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.*
-import java.awt.Color
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
-import javax.swing.JFrame
-import javax.swing.UIManager
-import javax.swing.plaf.ColorUIResource
 
 
 @ConsoleFrontEndImplementation
 object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScope(
-    NamedSupervisorJob("All") + CoroutineExceptionHandler { _, throwable ->
+    NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
         if (throwable is CancellationException) {
             return@CoroutineExceptionHandler
         }
-        PluginManager
-        throwable.printStackTrace()
+        val coroutineName = coroutineContext[CoroutineName]?.name ?: "<unnamed>"
+        MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
     }
 ) {
     override val rootPath: Path =
@@ -65,24 +63,31 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-
     override fun preStart() {
-        setSystemOut(MiraiComposeLogger.out)
+        if (!DEBUG)
+            setSystemOut(MiraiComposeLogger.out)
+    }
+
+    override fun prePhase(phase: String) {
+        if (phase == "auto-login bots") {
+            backendAccess.globalComponentStorage.contribute(BotConfigurationAlterer, InternalHook, InternalHook)
+        }
     }
 
     override fun postPhase(phase: String) {
         if (phase == "auto-login bots") {
             Bot.instances.forEach {
-                ComposeBot(it)
+                ComposeBot.instances.add(ComposeBot(it))
             }
         }
-
         if (phase == "load configurations") {
             ComposeDataScope.reloadAll()
         }
     }
+
 }
 
+const val DEBUG = true
 
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
@@ -91,9 +96,16 @@ object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val version: SemVersion = SemVersion("1.1.0")
 }
 
-
 // Compose Entry Point
 fun main() {
     MiraiComposeView()
     MiraiCompose.start()
+}
+
+
+internal object InternalHook :KotlinPlugin(JvmPluginDescription("com.youngerhousea.internal", MiraiComposeDescription.version)), BotConfigurationAlterer {
+    override fun alterConfiguration(botId: Long, configuration: BotConfiguration): BotConfiguration {
+        println("114514")
+        return configuration
+    }
 }

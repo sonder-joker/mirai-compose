@@ -22,10 +22,5 @@ internal class ColorTest {
         assertEquals(ComposeSetting.AppTheme, data)
     }
 
-    @Test
-    fun t() {
-        println(yaml.encodeToString(ColorSerializer, testColor))
-    }
-
 }
 

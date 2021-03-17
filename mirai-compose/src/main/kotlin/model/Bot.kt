@@ -5,42 +5,53 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import com.youngerhousea.miraicompose.utils.getAvatarImage
+import androidx.compose.ui.graphics.asImageBitmap
+import io.ktor.client.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.alsoLogin
-import net.mamoe.mirai.contact.*
-import net.mamoe.mirai.event.EventChannel
-import net.mamoe.mirai.event.events.BotEvent
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.supervisorJob
-import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.MiraiLogger
-import kotlin.coroutines.CoroutineContext
+import org.jetbrains.skija.Image
 
-
-interface ComposeBot : Bot {
+interface ComposeBot {
 
     val avatar: ImageBitmap
 
     val time: Long
 
-    val messageCount: Long
+    val id: String
+
+    val nick: String
+
+    val state: State
+
+    val messagePerMinute: Float
+
+    enum class State {
+        NoLogin, Loading, Online
+    }
+
+    suspend fun login(account: Long, password: String)
+
+    fun toBot(): Bot
 
     companion object {
         //only after longin
-        operator fun invoke(bot: Bot): ComposeBot = ComposeBotImpl(bot)
-
-        operator fun invoke(): ComposeBot = ComposeBotImpl()
+        operator fun invoke(bot: Bot? = null): ComposeBot = ComposeBotImpl(bot)
 
         val instances: MutableList<ComposeBot> = mutableStateListOf()
     }
 }
 
 
-private class ComposeBotImpl(var _bot: Bot? = null) : Bot, ComposeBot {
+private class ComposeBotImpl(
+    var _bot: Bot?,
+) : ComposeBot {
 
     private var _avatar by mutableStateOf(ImageBitmap(200, 200))
 
@@ -48,91 +59,90 @@ private class ComposeBotImpl(var _bot: Bot? = null) : Bot, ComposeBot {
 
     private var _time by mutableStateOf(0L)
 
-    override val avatar: ImageBitmap
-        get() = _avatar
-
-    override val messageCount: Long
-        get() = _messageCount
-
-    override val asFriend: Friend
-        get() = _bot?.asFriend ?: throw Exception("No ok")
-
-    override val asStranger: Stranger
-        get() = _bot?.asStranger ?: throw Exception("No ok")
-
-    override val configuration: BotConfiguration
-        get() = _bot?.configuration ?: throw Exception("No ok")
-
-    override val coroutineContext: CoroutineContext
-        get() = _bot?.coroutineContext ?: throw Exception("No ok")
-
-    override val eventChannel: EventChannel<BotEvent>
-        get() = _bot?.eventChannel ?: throw Exception("No ok")
-
-    override val friends: ContactList<Friend>
-        get() = _bot?.friends ?: throw Exception("No ok")
-
-    override val groups: ContactList<Group>
-        get() = _bot?.groups ?: throw Exception("No ok")
-
-    override val id: Long
-        get() = _bot?.id ?: throw Exception("No ok")
-
-    override val isOnline: Boolean
-        get() = _bot?.isOnline ?: throw Exception("No ok")
-
-    override val logger: MiraiLogger
-        get() = _bot?.logger ?: throw Exception("No ok")
-
-    override val nick: String
-        get() = _bot?.nick ?: "Unknown"
-
-    override val otherClients: ContactList<OtherClient>
-        get() = _bot?.otherClients ?: throw Exception("No ok")
-
-    override val strangers: ContactList<Stranger>
-        get() = _bot?.strangers ?: throw Exception("No ok")
-
-    override fun close(cause: Throwable?) {
-        _bot?.close(cause)
-    }
-
     override val time: Long get() = _time
 
-    suspend fun login(account:Long, password:String) {
-        _bot = BotFactory.newBot(account, password).alsoLogin()
-        loadResource()
+    override var state: ComposeBot.State by mutableStateOf(_bot?.takeIf { it.isOnline }?.let { ComposeBot.State.Online }
+        ?: ComposeBot.State.NoLogin)
+
+    override val avatar: ImageBitmap get() = _avatar
+
+    override suspend fun login(account: Long, password: String) {
+        kotlin.runCatching {
+            state = ComposeBot.State.Loading
+            _bot = MiraiConsole.addBot(account, password).alsoLogin()
+        }.onSuccess {
+            state = ComposeBot.State.Online
+            _bot!!.launch { loadResource() }
+        }.onFailure {
+            state = ComposeBot.State.NoLogin
+        }
     }
 
-    //Just for original bot!
-    override suspend fun login() {
-        _bot?.login()
-        loadResource()
+
+    private var _messagePerMinute by mutableStateOf(0f)
+
+    override val messagePerMinute: Float get() = _messagePerMinute
+
+    override fun toBot(): Bot = _bot ?: throw Exception("not bot")
+
+    override val id: String
+        get() = when (state) {
+            ComposeBot.State.NoLogin -> "Unknown"
+            ComposeBot.State.Loading -> "Loading"
+            ComposeBot.State.Online -> _bot!!.id.toString()
+        }
+
+    override val nick: String
+        get() = when (state) {
+            ComposeBot.State.NoLogin -> "Unknown"
+            ComposeBot.State.Loading -> "Loading"
+            ComposeBot.State.Online -> _bot!!.nick
+        }
+
+    fun close(cause: Throwable?) = when (state) {
+        ComposeBot.State.NoLogin -> Unit
+        ComposeBot.State.Loading -> Unit
+        ComposeBot.State.Online -> _bot!!.close(cause)
     }
+
 
     init {
-        ComposeBot.instances.add(this)
-        if (bot.isOnline) {
-            launch {
-                loadResource()
-            }
+        when (state) {
+            ComposeBot.State.NoLogin -> Unit
+            ComposeBot.State.Loading -> Unit
+            ComposeBot.State.Online -> _bot!!.launch { loadResource() }
         }
-        supervisorJob.invokeOnCompletion {
-            ComposeBot.instances.remove(this)
-        }
-
     }
 
     private suspend fun loadResource() {
-        _avatar = bot.getAvatarImage()
-        eventChannel.subscribeAlways<MessageEvent> {
+        loadAvatar()
+        startTiming()
+    }
+
+    private suspend fun loadAvatar() {
+        _avatar = Image.makeFromEncoded(
+            client.get(_bot!!.avatarUrl) {
+                header("Connection", "close")
+            }
+        ).asImageBitmap()
+    }
+
+    private suspend fun startTiming() {
+        _bot!!.eventChannel.subscribeAlways<MessageEvent> {
             _messageCount++
         }
 
-        while (true) {
-            delay(1000)
-            _time++
+        _bot!!.launch {
+            while (true) {
+                val currentMessage = _messageCount
+                delay(10 * 1000)
+                _messagePerMinute = (_messageCount - currentMessage) * 6f
+                _messageCount = 0
+            }
         }
     }
+
 }
+
+private val client = HttpClient()
 

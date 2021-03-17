@@ -9,11 +9,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.*
@@ -25,10 +27,14 @@ import com.youngerhousea.miraicompose.utils.HorizontalDottedProgressBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
-class BotLogin(
+class BotNoLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit
 ) : Component, ComponentContext by componentContext {
@@ -100,20 +106,19 @@ private class LoginWindowState(private val _onLogin: (account: Long, password: S
         password = textFieldValue
     }
 
-    @Composable
-    fun accountLabel() {
+    val accountLabel =
         if (hasAccountError)
-            Text(errorTip)
+            errorTip
         else
-            Text("账号")
-    }
+            "Account"
+
 
     @Composable
     fun passwordLabel() {
         if (hasPasswordError)
             Text(errorTip)
         else
-            Text("密码")
+            Text("Password")
     }
 
     fun passwordTrailingIconChange() {
@@ -137,7 +142,7 @@ fun BotLoginView(onLogin: (account: Long, password: String) -> Unit) {
     ) {
         Image(
             ResourceImage.mirai,
-            contentDescription = "Mirai",
+            contentDescription = null,
             modifier = Modifier
                 .padding(5.dp)
         )
@@ -160,11 +165,11 @@ private inline fun AccountTextField(
             on(Key.Enter, callback = { scope.launch { loginWindowState.onLogin() } })
         },
     label = {
-        loginWindowState.accountLabel()
+        Text(loginWindowState.accountLabel)
     },
     leadingIcon = {
         Icon(
-            imageVector = Icons.Default.AccountBox,
+            imageVector = Icons.Default.AccountCircle,
             null
         )
     },
@@ -223,6 +228,6 @@ private inline fun LoginButton(
     if (loginWindowState.loading)
         HorizontalDottedProgressBar()
     else
-        Text("登录")
+        Text("Login", color = Color.Black)
 }
 

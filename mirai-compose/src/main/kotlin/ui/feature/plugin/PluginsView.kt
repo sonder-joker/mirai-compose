@@ -1,8 +1,6 @@
 package com.youngerhousea.miraicompose.ui.feature.plugin
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -13,23 +11,28 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.ui.common.PluginCommandView
 import com.youngerhousea.miraicompose.ui.common.PluginDataView
-import com.youngerhousea.miraicompose.ui.common.PluginDescription
-import com.youngerhousea.miraicompose.utils.ChildWrapper
+import com.youngerhousea.miraicompose.ui.common.PluginDescriptionCard
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.CrossFade
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
-import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.console.plugin.*
+import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.description
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 
@@ -49,22 +52,14 @@ class PluginV(component: ComponentContext, val plugins: List<Plugin>) : Componen
                     )
                 }
                 is Configuration.Detailed -> {
-                    when (configuration.plugin) {
-                        is JvmPlugin -> {
-                            PluginDetailed(
-                                ComponentContext,
-                                configuration.plugin,
-                                onExit = ::onExit
-                            )
-                        }
-                        else -> {
-                            TODO()
-                        }
-                    }
+                    PluginDetailed(
+                        ComponentContext,
+                        configuration.plugin as JvmPlugin,
+                        onExit = ::onExit
+                    )
                 }
             }
-        }
-    )
+        })
 
     private fun onItemSelected(plugin: Plugin) {
         router.push(Configuration.Detailed(plugin))
@@ -94,7 +89,6 @@ class PluginList(
     val onItemSelected: (plugin: Plugin) -> Unit
 ) : Component, ComponentContext by componentContext {
 
-
     @Composable
     override fun render() {
         LazyVerticalGrid(
@@ -103,29 +97,22 @@ class PluginList(
             contentPadding = PaddingValues(20.dp)
         ) {
             items(plugins) { plugin ->
-                Card(
-                    Modifier
-                        .padding(10.dp)
-                        .clickable(onClick = { onItemSelected(plugin) })
-                        .requiredHeight(150.dp)
-                        .fillMaxWidth(),
-                    backgroundColor= Color(0xff979595)
-                ) {
-                    PluginDescription(plugin, Modifier.padding(10.dp))
-                }
+                PluginDescriptionCard(plugin, onItemSelected = onItemSelected)
             }
         }
     }
+
 }
 
 
 class PluginDetailed(
     componentContext: ComponentContext,
-    val plugin: JvmPlugin,
+    private val plugin: JvmPlugin,
     val onExit: () -> Unit
 ) : Component, ComponentContext by componentContext {
 
     sealed class Setting : Parcelable {
+        object Description : Setting()
         object Command : Setting()
         object Data : Setting()
     }
@@ -136,88 +123,119 @@ class PluginDetailed(
         key = "PluginDetailedRouter",
         componentFactory = { configuration, componentContext ->
             when (configuration) {
-                is Setting.Data -> {
-                    DataWindow(componentContext, plugin, ::onClick)
-                }
-                is Setting.Command -> {
-                    CommandWindow(componentContext, plugin.registeredCommands, ::onReturn)
-                }
+                is Setting.Description ->
+                    DescriptionWindow(componentContext, plugin)
+                is Setting.Data ->
+                    DataWindow(componentContext, plugin)
+                is Setting.Command ->
+                    CommandWindow(componentContext, plugin.registeredCommands)
             }
         }
     )
 
-    private fun onClick() {
-        router.push(Setting.Command)
-    }
+    private inline val Plugin.annotatedName: AnnotatedString
+        get() = with(AnnotatedString.Builder()) {
+            pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.Black, fontSize = 20.sp))
+            append(name.ifEmpty { "Unknown" })
+            pop()
+            toAnnotatedString()
+        }
 
-    private fun onReturn() {
-        router.pop()
-    }
-
-    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     override fun render() {
-        Card(Modifier.fillMaxSize()) {
-            Column(Modifier.fillMaxSize()) {
+
+        Column(Modifier.fillMaxSize().animateContentSize()) {
+            Box(Modifier.fillMaxWidth().requiredHeight(34.dp), contentAlignment = Alignment.CenterStart) {
                 Icon(Icons.Default.KeyboardArrowLeft, null, Modifier.clickable(onClick = onExit))
-                PluginDescription(plugin, Modifier.padding(start = 20.dp))
-                Divider(thickness = 5.dp)
-                Children(router.state, animation = { child, configuration, function ->
-                    AnimatedVisibility(configuration is Setting.Data) {
-                        function(child, configuration)
-                    }
-                }) { child, _ ->
-                    child.render()
-                }
+                Text(
+                    plugin.annotatedName, textAlign = TextAlign.Center, maxLines = 1, modifier = Modifier.align(
+                        Alignment.Center
+                    )
+                )
+            }
+            var index by remember(plugin) { mutableStateOf(0) }
+            TabRow(index) {
+                Tab(
+                    selectedContentColor = Color.Black,
+                    text = { Text("Description") },
+                    selected = index == 0,
+                    onClick = { index = 0; router.push(Setting.Description) })
+                Tab(
+                    selectedContentColor = Color.Black,
+                    text = { Text("Data") },
+                    selected = index == 1,
+                    onClick = { index = 1;router.push(Setting.Data) })
+                Tab(
+                    selectedContentColor = Color.Black,
+                    text = { Text("Command") },
+                    selected = index == 2,
+                    onClick = { index = 2; router.push(Setting.Command) })
+            }
+            Children(router.state) { child, _ ->
+                child.render()
             }
         }
     }
 
 }
 
+
+class DescriptionWindow(
+    componentContext: ComponentContext,
+    val plugin: Plugin
+) : Component, ComponentContext by componentContext {
+    private val Plugin.annotatedDescription
+        get() = with(AnnotatedString.Builder()) {
+            pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.Black, fontSize = 20.sp))
+            append("Name:${name.ifEmpty { "Unknown" }}\n")
+            append("ID:$id\n")
+            append("Version:${version}\n")
+            append("Info:${info.ifEmpty { "None" }}\n")
+            append("Author:$author\n")
+            append("Dependencies:$dependencies")
+            pop()
+            toAnnotatedString()
+        }
+
+    @Composable
+    override fun render() {
+        Column(
+            Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(plugin.annotatedDescription)
+        }
+    }
+
+}
+
+
 class DataWindow(
     componentContext: ComponentContext,
     private val plugin: JvmPlugin,
-    private val onRightClick: () -> Unit
 ) : Component, ComponentContext by componentContext {
     @Composable
     override fun render() {
-        Row(Modifier.fillMaxSize()) {
-            PluginDataView(plugin = plugin, modifier = Modifier.weight(6f))
-            SwitchArrow(
-                isLeft = false,
-                onClick = onRightClick, modifier = Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
-            )
-        }
+        PluginDataView(plugin = plugin)
     }
 }
 
 class CommandWindow(
     componentContext: ComponentContext,
     private val command: List<Command>,
-    private val onLeftClick: () -> Unit
 ) : Component, ComponentContext by componentContext {
     @Composable
     override fun render() {
-        Row(Modifier.fillMaxSize()) {
-            SwitchArrow(
-                isLeft = true,
-                onClick = onLeftClick, modifier = Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
-            )
-            PluginCommandView(registeredCommands = command, modifier = Modifier.weight(6f))
-        }
+        PluginCommandView(registeredCommands = command)
     }
 }
 
-@Composable
-fun SwitchArrow(isLeft: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Icon(
-        if (isLeft) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
-        null,
-        modifier.padding(horizontal = 40.dp).clickable(onClick = onClick)
-    )
-}
+//@Composable
+//fun SwitchArrow(isLeft: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+//    Icon(
+//        if (isLeft) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
+//        null,
+//        modifier.padding(horizontal = 40.dp).clickable(onClick = onClick)
+//    )
+//}

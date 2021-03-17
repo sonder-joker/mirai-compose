@@ -1,17 +1,16 @@
 package com.youngerhousea.miraicompose.ui.navigation
 
 import androidx.compose.desktop.DesktopMaterialTheme
-import androidx.compose.desktop.DesktopTheme
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -28,7 +27,7 @@ import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.ui.common.SelectEdgeText
 import com.youngerhousea.miraicompose.ui.common.Spacer
 import com.youngerhousea.miraicompose.ui.feature.about.About
-import com.youngerhousea.miraicompose.ui.feature.bot.BotV
+import com.youngerhousea.miraicompose.ui.feature.bot.Choose
 import com.youngerhousea.miraicompose.ui.feature.log.Log
 import com.youngerhousea.miraicompose.ui.feature.plugin.PluginV
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
@@ -55,8 +54,11 @@ fun MiraiComposeView() =
 class NavHost(
     component: ComponentContext,
 ) : Component, ComponentContext by component {
+    private var currentBot: ComposeBot? by mutableStateOf(null)
+    private val instance get() = ComposeBot.instances
 
     sealed class Config : Parcelable {
+
         object Bot : Config()
         object Setting : Config()
         object About : Config()
@@ -70,10 +72,12 @@ class NavHost(
         componentFactory = { config, componentContext ->
             when (config) {
                 is Config.Bot ->
-                    BotV(
+                    Choose(
                         componentContext,
-                        model = ComposeBot.instances
-                    )
+                        instance
+                    ) {
+                        currentBot = it
+                    }
                 is Config.Setting ->
                     Setting(
                         componentContext,
@@ -107,7 +111,11 @@ class NavHost(
                 router.state,
             ) { child, config ->
                 Row {
-                    Edge(config)
+                    Edge(
+                        config,
+                        currentBot?.messagePerMinute,
+                        instance.map { it.messagePerMinute }.fold(0f) { acc: Float, fl: Float -> acc + fl }
+                    )
                     child.render()
                 }
             }
@@ -116,7 +124,7 @@ class NavHost(
 
 
     @Composable
-    private fun Edge(config: Config) {
+    private fun Edge(config: Config, currentBot: Float?, allBotMessage: Float?) {
         Column(
             Modifier
                 .requiredWidth(160.dp)
@@ -124,34 +132,34 @@ class NavHost(
                 .background(MaterialTheme.colors.primary),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer()
+            Spacer(currentBot, allBotMessage)
             SelectEdgeText(
-                "机器人",
+                "Robot",
                 isWishWindow = config is Config.Bot
             ) {
                 router.push(Config.Bot)
             }
             SelectEdgeText(
-                "插件",
+                "Plugin",
                 isWishWindow = config is Config.Plugin
             ) {
                 router.push(Config.Plugin)
             }
             SelectEdgeText(
-                "设置",
+                "Setting",
                 isWishWindow = config is Config.Setting
             ) {
                 router.push(Config.Setting)
             }
 
             SelectEdgeText(
-                "日志",
+                "Log",
                 isWishWindow = config is Config.Log
             ) {
                 router.push(Config.Log)
             }
             SelectEdgeText(
-                "关于",
+                "About",
                 isWishWindow = config is Config.About
             ) {
                 router.push(Config.About)
@@ -159,3 +167,4 @@ class NavHost(
         }
     }
 }
+

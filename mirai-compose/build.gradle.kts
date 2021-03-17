@@ -29,7 +29,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
-
+    testImplementation("org.jetbrains.compose.ui:ui-test-junit4:${Versions.compose}")
 }
 
 tasks.named<Test>("test") {

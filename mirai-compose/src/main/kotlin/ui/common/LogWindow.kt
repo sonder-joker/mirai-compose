@@ -2,8 +2,8 @@ package com.youngerhousea.miraicompose.ui.common
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,45 +31,40 @@ import kotlin.reflect.full.isSubclassOf
 
 
 @Composable
-internal fun LogBox(logs: List<AnnotatedString>, modifier: Modifier = Modifier) {
-    Surface(
-        modifier
-            .fillMaxWidth()
-    ) {
-        val state = rememberLazyListState()
-        val scope = rememberCoroutineScope()
-        BoxWithConstraints {
-            val listLog =  logs.flatMap {
-                it.chunked(constraints.minWidth / 9)
-            }
-            val itemHeight = 35.dp
+internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) {
+    BoxWithConstraints(modifier) {
+        val listLog = logs.flatMap {
+            it.chunked(constraints.maxWidth / 9)
+        }
+        val itemHeight = 40.dp
+        val state = remember(listLog) { LazyListState() }
 
-            LazyColumn(
-                Modifier
-                    .fillMaxWidth(),
-                state = state
+        LazyColumn(
+            Modifier
+                .fillMaxWidth(),
+            state = state
+        ) {
+            items(
+                listLog
             ) {
-                items(
-                    listLog
-                ) {
-                    Text(
-                        it,
-                        modifier = Modifier
-                            .height(itemHeight)
-                    )
-                }
-                scope.launch {
-                    state.scrollToItem(listLog.size - 1, 0)
-                }
+                Text(
+                    it,
+                    modifier = Modifier
+                        .height(itemHeight)
+                )
             }
+        }
 
+        VerticalScrollbar(
+            Modifier.align(Alignment.CenterEnd),
+            state,
+            listLog.size,
+            itemHeight
+        )
 
-            VerticalScrollbar(
-                Modifier.align(Alignment.CenterEnd),
-                state,
-                listLog.size,
-                itemHeight
-            )
+        LaunchedEffect(listLog) {
+            if (listLog.isNotEmpty())
+                state.scrollToItem(listLog.size - 1, 0)
         }
     }
 }

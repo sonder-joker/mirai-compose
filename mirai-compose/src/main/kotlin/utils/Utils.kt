@@ -11,26 +11,14 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
-import com.arkivanov.decompose.extensions.compose.jetbrains.ChildContent
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
-import com.youngerhousea.miraicompose.ui.feature.plugin.PluginDetailed
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
 import java.io.PrintStream
-
-private val client = HttpClient()
-
-suspend fun Bot.getAvatarImage(): ImageBitmap {
-    return org.jetbrains.skija.Image.makeFromEncoded(
-        client.get(this@getAvatarImage.avatarUrl) {
-            header("Connection", "close")
-        }
-    ).asImageBitmap()
-}
-
 
 @Composable
 fun VerticalScrollbar(
@@ -67,11 +55,21 @@ inline fun <T> ColumnScope.items(
 internal fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
     return windowed(size, size, partialWindows = true)
 }
-internal fun AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): List<AnnotatedString> {
+
+internal fun AnnotatedString.windowed(
+    size: Int,
+    step: Int = 1,
+    partialWindows: Boolean = false
+): List<AnnotatedString> {
     return windowed(size, step, partialWindows) { it }
 }
 
-internal fun <R> AnnotatedString.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false, transform: (AnnotatedString) -> R): List<R> {
+internal fun <R> AnnotatedString.windowed(
+    size: Int,
+    step: Int = 1,
+    partialWindows: Boolean = false,
+    transform: (AnnotatedString) -> R
+): List<R> {
     checkWindowSizeStep(size, step)
     val thisSize = this.length
     val resultCapacity = thisSize / step + if (thisSize % step == 0) 0 else 1
@@ -79,7 +77,9 @@ internal fun <R> AnnotatedString.windowed(size: Int, step: Int = 1, partialWindo
     var index = 0
     while (index in 0 until thisSize) {
         val end = index + size
-        val coercedEnd = if (end < 0 || end > thisSize) { if (partialWindows) thisSize else break } else end
+        val coercedEnd = if (end < 0 || end > thisSize) {
+            if (partialWindows) thisSize else break
+        } else end
         result.add(transform(subSequence(index, coercedEnd)))
         index += step
     }
@@ -121,7 +121,6 @@ fun <T, K> CrossFade(): @Composable (currentChild: T, currentKey: K, children: @
     { currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit ->
         KeyedCrossFade(currentChild, currentKey, children)
     }
-
 
 
 @Composable

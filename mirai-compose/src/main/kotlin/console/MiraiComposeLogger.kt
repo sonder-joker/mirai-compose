@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import com.youngerhousea.miraicompose.DEBUG
 import com.youngerhousea.miraicompose.MiraiCompose
 import com.youngerhousea.miraicompose.console.MiraiComposeLogger.Companion.logFiles
 import com.youngerhousea.miraicompose.console.MiraiComposeLogger.Companion.loggerStorage
@@ -49,6 +50,8 @@ class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBa
             ),
             "$it\n".toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND
         )
+        if(DEBUG)
+            println(it)
     }
 
     private val SimpleLogger.LogPriority.color: Color

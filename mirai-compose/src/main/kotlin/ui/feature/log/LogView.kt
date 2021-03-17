@@ -1,7 +1,7 @@
 package com.youngerhousea.miraicompose.ui.feature.log
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +18,7 @@ import net.mamoe.mirai.utils.MiraiLogger
 class Log(
     componentContext: ComponentContext,
     val loggerStorage: List<AnnotatedString>,
-    val logger:MiraiLogger
+    val logger: MiraiLogger
 ) : Component, ComponentContext by componentContext {
     @MiraiInternalApi
     @Composable
@@ -32,10 +32,11 @@ class Log(
 internal fun LogWindow(logs: List<AnnotatedString>, logger: MiraiLogger) {
     Column {
         LogBox(
-            logs,
             Modifier
+                .fillMaxSize()
                 .weight(8f)
-                .padding(horizontal = 40.dp, vertical =  20.dp)
+                .padding(horizontal = 40.dp, vertical = 20.dp),
+            logs,
         )
         CommandSendBox(
             logger,

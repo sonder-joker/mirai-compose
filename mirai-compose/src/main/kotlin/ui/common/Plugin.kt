@@ -1,6 +1,7 @@
 package com.youngerhousea.miraicompose.ui.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -49,7 +50,7 @@ private inline val Plugin.annotatedAuthor: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
         pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
         append("Author:")
-        append(this@annotatedAuthor.author.ifEmpty { "Unknown" })
+        append(author.ifEmpty { "Unknown" })
         toAnnotatedString()
     }
 
@@ -57,19 +58,9 @@ private inline val Plugin.annotatedInfo: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
         pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
         append("Info:")
-        append(this@annotatedInfo.info.ifEmpty { "Unknown" })
+        append(info.ifEmpty { "Unknown" })
         toAnnotatedString()
     }
-
-//private inline val Plugin.annotatedSimple: AnnotatedString
-//    get() = with(AnnotatedString.Builder()) {
-//        append(this@annotatedSimple.annotatedName)
-//        append('\n')
-//        append(this@annotatedSimple.annotatedAuthor)
-//        append('\n')
-//        append(this@annotatedSimple.annotatedInfo)
-//        toAnnotatedString()
-//    }
 
 private inline val Plugin.annotatedKind: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
@@ -104,15 +95,28 @@ private val Plugin.kindIcon: ImageVector
             }
         }
 
+@Composable
+internal fun PluginDescriptionCard(plugin: Plugin, onItemSelected:(Plugin) -> Unit) {
+    Card(
+        Modifier
+            .padding(10.dp)
+            .clickable(onClick = { onItemSelected(plugin) })
+            .requiredHeight(150.dp)
+            .fillMaxWidth(),
+        backgroundColor = Color(0xff979595)
+    ) {
+        PluginDescription(plugin, Modifier.padding(10.dp))
+    }
+}
 
 @Composable
 internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(plugin.annotatedName, overflow = TextOverflow.Ellipsis, maxLines = 1)
         Spacer(Modifier.height(20.dp))
-        Text(plugin.annotatedAuthor, overflow = TextOverflow.Ellipsis)
+        Text(plugin.annotatedAuthor, overflow = TextOverflow.Ellipsis, maxLines = 1)
         Spacer(Modifier.height(10.dp))
-        Text(plugin.annotatedInfo, overflow = TextOverflow.Ellipsis)
+        Text(plugin.annotatedInfo, overflow = TextOverflow.Ellipsis, maxLines = 1)
         Spacer(Modifier.height(10.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
