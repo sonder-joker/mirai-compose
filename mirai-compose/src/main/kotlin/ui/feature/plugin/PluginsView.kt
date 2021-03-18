@@ -54,6 +54,7 @@ class PluginV(component: ComponentContext, val plugins: List<Plugin>) : Componen
                 is Configuration.Detailed -> {
                     PluginDetailed(
                         ComponentContext,
+                        //If other plugin
                         configuration.plugin as JvmPlugin,
                         onExit = ::onExit
                     )

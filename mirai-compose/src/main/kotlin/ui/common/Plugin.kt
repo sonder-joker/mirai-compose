@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.ui.common
 
+import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -189,6 +190,7 @@ private fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
                     }.onSuccess {
                         value = textField.text
                     }.onFailure {
+                        ErrorWindow(it)
                         it.printStackTrace()
                     }
                 }
@@ -222,5 +224,9 @@ private inline val Command.simpleDescription: AnnotatedString
             toAnnotatedString()
         }
 
+fun ErrorWindow(error:Throwable) = Window {
+    Text("出现错误！$error")
+    Text("请上报日志issue")
+}
 
 
