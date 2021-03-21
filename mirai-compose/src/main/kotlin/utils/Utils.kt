@@ -18,6 +18,7 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
+import org.jetbrains.skija.Image
 import java.io.PrintStream
 
 @Composable
@@ -30,6 +31,8 @@ fun VerticalScrollbar(
     rememberScrollbarAdapter(scrollState, itemCount, averageItemSize),
     modifier
 )
+
+fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap = Image.makeFromEncoded(byteArray).asImageBitmap()
 
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))

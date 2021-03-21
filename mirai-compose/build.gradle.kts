@@ -37,6 +37,7 @@ tasks.named<Test>("test") {
 }
 
 
+
 //configure<ProcessResources>("processResources") {
 //    from(sourceSets.getAt("").resources.srcDirs) {
 //
@@ -74,6 +75,7 @@ compose.desktop {
         }
     }
 }
+
 
 tasks {
     val compileKotlin by getting {}

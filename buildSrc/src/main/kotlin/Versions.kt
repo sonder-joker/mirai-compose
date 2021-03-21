@@ -12,5 +12,7 @@ object Versions {
 
     const val yamlkt = "0.7.5"
     const val koin = "2.2.2"
+
+    const val download = "4.1.1"
 }
 

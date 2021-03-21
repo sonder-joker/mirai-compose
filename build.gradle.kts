@@ -5,8 +5,9 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 plugins {
     kotlin("jvm") version Versions.kotlin
-    kotlin("plugin.serialization") version Versions.kotlin
-    id("org.jetbrains.compose") version Versions.compose
+    kotlin("plugin.serialization") version Versions.kotlin apply false
+    id("org.jetbrains.compose") version Versions.compose apply false
+    id("de.undercouch.download") version Versions.download
 }
 
 allprojects {
@@ -18,6 +19,7 @@ allprojects {
         mavenCentral()
         maven(url = "https://jitpack.io/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/ui/dev")
     }
 }
 
@@ -30,6 +32,7 @@ subprojects {
         configureKotlinCompilerSettings()
     }
 }
+
 
 val experimentalAnnotations = arrayOf(
     "kotlin.Experimental",
@@ -47,7 +50,7 @@ val experimentalAnnotations = arrayOf(
 )
 
 fun Project.configureJvmTarget() {
-    tasks.withType(KotlinJvmCompile::class.java) {
+    tasks.withType<KotlinJvmCompile>().configureEach {
         kotlinOptions.jvmTarget = "1.8"
     }
 
@@ -67,12 +70,13 @@ fun Project.configureEncoding() {
 fun Project.configureKotlinExperimentalUsages() {
     val sourceSets = kotlinSourceSets ?: return
 
-    for (target in sourceSets) target.languageSettings.run {
-        progressiveMode = true
-        experimentalAnnotations.forEach { a ->
-            useExperimentalAnnotation(a)
+    for (target in sourceSets)
+        target.languageSettings.run {
+            progressiveMode = true
+            experimentalAnnotations.forEach { a ->
+                useExperimentalAnnotation(a)
+            }
         }
-    }
 }
 
 fun Project.configureKotlinCompilerSettings() {
@@ -98,3 +102,4 @@ val Project.kotlinTargets
 
 val Project.kotlinCompilations
     get() = kotlinTargets?.flatMap { it.compilations }
+

@@ -81,9 +81,7 @@ class Choose(
                     .fillMaxHeight(),
                 panelState
             ) {
-                Column(
-                    Modifier.animateContentSize()
-                ) {
+                Column{
                     TopView(
                         Modifier.padding(8.dp)
                     )
@@ -120,10 +118,10 @@ private fun ResizablePanel(
     state: PanelState,
     content: @Composable () -> Unit,
 ) {
-    val alpha = animateFloatAsState(
+    val alpha by animateFloatAsState(
         if (state.isExpanded) 1f else 0f,
         SpringSpec(stiffness = Spring.StiffnessLow)
-    ).value
+    )
 
     Box(modifier) {
         Box(

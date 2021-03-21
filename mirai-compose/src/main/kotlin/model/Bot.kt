@@ -16,6 +16,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.utils.BotConfiguration
 import org.jetbrains.skija.Image
 
 interface ComposeBot {
@@ -36,7 +37,7 @@ interface ComposeBot {
         NoLogin, Loading, Online
     }
 
-    suspend fun login(account: Long, password: String)
+    suspend fun login(account: Long, password: String, configuration: BotConfiguration.() -> Unit = {})
 
     fun toBot(): Bot
 
@@ -66,10 +67,10 @@ private class ComposeBotImpl(
 
     override val avatar: ImageBitmap get() = _avatar
 
-    override suspend fun login(account: Long, password: String) {
+    override suspend fun login(account: Long, password: String, configuration: BotConfiguration.() -> Unit) {
         kotlin.runCatching {
             state = ComposeBot.State.Loading
-            _bot = MiraiConsole.addBot(account, password).alsoLogin()
+            _bot = MiraiConsole.addBot(account, password, configuration).alsoLogin()
         }.onSuccess {
             state = ComposeBot.State.Online
             _bot!!.launch { loadResource() }
