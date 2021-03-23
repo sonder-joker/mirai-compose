@@ -1,7 +1,7 @@
 @file:Suppress("ObjectPropertyName", "SpellCheckingInspection")
 
 object Versions {
-    const val mirai_compose = "1.1.0"
+    const val mirai_compose = "1.1.1"
 
     const val kotlin = "1.4.31"
 

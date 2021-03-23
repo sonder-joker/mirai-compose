@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.feature.bot.botstate
+package com.youngerhousea.miraicompose.ui.feature.bot.state
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,23 +8,18 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.console.MiraiComposeLogger.Companion.logs
 import com.youngerhousea.miraicompose.ui.common.LogBox
-import com.youngerhousea.miraicompose.utils.Component
 import net.mamoe.mirai.Bot
 
-class BotOnline(context: ComponentContext, val bot: Bot) : Component, ComponentContext by context {
-    @Composable
-    override fun render() {
-        BotStateView(bot)
-    }
+class BotOnline(context: ComponentContext, val bot: Bot): ComponentContext by context {
 
 }
 
 @Composable
-fun BotStateView(bot: Bot) =
+fun BotOnlineUi(botOnline: BotOnline) =
     LogBox(
         Modifier
             .fillMaxSize()
             .padding(horizontal = 40.dp, vertical = 20.dp),
-        bot.logs,
+        botOnline.bot.logs,
     )
 

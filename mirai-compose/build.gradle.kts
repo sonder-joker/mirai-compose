@@ -19,17 +19,15 @@ dependencies {
     implementation(`mirai-console`)
 
     implementation(yamlkt)
-    implementation(koin)
+    implementation(compose.materialIconsExtended)
 
     //may remove in future
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
 
-    implementation("org.jetbrains.compose.material:material-icons-extended:${Versions.compose}")
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
-    testImplementation("org.jetbrains.compose.ui:ui-test-junit4:${Versions.compose}")
+//    testImplementation("org.jetbrains.compose.ui:ui-test-junit4:${Versions.compose}")
 }
 
 tasks.named<Test>("test") {
@@ -38,47 +36,41 @@ tasks.named<Test>("test") {
 
 
 
-//configure<ProcessResources>("processResources") {
-//    from(sourceSets.getAt("").resources.srcDirs) {
-//
-//    }
-//}
-
 inline fun <reified C> Project.configure(name: String, configuration: C.() -> Unit) {
     (this.tasks.getByName(name) as C).configuration()
 }
 
+println(sourceSets.main.name)
 
 compose.desktop {
     application {
-        mainClass = "com.youngerhousea.miraicompose.MiraiComposeKt"
+        mainClass = "com.youngerhousea.miraicompose.MiraiComposeLoader"
         nativeDistributions {
             modules(*jdkModules)
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MiraiCompose"
             packageVersion = Versions.mirai_compose
             vendor = "Noire"
-
+            dependsOn("fillConstaant")
             macOS {
                 bundleID = "com.youngerhousea.miraicompose"
-                iconFile.set(project.file("../icons/mirai.icns"))
+                iconFile.set(project.file("icons/mirai.icns"))
             }
 
             linux {
-                iconFile.set(project.file("../icons/mirai.png"))
+                iconFile.set(project.file("icons/mirai.png"))
             }
 
             windows {
-                iconFile.set(project.file("../icons/mirai.ico"))
+                iconFile.set(project.file("icons/mirai.ico"))
                 upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
             }
         }
     }
 }
-
-
 tasks {
-    val compileKotlin by getting {}
+    val compileKotlin by getting {
+    }
 
     register("fillConstant") {
         doLast {

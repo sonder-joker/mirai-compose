@@ -1,8 +1,9 @@
-package com.youngerhousea.miraicompose
+package com.youngerhousea.miraicompose.console
 
+import androidx.compose.runtime.*
 import com.youngerhousea.miraicompose.console.*
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.ui.navigation.MiraiComposeView
+import com.youngerhousea.miraicompose.ui.feature.MiraiComposeView
 import com.youngerhousea.miraicompose.utils.setSystemOut
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
@@ -10,8 +11,10 @@ import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
-import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
+import net.mamoe.mirai.console.data.PluginData
+import net.mamoe.mirai.console.data.PluginDataHolder
 import net.mamoe.mirai.console.extensions.BotConfigurationAlterer
+import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -25,7 +28,7 @@ import java.util.*
 
 
 @ConsoleFrontEndImplementation
-object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScope(
+class MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScope(
     NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
         if (throwable is CancellationException) {
             return@CoroutineExceptionHandler
@@ -63,6 +66,8 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
+    var isStart by mutableStateOf(false)
+
     override fun preStart() {
         if (!DEBUG)
             setSystemOut(MiraiComposeLogger.out)
@@ -85,6 +90,9 @@ object MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineSco
         }
     }
 
+    override fun postStart() {
+        isStart = true
+    }
 }
 
 const val DEBUG = true
@@ -96,16 +104,13 @@ object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val version: SemVersion = SemVersion("1.1.0")
 }
 
-// Compose Entry Point
-fun main() {
-    MiraiComposeView()
-    MiraiCompose.start()
-}
 
-
-internal object InternalHook :KotlinPlugin(JvmPluginDescription("com.youngerhousea.internal", MiraiComposeDescription.version)), BotConfigurationAlterer {
+internal object InternalHook :
+    KotlinPlugin(JvmPluginDescription("com.youngerhousea.internal", MiraiComposeDescription.version)),
+    BotConfigurationAlterer {
     override fun alterConfiguration(botId: Long, configuration: BotConfiguration): BotConfiguration {
         println("114514")
         return configuration
     }
 }
+

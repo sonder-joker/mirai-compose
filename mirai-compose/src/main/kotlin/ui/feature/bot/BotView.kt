@@ -1,6 +1,23 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.pop
@@ -8,43 +25,47 @@ import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.ui.feature.bot.botstate.*
-import com.youngerhousea.miraicompose.utils.Component
+import com.youngerhousea.miraicompose.ui.feature.bot.state.*
+import com.youngerhousea.miraicompose.utils.VerticalScrollbar
+import com.youngerhousea.miraicompose.utils.asComponent
+import com.youngerhousea.miraicompose.utils.withoutWidthConstraints
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.LoginSolver
 import kotlin.coroutines.resume
 
-class BotV(componentContext: ComponentContext, val model: ComposeBot) : Component,
-    ComponentContext by componentContext {
+class BotState(
+    componentContext: ComponentContext,
+    val model: ComposeBot
+) : ComponentContext by componentContext {
 
-    private val router = router<BotState, Component>(
+    private val router = router(
         initialConfiguration = when (model.state) {
-            ComposeBot.State.NoLogin -> BotState.NoLogin
-            ComposeBot.State.Online -> BotState.Online(model)
+            ComposeBot.State.NoLogin -> BotStatus.NoLogin
+            ComposeBot.State.Online -> BotStatus.Online(model)
             ComposeBot.State.Loading -> throw Exception("Can't be in loading!")
         },
         key = model.hashCode().toString(),
         handleBackButton = true,
-        componentFactory = { configuration: BotState, componentContext ->
+        componentFactory = { configuration: BotStatus, componentContext ->
             when (configuration) {
-                is BotState.NoLogin ->
-                    BotNoLogin(componentContext, onClick = ::onClick)
-                is BotState.Lo ->
-                    BotLo(componentContext, configuration.bot, configuration.data, configuration.result)
-                is BotState.Load ->
-                    BotLoad(componentContext, configuration.bot, configuration.url, configuration.result)
-                is BotState.Loading ->
-                    BotLoading(componentContext, configuration.bot, configuration.url, configuration.result)
-                is BotState.Online ->
-                    BotOnline(componentContext, configuration.bot.toBot())
-
+                is BotStatus.NoLogin ->
+                    BotNoLogin(componentContext, onClick = ::onClick).asComponent { BotNoLoginUi(it) }
+                is BotStatus.Lo ->
+                    BotSolvePicCaptchaLoading(componentContext, configuration.bot, configuration.data, configuration.result).asComponent { BotSolvePicCaptchaLoadingUi(it) }
+                is BotStatus.Load ->
+                    BotSolveSliderCaptchaLoading(componentContext, configuration.bot, configuration.url, configuration.result).asComponent { BotSolveSliderCaptchaLoadingUi(it) }
+                is BotStatus.Loading ->
+                    BotSolveUnsafeDeviceLoginVerify(componentContext, configuration.bot, configuration.url, configuration.result).asComponent { BotSolveUnsafeDeviceLoginVerifyUi(it) }
+                is BotStatus.Online ->
+                    BotOnline(componentContext, configuration.bot.toBot()).asComponent { BotOnlineUi(it) }
             }
         }
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    val state get() = router.state
+
     private fun onClick(account: Long, password: String) {
         MiraiConsole.launch {
             kotlin.runCatching {
@@ -57,14 +78,14 @@ class BotV(componentContext: ComponentContext, val model: ComposeBot) : Componen
                             if (it != null) {
                                 // pass exception?
                                 bot.logger.error(it)
-                                router.push(BotState.NoLogin)
+                                router.push(BotStatus.NoLogin)
                             }
                         }
 
                         override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? =
                             suspendCancellableCoroutine { continuation ->
                                 errorHandler(continuation, bot)
-                                router.push(BotState.Lo(bot, data) {
+                                router.push(BotStatus.Lo(bot, data) {
                                     continuation.resume(it)
                                 })
                             }
@@ -73,7 +94,7 @@ class BotV(componentContext: ComponentContext, val model: ComposeBot) : Componen
                         override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? =
                             suspendCancellableCoroutine { continuation ->
                                 errorHandler(continuation, bot)
-                                router.push(BotState.Load(bot, url) {
+                                router.push(BotStatus.Load(bot, url) {
                                     continuation.resume(it)
                                 })
                             }
@@ -81,14 +102,14 @@ class BotV(componentContext: ComponentContext, val model: ComposeBot) : Componen
                         override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? =
                             suspendCancellableCoroutine { continuation ->
                                 errorHandler(continuation, bot)
-                                router.push(BotState.Loading(bot, url) {
+                                router.push(BotStatus.Loading(bot, url) {
                                     continuation.resume(it)
                                 })
                             }
                     }
                 }
             }.onSuccess {
-                router.push(BotState.Online(model))
+                router.push(BotStatus.Online(model))
             }.onFailure {
                 router.pop()
             }
@@ -96,54 +117,138 @@ class BotV(componentContext: ComponentContext, val model: ComposeBot) : Componen
     }
 
 
-    @Composable
-    override fun render() {
-        Children(router.state) { child, _ ->
-            child.render()
-        }
-    }
-
-    private sealed class BotState : Parcelable {
-        object NoLogin : BotState()
-        class Lo(val bot: Bot, val data: ByteArray, val result: suspend (String?) -> Unit) : BotState()
-        class Load(val bot: Bot, val url: String, val result: suspend (String?) -> Unit) : BotState()
-        class Loading(val bot: Bot, val url: String, val result: suspend (String?) -> Unit) : BotState()
-        class Online(val bot: ComposeBot) : BotState()
+    sealed class BotStatus : Parcelable {
+        object NoLogin : BotStatus()
+        class Lo(val bot: Bot, val data: ByteArray, val result: suspend (String?) -> Unit) : BotStatus()
+        class Load(val bot: Bot, val url: String, val result: suspend (String?) -> Unit) : BotStatus()
+        class Loading(val bot: Bot, val url: String, val result: suspend (String?) -> Unit) : BotStatus()
+        class Online(val bot: ComposeBot) : BotStatus()
     }
 
 }
 
+@Composable
+fun BotItem(
+    bot: ComposeBot,
+    modifier: Modifier = Modifier,
+    onItemClick: () -> Unit,
+    onItemRemove: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .aspectRatio(2f)
+            .clickable(onClick = onItemClick),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            modifier = Modifier
+                .weight(2f, fill = false)
+                .requiredSize(60.dp),
+            shape = CircleShape,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
+        ) {
+            Image(bot.avatar, null)
+        }
 
-class Action(
-    val onError: (Throwable?) -> Unit,
-    val onSolvePicCaptcha: (bot: Bot, data: ByteArray) -> String?,
-    val onSolveSliderCaptcha: (bot: Bot, url: String) -> String?,
-    val onSolveUnsafeDeviceLoginVerify: (bot: Bot, url: String) -> String?
-) : LoginSolver() {
-    private fun errorHandler(
-        continuation: CancellableContinuation<String?>,
-        bot: Bot
-    ) = continuation.invokeOnCancellation {
-        if (it != null) {
-            // pass exception?
-            bot.logger.error(it)
-            onError(it)
+        Column(
+            Modifier
+                .weight(3f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(bot.nick, fontWeight = FontWeight.Bold)
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text(bot.id, style = MaterialTheme.typography.body2)
+            }
+        }
+
+        Column(
+            Modifier
+                .weight(1f)
+        ) {
+            Icon(
+                Icons.Default.Delete,
+                contentDescription = "Delete",
+                modifier = Modifier
+                    .clickable(onClick = onItemRemove)
+            )
+        }
+    }
+}
+
+@Composable
+fun TopView(modifier: Modifier) = Surface {
+    Row(
+        modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Bots",
+            color = LocalContentColor.current.copy(alpha = 0.60f),
+            fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
+    }
+}
+
+@Composable
+fun BotListView(
+    model: MutableList<ComposeBot>,
+    modifier: Modifier = Modifier,
+    onAddButtonClick: () -> Unit,
+    onItemClick: (bot: ComposeBot) -> Unit,
+    onItemRemove: (bot: ComposeBot) -> Unit
+) = Box(modifier) {
+    val scrollState = rememberLazyListState()
+    val itemHeight = 100.dp
+
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .withoutWidthConstraints(),
+        state = scrollState
+    ) {
+        items(model) { item ->
+            BotItem(
+                item,
+                Modifier
+                    .requiredHeight(itemHeight),
+                onItemClick = {
+                    onItemClick(item)
+                },
+                onItemRemove = {
+                    onItemRemove(item)
+                }
+            )
+        }
+
+        item {
+            Button(
+                onClick = onAddButtonClick,
+                modifier = Modifier
+                    .requiredHeight(itemHeight)
+                    .aspectRatio(2f)
+                    .padding(24.dp),
+            ) {
+                Text("Add a bot", color = Color.Black)
+            }
+
         }
     }
 
-    override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? =
-        suspendCancellableCoroutine { continuation ->
-            errorHandler(continuation, bot)
-        }
+    VerticalScrollbar(
+        Modifier.align(Alignment.CenterEnd),
+        scrollState,
+        model.size + 1,
+        itemHeight
+    )
+}
 
 
-    override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? =
-        suspendCancellableCoroutine { continuation ->
-            errorHandler(continuation, bot)
-        }
 
-    override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? =
-        suspendCancellableCoroutine { continuation ->
-            errorHandler(continuation, bot)
-        }
+@Composable
+fun BotStateUi(botState: BotState) {
+    Children(botState.state) { child, _ ->
+        child()
+    }
 }

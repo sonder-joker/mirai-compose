@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import io.ktor.client.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.coroutineScope
@@ -121,11 +122,11 @@ private class ComposeBotImpl(
     }
 
     private suspend fun loadAvatar() {
-        _avatar = Image.makeFromEncoded(
+        _avatar = SkiaImageDecode(
             client.get(_bot!!.avatarUrl) {
                 header("Connection", "close")
             }
-        ).asImageBitmap()
+        )
     }
 
     private suspend fun startTiming() {

@@ -4,12 +4,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import com.youngerhousea.miraicompose.DEBUG
-import com.youngerhousea.miraicompose.MiraiCompose
-import com.youngerhousea.miraicompose.console.MiraiComposeLogger.Companion.logFiles
-import com.youngerhousea.miraicompose.console.MiraiComposeLogger.Companion.loggerStorage
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import net.mamoe.mirai.utils.SimpleLogger
@@ -39,7 +36,7 @@ class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBa
 
         val out = MiraiLogger.create("stdout")
 
-        val logFiles = MiraiCompose.rootPath.resolve("log").createDirectories()
+        val logFiles = MiraiConsole.rootPath.resolve("log").createDirectories()
     }
 
 

@@ -10,27 +10,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.theme.AppTheme
-import com.youngerhousea.miraicompose.utils.Component
 
 
-internal class Setting(componentContext: ComponentContext) : Component,
-    ComponentContext by componentContext {
-    @Composable
-    override fun render() {
-        Column(
-            Modifier
-                .padding(20.dp)
-                .fillMaxSize()
-        ) {
-            Text("自定义配色(未实现)")
+class Setting(
+    componentContext: ComponentContext
+) : ComponentContext by componentContext {
+
+}
+
+@Composable
+fun SettingUi(setting: Setting) {
+    Column(
+        Modifier
+            .padding(20.dp)
+            .fillMaxSize()
+    ) {
+        Text("自定义配色(未实现)")
 
 //            SimpleSetWindows("VERBOSE") { logColor.verbose = Color(it.toULong(16)) }
 //            SimpleSetWindows("INFO") { logColor.info = Color(it.toULong(16)) }
 //            SimpleSetWindows("WARING") { logColor.warning = Color(it.toULong(16)) }
 //            SimpleSetWindows("ERROR") { logColor.error = Color(it.toULong(16)) }
 //            SimpleSetWindows("DEBUG") { logColor.debug = Color(it.toULong(16)) }
-        }
     }
 }
 

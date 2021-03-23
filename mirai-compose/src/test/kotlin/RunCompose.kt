@@ -1,13 +1,12 @@
 package com.youngerhousea.miraicompose
 
-import com.youngerhousea.miraicompose.ui.navigation.MiraiComposeView
-import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
+import com.youngerhousea.miraicompose.ui.feature.MiraiComposeView
 import java.io.File
 
 fun main() {
     configureUserDir()
-    MiraiComposeView()
-    MiraiCompose.start()
+
+    MiraiComposeLoader.main()
 }
 
 internal fun configureUserDir() {

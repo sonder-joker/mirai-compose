@@ -13,7 +13,12 @@ internal class ColorTest {
 
     val yaml = Yaml { }
 
-    val testColor = Color(235, 235, 235)
+    val testColor = Color(232, 224, 203)
+
+    @Test
+    fun getColor() {
+        println(yaml.encodeToString(ColorSerializer,testColor))
+    }
 
     @Test
     fun appThemeTest() {

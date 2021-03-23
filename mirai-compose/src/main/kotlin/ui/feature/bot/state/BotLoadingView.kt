@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.feature.bot.botstate
+package com.youngerhousea.miraicompose.ui.feature.bot.state
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -16,55 +16,59 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 
-class BotLo(context: ComponentContext, val bot: Bot, val data: ByteArray, val result: suspend (String?) -> Unit) :
-    Component, ComponentContext by context {
-    @Composable
-    override fun render() {
-        BotLoView(bot, data, result)
-    }
+class BotSolvePicCaptchaLoading(
+    context: ComponentContext,
+    val bot: Bot,
+    val data: ByteArray,
+    val result: suspend (String?) -> Unit
+) : ComponentContext by context {
+
 }
 
 @Composable
-fun BotLoView(bot: Bot, data: ByteArray, result: suspend (String?) -> Unit) {
-    val image = SkiaImageDecode(data)
+fun BotSolvePicCaptchaLoadingUi(botSolvePicCaptchaLoading: BotSolvePicCaptchaLoading) {
+    val image = SkiaImageDecode(botSolvePicCaptchaLoading.data)
     val scope = rememberCoroutineScope()
     var value by mutableStateOf(TextFieldValue())
     Column {
-        Text("Mirai PicCaptcha(${bot.id})")
+        Text("Mirai PicCaptcha(${botSolvePicCaptchaLoading.bot.id})")
         Image(image, null)
         TextField(value = value, onValueChange = { value = it })
-        Button(onClick = { scope.launch { result(value.text) } }) {
+        Button(onClick = { scope.launch { botSolvePicCaptchaLoading.result(value.text) } }) {
             Text("Sure")
         }
     }
 }
 
-class BotLoad(context: ComponentContext, val bot: Bot, val url: String, result: suspend (String?) -> Unit) : Component, ComponentContext by context {
-    @Composable
-    override fun render() {
-        BotLoadView(bot, url)
-    }
+class BotSolveSliderCaptchaLoading(
+    context: ComponentContext,
+    val bot: Bot,
+    val url: String,
+    val result: suspend (String?) -> Unit
+) : ComponentContext by context {
+
 }
 
 @Composable
-fun BotLoadView(bot: Bot, url: String) {
+fun BotSolveSliderCaptchaLoadingUi(botSolveSliderCaptchaLoading: BotSolveSliderCaptchaLoading) {
     TODO("嵌入一下.jpg")
 }
 
-class BotLoading(context: ComponentContext, val bot: Bot, val url: String, result: suspend (String?) -> Unit) : Component, ComponentContext by context {
-    @Composable
-    override fun render() {
-        BotLoadingView(bot, url)
-    }
+class BotSolveUnsafeDeviceLoginVerify(
+    context: ComponentContext,
+    val bot: Bot,
+    val url: String,
+    val result: suspend (String?) -> Unit
+) : ComponentContext by context {
+
 }
 
 @Composable
-fun BotLoadingView(bot: Bot, url: String) = Box(
+fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveUnsafeDeviceLoginVerify) = Box(
     Modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {

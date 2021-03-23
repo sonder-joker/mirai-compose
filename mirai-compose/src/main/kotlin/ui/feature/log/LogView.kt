@@ -10,36 +10,30 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
-import com.youngerhousea.miraicompose.utils.Component
-import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLogger
 
 
-class Log(
+class AllLog(
     componentContext: ComponentContext,
     val loggerStorage: List<AnnotatedString>,
     val logger: MiraiLogger
-) : Component, ComponentContext by componentContext {
-    @MiraiInternalApi
-    @Composable
-    override fun render() {
-        LogWindow(loggerStorage, logger)
-    }
+) : ComponentContext by componentContext {
+
 }
 
 
 @Composable
-internal fun LogWindow(logs: List<AnnotatedString>, logger: MiraiLogger) {
+fun LogUi(allLog: AllLog) {
     Column {
         LogBox(
             Modifier
                 .fillMaxSize()
                 .weight(8f)
                 .padding(horizontal = 40.dp, vertical = 20.dp),
-            logs,
+            allLog.loggerStorage,
         )
         CommandSendBox(
-            logger,
+            allLog.logger,
             Modifier
                 .weight(1f)
                 .padding(horizontal = 40.dp),

@@ -1,12 +1,10 @@
 package com.youngerhousea.miraicompose.theme
 
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.loadVectorXmlResource
-import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.unit.Density
-import org.jetbrains.skija.Image
+import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import org.xml.sax.InputSource
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
@@ -37,10 +35,4 @@ internal fun loadImageResource(path: String): BufferedImage {
     val resource = Thread.currentThread().contextClassLoader.getResource(path)
     requireNotNull(resource) { "Resource $path not found" }
     return resource.openStream().use(ImageIO::read)
-}
-
-fun asImageAsset(image: BufferedImage): ImageBitmap {
-    val baos = ByteArrayOutputStream()
-    ImageIO.write(image, "png", baos)
-    return Image.makeFromEncoded(baos.toByteArray()).asImageBitmap()
 }

@@ -2,8 +2,10 @@ package com.youngerhousea.miraicompose.utils
 
 import androidx.compose.runtime.Composable
 
+typealias Component = @Composable () -> Unit
 
-fun interface Component {
-    @Composable
-    fun render()
+fun <T : Any> T.asComponent(content: @Composable (T) -> Unit): Component {
+    return {
+        content(this)
+    }
 }

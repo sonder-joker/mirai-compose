@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package com.youngerhousea.miraicompose.ui.feature.bot.botstate
+package com.youngerhousea.miraicompose.ui.feature.bot.state
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VpnKey
@@ -22,30 +21,17 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ResourceImage
-import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.HorizontalDottedProgressBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 class BotNoLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit
-) : Component, ComponentContext by componentContext {
-    @Composable
-    override fun render() {
-        BotLoginView(onClick)
-    }
-}
-
-
-private class LoginWindowState(private val _onLogin: (account: Long, password: String) -> Unit) {
+) :  ComponentContext by componentContext {
     var account by mutableStateOf(TextFieldValue())
 
     var password by mutableStateOf(TextFieldValue())
@@ -65,7 +51,7 @@ private class LoginWindowState(private val _onLogin: (account: Long, password: S
     suspend fun onLogin() {
         runCatching {
             loading = true
-            this@LoginWindowState._onLogin(account.text.toLong(), password.text)
+            this.onClick(account.text.toLong(), password.text)
         }.onSuccess {
             loading = false
         }.onFailure {
@@ -128,12 +114,10 @@ private class LoginWindowState(private val _onLogin: (account: Long, password: S
             else
                 PasswordVisualTransformation()
     }
-
 }
 
 @Composable
-fun BotLoginView(onLogin: (account: Long, password: String) -> Unit) {
-    val loginWindowState = remember { LoginWindowState(onLogin) }
+fun BotNoLoginUi(botNoLogin: BotNoLogin) {
     val scope = rememberCoroutineScope()
     Column(
         verticalArrangement = Arrangement.Center,
@@ -146,15 +130,15 @@ fun BotLoginView(onLogin: (account: Long, password: String) -> Unit) {
             modifier = Modifier
                 .padding(5.dp)
         )
-        AccountTextField(loginWindowState, scope)
-        PasswordTextField(loginWindowState, scope)
-        LoginButton(loginWindowState, scope)
+        AccountTextField(botNoLogin, scope)
+        PasswordTextField(botNoLogin, scope)
+        LoginButton(botNoLogin, scope)
     }
 }
 
 @Composable
 private inline fun AccountTextField(
-    loginWindowState: LoginWindowState,
+    loginWindowState: BotNoLogin,
     scope: CoroutineScope
 ) = TextField(
     value = loginWindowState.account,
@@ -182,7 +166,7 @@ private inline fun AccountTextField(
 )
 
 @Composable
-private inline fun PasswordTextField(loginWindowState: LoginWindowState, scope: CoroutineScope) =
+private inline fun PasswordTextField(loginWindowState: BotNoLogin, scope: CoroutineScope) =
     TextField(
         value = loginWindowState.password,
         onValueChange = loginWindowState::onPasswordTextChange,
@@ -216,7 +200,7 @@ private inline fun PasswordTextField(loginWindowState: LoginWindowState, scope: 
 
 @Composable
 private inline fun LoginButton(
-    loginWindowState: LoginWindowState,
+    loginWindowState: BotNoLogin,
     scope: CoroutineScope
 ) = Button(
     onClick = { scope.launch { loginWindowState.onLogin() } },

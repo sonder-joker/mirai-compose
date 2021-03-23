@@ -1,3 +1,5 @@
+package com.youngerhousea.miraicompose
+
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window

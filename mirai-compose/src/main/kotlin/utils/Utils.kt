@@ -22,7 +22,7 @@ import org.jetbrains.skija.Image
 import java.io.PrintStream
 
 @Composable
-fun VerticalScrollbar(
+internal fun VerticalScrollbar(
     modifier: Modifier,
     scrollState: LazyListState,
     itemCount: Int,
@@ -32,7 +32,7 @@ fun VerticalScrollbar(
     modifier
 )
 
-fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap = Image.makeFromEncoded(byteArray).asImageBitmap()
+internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap = Image.makeFromEncoded(byteArray).asImageBitmap()
 
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))
@@ -120,7 +120,7 @@ internal fun setSystemOut(out: MiraiLogger) {
     )
 }
 
-fun <T, K> CrossFade(): @Composable (currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) -> Unit =
+internal fun <T, K> CrossFade(): @Composable (currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) -> Unit =
     { currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit ->
         KeyedCrossFade(currentChild, currentKey, children)
     }
@@ -134,11 +134,7 @@ private fun <T, K> KeyedCrossFade(currentChild: T, currentKey: K, children: @Com
 }
 
 
-class ChildWrapper<out T, out C>(val child: T, val key: C) {
+internal class ChildWrapper<out T, out C>(val child: T, val key: C) {
     override fun equals(other: Any?): Boolean = key == (other as? ChildWrapper<*, *>)?.key
     override fun hashCode(): Int = key.hashCode()
-}
-
-fun Keyed() {
-
 }

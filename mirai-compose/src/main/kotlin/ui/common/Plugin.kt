@@ -8,23 +8,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AlignHorizontalCenter
 import androidx.compose.material.icons.filled.Help
-import androidx.compose.material.icons.materialIcon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youngerhousea.miraicompose.console.dataWithConfig
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.Command
@@ -35,6 +31,7 @@ import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.yamlkt.Yaml
+import kotlin.reflect.KProperty0
 
 private val yaml = Yaml.default
 
@@ -97,7 +94,7 @@ private val Plugin.kindIcon: ImageVector
         }
 
 @Composable
-internal fun PluginDescriptionCard(plugin: Plugin, onItemSelected:(Plugin) -> Unit) {
+internal fun PluginDescriptionCard(plugin: Plugin, onItemSelected: (plugin: Plugin) -> Unit) {
     Card(
         Modifier
             .padding(10.dp)
@@ -127,18 +124,6 @@ internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-internal fun PluginDataView(modifier: Modifier = Modifier, plugin: JvmPlugin) =
-    LazyColumn(
-        modifier,
-        verticalArrangement = Arrangement.SpaceAround,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(plugin.dataWithConfig) { pluginData ->
-            PluginDataExplanationView(pluginData)
-            EditView(pluginData, plugin)
-        }
-    }
 
 private inline val PluginData.annotatedExplain: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
@@ -158,11 +143,11 @@ private inline val PluginData.annotatedExplain: AnnotatedString
     }
 
 @Composable
-private fun PluginDataExplanationView(pluginData: PluginData) =
+internal fun PluginDataExplanationView(pluginData: PluginData) =
     Text(pluginData.annotatedExplain, Modifier.padding(bottom = 40.dp))
 
 @Composable
-private fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
+internal fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
     var value by remember(pluginData) {
         mutableStateOf(
             yaml.encodeToString(
@@ -204,16 +189,9 @@ private fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
     }
 }
 
-@Composable
-internal fun PluginCommandView(modifier: Modifier = Modifier, registeredCommands: List<Command>) =
-    LazyColumn(modifier) {
-        items(registeredCommands) { registeredCommand ->
-            Text(registeredCommand.simpleDescription)
-            Spacer(Modifier.height(20.dp))
-        }
-    }
 
-private inline val Command.simpleDescription: AnnotatedString
+
+internal inline val Command.simpleDescription: AnnotatedString
     get() =
         with(AnnotatedString.Builder()) {
             append(allNames.joinToString { " " })
