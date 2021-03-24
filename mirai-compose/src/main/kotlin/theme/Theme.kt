@@ -54,8 +54,9 @@ internal data class InternalColor(
     @Transient
     val materialLight: Colors = lightColors(
 //        background = Color(0xf5FFFFFF),
-//        surface = backgroundMedium,
+        surface = Color(0xff979595),
         primary = Color(0xf5f5f5f5),
+        onPrimary = Color.Black
 //        secondary = backgroundLight
     )
 }

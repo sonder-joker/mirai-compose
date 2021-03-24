@@ -3,7 +3,6 @@ package com.youngerhousea.miraicompose.console
 import androidx.compose.runtime.*
 import com.youngerhousea.miraicompose.console.*
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.ui.feature.MiraiComposeView
 import com.youngerhousea.miraicompose.utils.setSystemOut
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
@@ -11,10 +10,13 @@ import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.data.PluginDataHolder
 import net.mamoe.mirai.console.extensions.BotConfigurationAlterer
 import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.console.plugin.PluginManager
+import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -28,7 +30,7 @@ import java.util.*
 
 
 @ConsoleFrontEndImplementation
-class MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScope(
+class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, CoroutineScope by CoroutineScope(
     NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
         if (throwable is CancellationException) {
             return@CoroutineExceptionHandler
@@ -66,7 +68,17 @@ class MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScop
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    var isStart by mutableStateOf(false)
+    override var isReady by mutableStateOf(false)
+
+    @Suppress("UNCHECKED_CAST")
+    override val jvmPluginList: List<JvmPlugin> by lazy {  PluginManager.plugins as List<JvmPlugin> }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun getConfig(plugin: Plugin): List<PluginConfig> =
+        if (plugin is PluginDataHolder) configStorageForJvmPluginLoader[plugin] as List<PluginConfig> else error("Plugin is Not Holder!")
+
+    override fun getData(plugin: Plugin): List<PluginData> =
+        if (plugin is PluginDataHolder) dataStorageForJvmPluginLoader[plugin] else error("Plugin is Not Holder!")
 
     override fun preStart() {
         if (!DEBUG)
@@ -91,8 +103,9 @@ class MiraiCompose : MiraiConsoleImplementation, CoroutineScope by CoroutineScop
     }
 
     override fun postStart() {
-        isStart = true
+        isReady = true
     }
+
 }
 
 const val DEBUG = true

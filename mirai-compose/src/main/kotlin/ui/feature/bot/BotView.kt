@@ -53,11 +53,26 @@ class BotState(
                 is BotStatus.NoLogin ->
                     BotNoLogin(componentContext, onClick = ::onClick).asComponent { BotNoLoginUi(it) }
                 is BotStatus.Lo ->
-                    BotSolvePicCaptchaLoading(componentContext, configuration.bot, configuration.data, configuration.result).asComponent { BotSolvePicCaptchaLoadingUi(it) }
+                    BotSolvePicCaptchaLoading(
+                        componentContext,
+                        configuration.bot,
+                        configuration.data,
+                        configuration.result
+                    ).asComponent { BotSolvePicCaptchaLoadingUi(it) }
                 is BotStatus.Load ->
-                    BotSolveSliderCaptchaLoading(componentContext, configuration.bot, configuration.url, configuration.result).asComponent { BotSolveSliderCaptchaLoadingUi(it) }
+                    BotSolveSliderCaptchaLoading(
+                        componentContext,
+                        configuration.bot,
+                        configuration.url,
+                        configuration.result
+                    ).asComponent { BotSolveSliderCaptchaLoadingUi(it) }
                 is BotStatus.Loading ->
-                    BotSolveUnsafeDeviceLoginVerify(componentContext, configuration.bot, configuration.url, configuration.result).asComponent { BotSolveUnsafeDeviceLoginVerifyUi(it) }
+                    BotSolveUnsafeDeviceLoginVerify(
+                        componentContext,
+                        configuration.bot,
+                        configuration.url,
+                        configuration.result
+                    ).asComponent { BotSolveUnsafeDeviceLoginVerifyUi(it) }
                 is BotStatus.Online ->
                     BotOnline(componentContext, configuration.bot.toBot()).asComponent { BotOnlineUi(it) }
             }
@@ -177,7 +192,7 @@ fun BotItem(
 }
 
 @Composable
-fun TopView(modifier: Modifier) = Surface {
+fun TopView(modifier: Modifier) =
     Row(
         modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -189,7 +204,7 @@ fun TopView(modifier: Modifier) = Surface {
             modifier = Modifier.padding(horizontal = 4.dp)
         )
     }
-}
+
 
 @Composable
 fun BotListView(
@@ -230,7 +245,7 @@ fun BotListView(
                     .aspectRatio(2f)
                     .padding(24.dp),
             ) {
-                Text("Add a bot", color = Color.Black)
+                Text("Add a bot")
             }
 
         }
@@ -243,7 +258,6 @@ fun BotListView(
         itemHeight
     )
 }
-
 
 
 @Composable

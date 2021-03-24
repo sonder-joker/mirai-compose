@@ -23,7 +23,7 @@ class AllLog(
 
 
 @Composable
-fun LogUi(allLog: AllLog) {
+fun AllLogUi(allLog: AllLog) {
     Column {
         LogBox(
             Modifier

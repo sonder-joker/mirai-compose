@@ -21,6 +21,7 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.console.MiraiComposeLogger
+import com.youngerhousea.miraicompose.console.MiraiConsoleRepository
 import com.youngerhousea.miraicompose.future.Application
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.theme.ComposeSetting
@@ -32,7 +33,7 @@ import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
 import com.youngerhousea.miraicompose.ui.feature.bot.BotChoose
 import com.youngerhousea.miraicompose.ui.feature.bot.BotChooseUi
 import com.youngerhousea.miraicompose.ui.feature.log.AllLog
-import com.youngerhousea.miraicompose.ui.feature.log.LogUi
+import com.youngerhousea.miraicompose.ui.feature.log.AllLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.LoadedPluginUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.LoadedPlugin
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
@@ -42,16 +43,17 @@ import com.youngerhousea.miraicompose.utils.asComponent
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
-import net.mamoe.mirai.console.plugin.PluginManager
 
 fun MiraiComposeView() = Application {
     val compose = remember { MiraiCompose() }
 
+    var circleSize by remember { mutableStateOf(50f) }
+    val animateCircleSize by animateFloatAsState(circleSize)
+
     LaunchedEffect(Unit) {
         compose.start()
     }
-
-    if (compose.isStart)
+    if (compose.isReady)
         ComposableWindow(
             title = "",
             size = IntSize(1280, 768),
@@ -73,16 +75,12 @@ fun MiraiComposeView() = Application {
             undecorated = true,
             size = IntSize(400, 400),
         ) {
-
-            var a by remember { mutableStateOf(50f) }
-            val b by animateFloatAsState(a)
-
             LaunchedEffect(Unit) {
                 while (true) {
                     delay(10)
-                    a++
-                    if (a > 200f) {
-                        a = 0f
+                    circleSize++
+                    if (circleSize > 200f) {
+                        circleSize = 0f
                     }
                 }
             }
@@ -93,7 +91,7 @@ fun MiraiComposeView() = Application {
                     .fillMaxHeight()
                     .background(Color(0xffe8e0cb))
             ) {
-                drawCircle(Color.Red, radius = b, style = Stroke(1.5f))
+                drawCircle(Color.Red, radius = animateCircleSize, style = Stroke(1.5f))
                 drawCircle(Color.Red, radius = 100f, style = Stroke(1.5f))
                 drawCircle(Color.Red, radius = 150f, style = Stroke(1.5f))
             }
@@ -103,7 +101,7 @@ fun MiraiComposeView() = Application {
 
 class NavHost(
     component: ComponentContext,
-    val compose: MiraiCompose,
+    val compose: MiraiConsoleRepository,
 ) : ComponentContext by component {
     private var currentBot: ComposeBot? = null
     private val instance = ComposeBot.instances
@@ -169,13 +167,11 @@ class NavHost(
                         componentContext,
                         loggerStorage = MiraiComposeLogger.loggerStorage,
                         logger = MiraiComposeLogger.out
-                    ).asComponent { LogUi(it) }
+                    ).asComponent { AllLogUi(it) }
                 is Config.Plugin -> {
                     LoadedPlugin(
                         componentContext,
-                        plugins = PluginManager.plugins,
-                        configStorage = compose.configStorageForJvmPluginLoader,
-                        dataStorage = compose.dataStorageForJvmPluginLoader
+                        repository = compose
                     ).asComponent { LoadedPluginUi(it) }
                 }
             }

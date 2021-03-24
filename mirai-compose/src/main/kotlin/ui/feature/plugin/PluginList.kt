@@ -18,7 +18,6 @@ class PluginList(
     val onItemSelected: (plugin: Plugin) -> Unit
 ) : ComponentContext by componentContext {
 
-
 }
 
 @Composable

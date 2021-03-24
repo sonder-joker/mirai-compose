@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 version = Versions.mirai_compose
 
@@ -34,14 +33,6 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-
-
-inline fun <reified C> Project.configure(name: String, configuration: C.() -> Unit) {
-    (this.tasks.getByName(name) as C).configuration()
-}
-
-println(sourceSets.main.name)
-
 compose.desktop {
     application {
         mainClass = "com.youngerhousea.miraicompose.MiraiComposeLoader"
@@ -51,7 +42,8 @@ compose.desktop {
             packageName = "MiraiCompose"
             packageVersion = Versions.mirai_compose
             vendor = "Noire"
-            dependsOn("fillConstaant")
+
+
             macOS {
                 bundleID = "com.youngerhousea.miraicompose"
                 iconFile.set(project.file("icons/mirai.icns"))
@@ -68,21 +60,4 @@ compose.desktop {
         }
     }
 }
-tasks {
-    val compileKotlin by getting {
-    }
 
-    register("fillConstant") {
-        doLast {
-            (compileKotlin as KotlinCompile).source.filter { it.name == "MiraiCompose.kt" }.single()
-                .let { file ->
-                    file.readText()
-                        .replace(
-                            Regex("""override val version: SemVersion = SemVersion\(.*\)""")
-                        ) {
-                            """override val version: SemVersion = SemVersion("${project.version}")"""
-                        }
-                }
-        }
-    }
-}

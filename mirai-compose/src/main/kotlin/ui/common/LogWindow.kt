@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,11 +49,14 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
             items(
                 listLog
             ) {
-                Text(
-                    it,
-                    modifier = Modifier
-                        .height(itemHeight)
-                )
+                //TODO:HapticFeedback.performHapticFeedback not implemented yet
+                SelectionContainer {
+                    Text(
+                        it,
+                        modifier = Modifier
+                            .height(itemHeight)
+                    )
+                }
             }
         }
 

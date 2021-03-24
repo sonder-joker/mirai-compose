@@ -212,6 +212,6 @@ private inline fun LoginButton(
     if (loginWindowState.loading)
         HorizontalDottedProgressBar()
     else
-        Text("Login", color = Color.Black)
+        Text("Login")
 }
 

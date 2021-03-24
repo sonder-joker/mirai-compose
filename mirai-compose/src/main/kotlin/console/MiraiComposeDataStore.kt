@@ -24,7 +24,6 @@ interface ReadablePluginDataStorage : MultiFilePluginDataStorage {
             ReadablePluginDataStorageImpl(MultiFilePluginDataStorage(directory))
 
     }
-
 }
 
 private class ReadablePluginDataStorageImpl(

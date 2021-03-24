@@ -39,7 +39,7 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 class PluginDetailed(
     componentContext: ComponentContext,
-    val plugin: JvmPlugin,
+    val plugin: Plugin,
     val data: List<PluginData>,
     val onExit: () -> Unit
 ) : ComponentContext by componentContext {
@@ -51,7 +51,7 @@ class PluginDetailed(
     }
 
     private val router: Router<Setting, Component> = router(
-        initialConfiguration = Setting.Data,
+        initialConfiguration = Setting.Description,
         handleBackButton = true,
         key = "PluginDetailedRouter",
         componentFactory = { configuration, componentContext ->
@@ -59,7 +59,12 @@ class PluginDetailed(
                 is Setting.Description ->
                     DetailedDescription(componentContext, plugin).asComponent { DetailedDescriptionUi(it) }
                 is Setting.Data ->
-                    DetailedData(componentContext, plugin, data).asComponent { DetailedDataUi(it) }
+//                    when (plugin) {
+//                        is JvmPlugin ->
+                            DetailedData(componentContext, plugin as JvmPlugin, data).asComponent { DetailedDataUi(it) }
+//                        else ->
+//                            error("Other Plugin!")
+//                    }
                 is Setting.Command ->
                     DetailedCommand(componentContext, plugin.registeredCommands).asComponent { DetailedCommandUi(it) }
             }
@@ -188,7 +193,7 @@ fun DetailedDataUi(detailedData: DetailedData) =
 class DetailedCommand(
     componentContext: ComponentContext,
     internal val command: List<Command>,
-) :  ComponentContext by componentContext
+) : ComponentContext by componentContext
 
 @Composable
 fun DetailedCommandUi(detailedCommand: DetailedCommand) =
