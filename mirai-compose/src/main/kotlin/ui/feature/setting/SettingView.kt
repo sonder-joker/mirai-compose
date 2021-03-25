@@ -16,6 +16,8 @@ import com.youngerhousea.miraicompose.console.ComposeDataScope
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import kotlinx.coroutines.launch
 
+@Suppress("NOTHING_TO_INLINE")
+private inline fun String.toColor() = Color(this.removePrefix("0x").toULong(16))
 
 class Setting(
     componentContext: ComponentContext
@@ -32,34 +34,25 @@ fun SettingUi() {
     ) {
         Text("自定义日志配色")
         SimpleSetWindows("VERBOSE") {
-            ComposeDataScope.launch {
-                ComposeSetting.AppTheme.logColors.verbose = Color(it.removePrefix("0x").toULong(16))
-            }
+            ComposeSetting.AppTheme.logColors.verbose = it.toColor()
         }
         SimpleSetWindows("INFO") {
-            ComposeDataScope.launch {
-                ComposeSetting.AppTheme.logColors.info = Color(it.removePrefix("0x").toULong(16))
-            }
+            ComposeSetting.AppTheme.logColors.info = it.toColor()
         }
         SimpleSetWindows("WARING") {
-            ComposeDataScope.launch {
-                ComposeSetting.AppTheme.logColors.warning = Color(it.removePrefix("0x").toULong(16))
-            }
+            ComposeSetting.AppTheme.logColors.warning = it.toColor()
         }
         SimpleSetWindows("ERROR") {
-            ComposeDataScope.launch {
-                ComposeSetting.AppTheme.logColors.error = Color(it.removePrefix("0x").toULong(16))
-            }
+            ComposeSetting.AppTheme.logColors.error = it.toColor()
         }
+
         SimpleSetWindows("DEBUG") {
-            ComposeDataScope.launch {
-                ComposeSetting.AppTheme.logColors.debug = Color(it.removePrefix("0x").toULong(16))
-            }
+            ComposeSetting.AppTheme.logColors.debug = it.toColor()
         }
         SimpleSetWindows("Primary") {
-            ComposeDataScope.launch {
-                ComposeSetting.AppTheme.themeColors.materialLight = darkColors()
-            }
+            ComposeSetting.AppTheme.materialLight =
+                ComposeSetting.AppTheme.materialLight
+                    .copy(primary = it.toColor())
         }
     }
 }
@@ -79,6 +72,10 @@ private fun SimpleSetWindows(textValue: String, action: (value: String) -> Unit)
         TextField(textFieldValue, {
             textFieldValue = it
         }, Modifier.weight(2f).padding(end = 20.dp))
-        Button({ action(textFieldValue) }) { Text("修改") }
+        Button({
+            ComposeDataScope.launch {
+                action(textFieldValue)
+            }
+        }) { Text("修改") }
     }
 }

@@ -63,7 +63,7 @@ fun MiraiComposeView() = Application {
             }
         ) {
             DesktopMaterialTheme(
-                colors = ComposeSetting.AppTheme.themeColors.materialLight
+                colors = ComposeSetting.AppTheme.materialLight
             ) {
                 rememberRootComponent { componentContext ->
                     NavHost(componentContext, compose)
