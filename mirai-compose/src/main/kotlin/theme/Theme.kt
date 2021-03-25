@@ -5,6 +5,10 @@ package com.youngerhousea.miraicompose.theme
 import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import kotlinx.serialization.KSerializer
@@ -32,6 +36,7 @@ internal object ColorSerializer : KSerializer<Color> {
         Color(decoder.decodeString().removePrefix("#").toLong(16))
 }
 
+
 @Serializable
 internal data class InternalColor(
     //dark
@@ -52,13 +57,13 @@ internal data class InternalColor(
     )
 
     @Transient
-    val materialLight: Colors = lightColors(
+    var materialLight: Colors by mutableStateOf( lightColors(
 //        background = Color(0xf5FFFFFF),
         surface = Color(0xff979595),
         primary = Color(0xf5f5f5f5),
         onPrimary = Color.Black
 //        secondary = backgroundLight
-    )
+    ))
 }
 
 @Serializable

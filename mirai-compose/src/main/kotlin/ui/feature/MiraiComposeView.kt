@@ -157,7 +157,7 @@ class NavHost(
                 is Config.Setting ->
                     Setting(
                         componentContext
-                    ).asComponent { SettingUi(it) }
+                    ).asComponent { SettingUi() }
                 is Config.About ->
                     About(
                         componentContext

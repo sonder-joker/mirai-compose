@@ -6,7 +6,6 @@ import com.youngerhousea.miraicompose.theme.ComposeSetting
 import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.data.*
-import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import java.nio.file.Path
 

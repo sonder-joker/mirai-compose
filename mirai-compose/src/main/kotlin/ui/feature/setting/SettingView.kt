@@ -4,12 +4,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.darkColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
+import com.youngerhousea.miraicompose.console.ComposeDataScope
+import com.youngerhousea.miraicompose.theme.ComposeSetting
+import kotlinx.coroutines.launch
 
 
 class Setting(
@@ -19,19 +24,43 @@ class Setting(
 }
 
 @Composable
-fun SettingUi(setting: Setting) {
+fun SettingUi() {
     Column(
         Modifier
             .padding(20.dp)
             .fillMaxSize()
     ) {
-        Text("自定义配色(未实现)")
-
-//            SimpleSetWindows("VERBOSE") { logColor.verbose = Color(it.toULong(16)) }
-//            SimpleSetWindows("INFO") { logColor.info = Color(it.toULong(16)) }
-//            SimpleSetWindows("WARING") { logColor.warning = Color(it.toULong(16)) }
-//            SimpleSetWindows("ERROR") { logColor.error = Color(it.toULong(16)) }
-//            SimpleSetWindows("DEBUG") { logColor.debug = Color(it.toULong(16)) }
+        Text("自定义日志配色")
+        SimpleSetWindows("VERBOSE") {
+            ComposeDataScope.launch {
+                ComposeSetting.AppTheme.logColors.verbose = Color(it.removePrefix("0x").toULong(16))
+            }
+        }
+        SimpleSetWindows("INFO") {
+            ComposeDataScope.launch {
+                ComposeSetting.AppTheme.logColors.info = Color(it.removePrefix("0x").toULong(16))
+            }
+        }
+        SimpleSetWindows("WARING") {
+            ComposeDataScope.launch {
+                ComposeSetting.AppTheme.logColors.warning = Color(it.removePrefix("0x").toULong(16))
+            }
+        }
+        SimpleSetWindows("ERROR") {
+            ComposeDataScope.launch {
+                ComposeSetting.AppTheme.logColors.error = Color(it.removePrefix("0x").toULong(16))
+            }
+        }
+        SimpleSetWindows("DEBUG") {
+            ComposeDataScope.launch {
+                ComposeSetting.AppTheme.logColors.debug = Color(it.removePrefix("0x").toULong(16))
+            }
+        }
+        SimpleSetWindows("Primary") {
+            ComposeDataScope.launch {
+                ComposeSetting.AppTheme.themeColors.materialLight = darkColors()
+            }
+        }
     }
 }
 
