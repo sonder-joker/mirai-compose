@@ -9,8 +9,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.*
 import net.mamoe.mirai.console.data.AutoSavePluginConfig
 import net.mamoe.mirai.console.data.value
@@ -133,7 +139,6 @@ internal object ColorsSerializer : KSerializer<Colors> {
         }
 }
 
-
 @Serializable
 internal data class LogColor(
     var verbose: Color = Color(0xFF00FF00),
@@ -144,9 +149,9 @@ internal data class LogColor(
 )
 
 @Serializable
-internal data class AppTheme(
-    val logColors: LogColor = LogColor(),
-) {
+internal class AppTheme {
+    val logColors: LogColor = LogColor()
+
     var materialLight: Colors by mutableStateOf(
         lightColors(
             surface = Color(0xff979595),

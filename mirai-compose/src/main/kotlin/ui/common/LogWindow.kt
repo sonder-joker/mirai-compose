@@ -80,12 +80,17 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
     var currentCommand by remember(logger) { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    fun onClick() = scope.launch {
-        SolveCommandResult(currentCommand, logger)
-    }.invokeOnCompletion {
-        currentCommand = ""
-    }
+    fun onClick() {
+        scope.launch {
+            try {
+                SolveCommandResult(currentCommand, logger)
+            } catch (e :Exception) {
 
+            } finally {
+                currentCommand = ""
+            }
+        }
+    }
     Row(modifier) {
         TextField(
             currentCommand,

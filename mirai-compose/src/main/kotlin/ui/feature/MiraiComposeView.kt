@@ -50,17 +50,17 @@ fun MiraiComposeView() = Application {
     var circleSize by remember { mutableStateOf(50f) }
     val animateCircleSize by animateFloatAsState(circleSize)
 
-    LaunchedEffect(Unit) {
+    DisposableEffect(Unit) {
         compose.start()
+        onDispose {
+            compose.cancel()
+        }
     }
     if (compose.isReady)
         ComposableWindow(
             title = "",
             size = IntSize(1280, 768),
-            icon = ResourceImage.icon,
-            onDismissRequest = {
-                compose.cancel()
-            }
+            icon = ResourceImage.icon
         ) {
             DesktopMaterialTheme(
                 colors = ComposeSetting.AppTheme.materialLight

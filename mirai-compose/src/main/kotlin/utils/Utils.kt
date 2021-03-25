@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -12,6 +13,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
+import com.youngerhousea.miraicompose.console.ComposeDataScope
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
@@ -20,6 +22,17 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
 import java.io.PrintStream
+
+@Composable
+inline fun ComposeDataScopeEffect(key:Any?, crossinline effect:() -> Unit ) =
+    DisposableEffect(key) {
+        val job = ComposeDataScope.launch {
+            effect()
+        }
+        onDispose {
+            job.cancel()
+        }
+    }
 
 @Composable
 internal fun VerticalScrollbar(
@@ -32,7 +45,9 @@ internal fun VerticalScrollbar(
     modifier
 )
 
-internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap = Image.makeFromEncoded(byteArray).asImageBitmap()
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap = Image.makeFromEncoded(byteArray).asImageBitmap()
 
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))
@@ -89,7 +104,7 @@ internal fun <R> AnnotatedString.windowed(
     return result
 }
 
-internal fun checkWindowSizeStep(size: Int, step: Int) {
+private fun checkWindowSizeStep(size: Int, step: Int) {
     require(size > 0 && step > 0) {
         if (size != step)
             "Both size $size and step $step must be greater than zero."
