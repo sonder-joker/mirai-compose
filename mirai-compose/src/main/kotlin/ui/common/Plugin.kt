@@ -4,8 +4,6 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Help
@@ -31,22 +29,20 @@ import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.yamlkt.Yaml
-import kotlin.reflect.KProperty0
 
 private val yaml = Yaml.default
 
-private inline val Plugin.annotatedName: AnnotatedString
+internal inline val Plugin.annotatedName: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.White, fontSize = 20.sp))
+        pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 20.sp))
         append(name.ifEmpty { "Unknown" })
         pop()
         toAnnotatedString()
     }
 
-
 private inline val Plugin.annotatedAuthor: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
+        pushStyle(SpanStyle( fontSize = 13.sp))
         append("Author:")
         append(author.ifEmpty { "Unknown" })
         toAnnotatedString()
@@ -54,7 +50,7 @@ private inline val Plugin.annotatedAuthor: AnnotatedString
 
 private inline val Plugin.annotatedInfo: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
+        pushStyle(SpanStyle( fontSize = 13.sp))
         append("Info:")
         append(info.ifEmpty { "Unknown" })
         toAnnotatedString()
@@ -62,7 +58,7 @@ private inline val Plugin.annotatedInfo: AnnotatedString
 
 private inline val Plugin.annotatedKind: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle(color = Color.White, fontSize = 13.sp))
+        pushStyle(SpanStyle( fontSize = 13.sp))
         append(
             when (this@annotatedKind) {
                 is JavaPlugin -> {
@@ -79,7 +75,7 @@ private inline val Plugin.annotatedKind: AnnotatedString
         toAnnotatedString()
     }
 
-private val Plugin.kindIcon: ImageVector
+private val Plugin.languageIcon: ImageVector
     get() =
         when (this) {
             is JavaPlugin -> {
@@ -93,19 +89,18 @@ private val Plugin.kindIcon: ImageVector
             }
         }
 
-@Composable
-internal fun PluginDescriptionCard(plugin: Plugin, onItemSelected: (plugin: Plugin) -> Unit) {
-    Card(
-        Modifier
-            .padding(10.dp)
-            .clickable(onClick = { onItemSelected(plugin) })
-            .requiredHeight(150.dp)
-            .fillMaxWidth(),
-        backgroundColor = Color(0xff979595)
-    ) {
-        PluginDescription(plugin, Modifier.padding(10.dp))
+val Plugin.annotatedDescription: AnnotatedString
+    get() = with(AnnotatedString.Builder()) {
+        pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.Black, fontSize = 20.sp))
+        append("Name:${this@annotatedDescription.name.ifEmpty { "Unknown" }}\n")
+        append("ID:${this@annotatedDescription.id}\n")
+        append("Version:${this@annotatedDescription.version}\n")
+        append("Info:${this@annotatedDescription.info.ifEmpty { "None" }}\n")
+        append("Author:${this@annotatedDescription.author}\n")
+        append("Dependencies:${this@annotatedDescription.dependencies}")
+        pop()
+        toAnnotatedString()
     }
-}
 
 @Composable
 internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
@@ -116,16 +111,15 @@ internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
         Spacer(Modifier.height(10.dp))
         Text(plugin.annotatedInfo, overflow = TextOverflow.Ellipsis, maxLines = 1)
         Spacer(Modifier.height(10.dp))
-
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(plugin.kindIcon, null, tint = Color.White)
+            Icon(plugin.languageIcon, null)
             Text(plugin.annotatedKind)
         }
     }
 }
 
 
-private inline val PluginData.annotatedExplain: AnnotatedString
+internal inline val PluginData.annotatedExplain: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
         pushStyle(SpanStyle(fontSize = 20.sp))
         append(
@@ -141,10 +135,6 @@ private inline val PluginData.annotatedExplain: AnnotatedString
         append(this@annotatedExplain.saveName)
         toAnnotatedString()
     }
-
-@Composable
-internal fun PluginDataExplanationView(pluginData: PluginData) =
-    Text(pluginData.annotatedExplain, Modifier.padding(bottom = 40.dp))
 
 @Composable
 internal fun EditView(pluginData: PluginData, plugin: JvmPlugin) {

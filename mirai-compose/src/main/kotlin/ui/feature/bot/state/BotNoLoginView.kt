@@ -167,7 +167,7 @@ private inline fun AccountTextField(
 
 @Composable
 private inline fun PasswordTextField(loginWindowState: BotNoLogin, scope: CoroutineScope) =
-    TextField(
+    OutlinedTextField(
         value = loginWindowState.password,
         onValueChange = loginWindowState::onPasswordTextChange,
         modifier = Modifier

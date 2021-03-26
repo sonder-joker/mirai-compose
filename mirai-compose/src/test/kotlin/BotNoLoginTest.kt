@@ -1,6 +1,6 @@
 package com.youngerhousea.miraicompose
 
-class BotNoLoginTest{
+internal class BotNoLoginTest {
 
 //    @get:Rule
 //    val rule = createComposeRule()

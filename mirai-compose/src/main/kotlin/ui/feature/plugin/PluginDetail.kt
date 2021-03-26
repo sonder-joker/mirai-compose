@@ -1,6 +1,5 @@
 package com.youngerhousea.miraicompose.ui.feature.plugin
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +10,10 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +30,10 @@ import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.ui.common.*
+import com.youngerhousea.miraicompose.ui.common.EditView
+import com.youngerhousea.miraicompose.ui.common.annotatedExplain
+import com.youngerhousea.miraicompose.ui.common.annotatedName
+import com.youngerhousea.miraicompose.ui.common.simpleDescription
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.command.Command
@@ -61,7 +67,7 @@ class PluginDetailed(
                 is Setting.Data ->
 //                    when (plugin) {
 //                        is JvmPlugin ->
-                            DetailedData(componentContext, plugin as JvmPlugin, data).asComponent { DetailedDataUi(it) }
+                    DetailedData(componentContext, plugin as JvmPlugin, data).asComponent { DetailedDataUi(it) }
 //                        else ->
 //                            error("Other Plugin!")
 //                    }
@@ -76,14 +82,6 @@ class PluginDetailed(
     private var _index by mutableStateOf(0)
 
     val index get() = _index
-
-    inline val annotatedName: AnnotatedString
-        get() = with(AnnotatedString.Builder()) {
-            pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.Black, fontSize = 20.sp))
-            append(plugin.name.ifEmpty { "Unknown" })
-            pop()
-            toAnnotatedString()
-        }
 
     fun onDescriptionClick() {
         _index = 0
@@ -102,40 +100,39 @@ class PluginDetailed(
 }
 
 @Composable
-fun PluginDetailedUi(pluginDetailed: PluginDetailed) {
-    Column(Modifier.fillMaxSize().animateContentSize()) {
-        Box(Modifier.fillMaxWidth().requiredHeight(34.dp), contentAlignment = Alignment.CenterStart) {
-            Icon(Icons.Default.KeyboardArrowLeft, null, Modifier.clickable(onClick = pluginDetailed.onExit))
-            Text(
-                pluginDetailed.annotatedName, textAlign = TextAlign.Center, maxLines = 1, modifier = Modifier.align(
-                    Alignment.Center
-                )
-            )
-        }
+fun PluginDetailedUi(pluginDetailed: PluginDetailed) = Column {
+    Box(Modifier.fillMaxWidth().requiredHeight(34.dp), contentAlignment = Alignment.CenterStart) {
+        Icon(Icons.Default.KeyboardArrowLeft, null, Modifier.clickable(onClick = pluginDetailed.onExit))
+        Text(
+            pluginDetailed.plugin.annotatedName,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
 
-        TabRow(pluginDetailed.index) {
-            Tab(
-                selectedContentColor = Color.Black,
-                text = { Text("Description") },
-                selected = pluginDetailed.index == 0,
-                onClick = pluginDetailed::onDescriptionClick
-            )
-            Tab(
-                selectedContentColor = Color.Black,
-                text = { Text("Data") },
-                selected = pluginDetailed.index == 1,
-                onClick = pluginDetailed::onDataClick
-            )
-            Tab(
-                selectedContentColor = Color.Black,
-                text = { Text("Command") },
-                selected = pluginDetailed.index == 2,
-                onClick = pluginDetailed::onCommandClick
-            )
-        }
-        Children(pluginDetailed.state) { child, _ ->
-            child()
-        }
+    TabRow(pluginDetailed.index) {
+        Tab(
+            selectedContentColor = Color.Black,
+            text = { Text("Description") },
+            selected = pluginDetailed.index == 0,
+            onClick = pluginDetailed::onDescriptionClick
+        )
+        Tab(
+            selectedContentColor = Color.Black,
+            text = { Text("Data") },
+            selected = pluginDetailed.index == 1,
+            onClick = pluginDetailed::onDataClick
+        )
+        Tab(
+            selectedContentColor = Color.Black,
+            text = { Text("Command") },
+            selected = pluginDetailed.index == 2,
+            onClick = pluginDetailed::onCommandClick
+        )
+    }
+    Children(pluginDetailed.state) { child, _ ->
+        child()
     }
 }
 
@@ -143,19 +140,6 @@ class DetailedDescription(
     componentContext: ComponentContext,
     val plugin: Plugin
 ) : ComponentContext by componentContext {
-
-    val annotatedDescription
-        get() = with(AnnotatedString.Builder()) {
-            pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.Black, fontSize = 20.sp))
-            append("Name:${plugin.name.ifEmpty { "Unknown" }}\n")
-            append("ID:${plugin.id}\n")
-            append("Version:${plugin.version}\n")
-            append("Info:${plugin.info.ifEmpty { "None" }}\n")
-            append("Author:${plugin.author}\n")
-            append("Dependencies:${plugin.dependencies}")
-            pop()
-            toAnnotatedString()
-        }
 
 }
 
@@ -166,7 +150,7 @@ fun DetailedDescriptionUi(detailedDescription: DetailedDescription) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(detailedDescription.annotatedDescription)
+        Text(detailedDescription.plugin.annotatedDescription)
     }
 }
 
@@ -184,7 +168,7 @@ fun DetailedDataUi(detailedData: DetailedData) =
     ) {
 
         items(detailedData.data) { pluginData ->
-            PluginDataExplanationView(pluginData)
+            Text(pluginData.annotatedExplain, Modifier.padding(bottom = 40.dp))
             EditView(pluginData, detailedData.plugin)
         }
     }

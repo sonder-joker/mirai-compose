@@ -155,6 +155,7 @@ internal class AppTheme {
     var materialLight: Colors by mutableStateOf(
         lightColors(
             surface = Color(0xff979595),
+            onSurface = Color.White,
             primary = Color(0xf5f5f5f5),
             onPrimary = Color.Black
         )

@@ -161,7 +161,7 @@ fun BotItem(
                 .weight(2f, fill = false)
                 .requiredSize(60.dp),
             shape = CircleShape,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
+            color = MaterialTheme.colors.surface.copy(alpha = 0.12f)
         ) {
             Image(bot.avatar, null)
         }
@@ -250,7 +250,6 @@ fun BotListView(
 
         }
     }
-
     VerticalScrollbar(
         Modifier.align(Alignment.CenterEnd),
         scrollState,
