@@ -140,13 +140,20 @@ internal object ColorsSerializer : KSerializer<Colors> {
 }
 
 @Serializable
-internal data class LogColor(
-    var verbose: Color = Color(0xFF00FF00),
-    var info: Color = Color(0xFF00FF00),
-    var warning: Color = Color(0xFFFFFF00),
-    var error: Color = Color(0xFFFFFF00),
-    var debug: Color = Color(0xFFCCCCCC),
-)
+internal class LogColor {
+    var verbose: Color by mutableStateOf(Color(0xFF00FF00))
+    val setVerbose: (Color) -> Unit
+    var info: Color by mutableStateOf(Color(0xFF00FF00))
+    var warning: Color by mutableStateOf(Color(0xFFFFFF00))
+    var error: Color by mutableStateOf(Color(0xFFFFFF00))
+    var debug: Color by mutableStateOf(Color(0xFFCCCCCC))
+
+    init {
+        val (a, b) = mutableStateOf(Color(0))
+        verbose = a
+        setVerbose = b
+    }
+}
 
 @Serializable
 internal class AppTheme {

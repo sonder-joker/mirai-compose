@@ -28,9 +28,7 @@ private inline fun String.toColor() = Color(this.removePrefix("#").toULong(16))
 
 class Setting(
     componentContext: ComponentContext
-) : ComponentContext by componentContext {
-
-}
+) : ComponentContext by componentContext
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -50,31 +48,31 @@ fun SettingUi() {
                     .fillMaxWidth()
                     .animateContentSize()
             ) {
-                SimpleSetWindows("VERBOSE") {
+                SimpleSetWindows("VERBOSE", ComposeSetting.AppTheme.logColors.verbose) {
                     ComposeSetting.AppTheme.logColors.verbose = it.toColor()
                 }
-                SimpleSetWindows("INFO") {
+                SimpleSetWindows("INFO", ComposeSetting.AppTheme.logColors.info) {
                     ComposeSetting.AppTheme.logColors.info = it.toColor()
                 }
-                SimpleSetWindows("WARING") {
+                SimpleSetWindows("WARING", ComposeSetting.AppTheme.logColors.warning) {
                     ComposeSetting.AppTheme.logColors.warning = it.toColor()
                 }
-                SimpleSetWindows("ERROR") {
+                SimpleSetWindows("ERROR", ComposeSetting.AppTheme.logColors.error) {
                     ComposeSetting.AppTheme.logColors.error = it.toColor()
                 }
-                SimpleSetWindows("DEBUG") {
+                SimpleSetWindows("DEBUG", ComposeSetting.AppTheme.logColors.debug) {
                     ComposeSetting.AppTheme.logColors.debug = it.toColor()
                 }
-                SimpleSetWindows("Primary") {
-                    ComposeSetting.AppTheme.materialLight =
-                        ComposeSetting.AppTheme.materialLight
-                            .copy(primary = it.toColor())
-                }
-                SimpleSetWindows("onPrimary") {
-                    ComposeSetting.AppTheme.materialLight =
-                        ComposeSetting.AppTheme.materialLight
-                            .copy(onPrimary = it.toColor())
-                }
+//                SimpleSetWindows("Primary",) {
+//                    ComposeSetting.AppTheme.materialLight =
+//                        ComposeSetting.AppTheme.materialLight
+//                            .copy(primary = it.toColor())
+//                }
+//                SimpleSetWindows("onPrimary",) {
+//                    ComposeSetting.AppTheme.materialLight =
+//                        ComposeSetting.AppTheme.materialLight
+//                            .copy(onPrimary = it.toColor())
+//                }
             }
         }
         VerticalScrollbar(
@@ -87,7 +85,7 @@ fun SettingUi() {
 }
 
 @Composable
-private fun SimpleSetWindows(textValue: String, action: (value: String) -> Unit) {
+private fun SimpleSetWindows(textValue: String, color: Color, action: (value: String) -> Unit) {
     var textFieldValue by remember(textValue) { mutableStateOf("") }
     var errorTip by remember(textValue) { mutableStateOf("") }
     var isError by remember(textValue) { mutableStateOf(false) }
@@ -101,7 +99,7 @@ private fun SimpleSetWindows(textValue: String, action: (value: String) -> Unit)
     ) {
         Text(textValue, Modifier.weight(2f), fontSize = 15.sp)
         Spacer(Modifier.weight(2f))
-        ColorImage(Color.Red, null, Modifier.weight(1f))
+        ColorImage(color, null, Modifier.weight(1f))
         Spacer(Modifier.weight(1f))
         ColorImage(Color.Black, null, Modifier.weight(1f))
         Spacer(Modifier.weight(2f))

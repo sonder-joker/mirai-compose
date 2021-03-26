@@ -6,7 +6,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.RemoveRedEye
@@ -14,7 +17,6 @@ import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.*
@@ -25,13 +27,17 @@ import com.youngerhousea.miraicompose.utils.HorizontalDottedProgressBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
 
 class BotNoLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit
-) :  ComponentContext by componentContext {
+) : ComponentContext by componentContext {
+    private val coroutineScope = MiraiConsole.childScope("BotNoLogin")
+
     var account by mutableStateOf(TextFieldValue())
 
     var password by mutableStateOf(TextFieldValue())
@@ -79,12 +85,14 @@ class BotNoLogin(
         }
     }
 
-    fun onAccountTextChange(textFieldValue: TextFieldValue) {
+    suspend fun onAccountTextChange(textFieldValue: TextFieldValue) {
         if (textFieldValue.text.matches("^[0-9]{0,15}$".toRegex())) {
             account = textFieldValue
             hasAccountError = false
         } else {
             hasAccountError = true
+            delay(3000)
+            hasAccountError = false
         }
     }
 
@@ -142,7 +150,11 @@ private inline fun AccountTextField(
     scope: CoroutineScope
 ) = TextField(
     value = loginWindowState.account,
-    onValueChange = loginWindowState::onAccountTextChange,
+    onValueChange = {
+        scope.launch {
+            loginWindowState.onAccountTextChange(it)
+        }
+    },
     modifier = Modifier
         .padding(40.dp)
         .shortcuts {
@@ -165,9 +177,10 @@ private inline fun AccountTextField(
     singleLine = true
 )
 
+
 @Composable
 private inline fun PasswordTextField(loginWindowState: BotNoLogin, scope: CoroutineScope) =
-    OutlinedTextField(
+    TextField(
         value = loginWindowState.password,
         onValueChange = loginWindowState::onPasswordTextChange,
         modifier = Modifier

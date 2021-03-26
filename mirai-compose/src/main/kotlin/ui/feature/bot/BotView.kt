@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,7 +28,9 @@ import com.youngerhousea.miraicompose.ui.feature.bot.state.*
 import com.youngerhousea.miraicompose.utils.VerticalScrollbar
 import com.youngerhousea.miraicompose.utils.asComponent
 import com.youngerhousea.miraicompose.utils.withoutWidthConstraints
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.LoginSolver
@@ -51,7 +52,8 @@ class BotState(
         componentFactory = { configuration: BotStatus, componentContext ->
             when (configuration) {
                 is BotStatus.NoLogin ->
-                    BotNoLogin(componentContext, onClick = ::onClick).asComponent { BotNoLoginUi(it) }
+                    BotNoLogin(componentContext, onClick = ::onClick)
+                        .asComponent { BotNoLoginUi(it) }
                 is BotStatus.Lo ->
                     BotSolvePicCaptchaLoading(
                         componentContext,
