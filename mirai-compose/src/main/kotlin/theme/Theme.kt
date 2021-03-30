@@ -4,9 +4,6 @@ package com.youngerhousea.miraicompose.theme
 
 import androidx.compose.material.Colors
 import androidx.compose.material.lightColors
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -141,32 +138,24 @@ internal object ColorsSerializer : KSerializer<Colors> {
 
 @Serializable
 internal class LogColor {
-    var verbose: Color by mutableStateOf(Color(0xFF00FF00))
-    val setVerbose: (Color) -> Unit
-    var info: Color by mutableStateOf(Color(0xFF00FF00))
-    var warning: Color by mutableStateOf(Color(0xFFFFFF00))
-    var error: Color by mutableStateOf(Color(0xFFFFFF00))
-    var debug: Color by mutableStateOf(Color(0xFFCCCCCC))
-
-    init {
-        val (a, b) = mutableStateOf(Color(0))
-        verbose = a
-        setVerbose = b
-    }
+    var verbose: Color = Color(0xFF00FF00)
+    var info: Color = Color(0xFF00FF00)
+    var warning: Color = Color(0xFFFFFF00)
+    var error: Color = Color(0xFFFFFF00)
+    var debug: Color = Color(0xFFCCCCCC)
 }
 
 @Serializable
 internal class AppTheme {
     val logColors: LogColor = LogColor()
 
-    var materialLight: Colors by mutableStateOf(
+    var materialLight: Colors =
         lightColors(
             surface = Color(0xff979595),
             onSurface = Color.White,
             primary = Color(0xf5f5f5f5),
             onPrimary = Color.Black
         )
-    )
 }
 
 internal object ComposeSetting : AutoSavePluginConfig("ComposeSetting") {
