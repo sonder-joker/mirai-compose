@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose
+package com.youngerhousea.miraicompose.future
 
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.LocalAppWindow

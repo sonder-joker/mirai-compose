@@ -2,41 +2,70 @@ package com.youngerhousea.miraicompose.ui.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.ui.feature.bot.BotItem
 
 @Composable
-internal fun Spacer(currentBot: Float?, allBotMessage: Float?) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .requiredHeight(80.dp)
-            .background(MaterialTheme.colors.primary),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
+internal fun AvatarColumn(
+    composeBotList: MutableList<ComposeBot>,
+    currentBot: ComposeBot?,
+    onItemSelected: (ComposeBot) -> Unit
+) {
+    var isExpand by remember { mutableStateOf(false) }
+
+    Box {
+        currentBot?.let { bot ->
+            Row(
+                modifier = Modifier
+                    .combinedClickable(
+                        onLongClick = { isExpand = !isExpand },
+                        onClick = { onItemSelected(bot) })
+                    .fillMaxWidth()
+                    .requiredHeight(80.dp)
+            ) {
+                BotItem(bot)
+            }
+        } ?: Row(
+            modifier = Modifier
+                .combinedClickable(
+                    onLongClick = { isExpand = !isExpand },
+                    onClick = { })
+                .fillMaxWidth()
+                .requiredHeight(80.dp)
         ) {
-            Text(
-                text = "All: " + (allBotMessage?.toString()?.plus("msg/min") ?: "None"),
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.subtitle2
-            )
-            Text(
-                text = "Current: " + (currentBot?.toString()?.plus("msg/min") ?: "None"),
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.subtitle2
-            )
+            Text("No item")
         }
-        Divider(Modifier.height(1.dp).fillMaxWidth())
+
+        DropdownMenu(isExpand, onDismissRequest = {}) {
+            DropdownMenuItem(onClick = { isExpand = !isExpand }) {
+                Text("exit")
+            }
+            DropdownMenuItem(onClick = {
+                isExpand = !isExpand
+                val new = ComposeBot()
+                composeBotList.add(new)
+                onItemSelected(new)
+            }) {
+                Text("Add")
+            }
+            for (item in composeBotList) {
+                DropdownMenuItem(onClick = {
+                    onItemSelected(item)
+                }) {
+                    BotItem(item)
+                }
+            }
+        }
     }
 }
 

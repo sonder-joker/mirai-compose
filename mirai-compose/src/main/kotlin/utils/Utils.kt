@@ -3,8 +3,8 @@ package com.youngerhousea.miraicompose.utils
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -14,17 +14,20 @@ import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
 import com.youngerhousea.miraicompose.console.ComposeDataScope
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.request.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
 import java.io.PrintStream
+import java.net.URL
+import java.net.URLDecoder
+import java.util.*
+import kotlin.collections.set
+
 
 @Composable
-inline fun ComposeDataScopeEffect(key:Any?, crossinline effect:() -> Unit ) =
+inline fun ComposeDataScopeEffect(key: Any?, crossinline effect: () -> Unit) =
     DisposableEffect(key) {
         val job = ComposeDataScope.launch {
             effect()
@@ -34,6 +37,16 @@ inline fun ComposeDataScopeEffect(key:Any?, crossinline effect:() -> Unit ) =
         }
     }
 
+@Composable
+fun <T> Flow<T>.collectAsStateList(): SnapshotStateList<T> {
+    val list = remember { mutableStateListOf<T>() }
+    LaunchedEffect(this) {
+        this@collectAsStateList.collect {
+            list.add(it)
+        }
+    }
+    return list
+}
 
 @Composable
 internal fun VerticalScrollbar(
@@ -46,9 +59,25 @@ internal fun VerticalScrollbar(
     modifier
 )
 
+fun URL.splitQuery(): Map<String, String> {
+    val queryPairs: MutableMap<String, String> = LinkedHashMap()
+    val query: String = this.query
+    val pairs = query.split("&".toRegex()).toTypedArray()
+    for (pair in pairs) {
+        val idx = pair.indexOf("=")
+        queryPairs[URLDecoder.decode(pair.substring(0, idx), "UTF-8")] =
+            URLDecoder.decode(pair.substring(idx + 1), "UTF-8")
+    }
+    return queryPairs
+}
 
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap = Image.makeFromEncoded(byteArray).asImageBitmap()
+internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
+    Image.makeFromEncoded(byteArray).asImageBitmap()
+
+internal fun Base64ImageDecode(data: String): ImageBitmap {
+    val base64Image = data.split(",").last()
+    return SkiaImageDecode(Base64.getDecoder().decode(base64Image))
+}
 
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))

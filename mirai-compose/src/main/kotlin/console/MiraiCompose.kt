@@ -1,10 +1,16 @@
 package com.youngerhousea.miraicompose.console
 
-import androidx.compose.runtime.*
-import com.youngerhousea.miraicompose.console.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.ui.feature.ExceptionWithWindows
 import com.youngerhousea.miraicompose.utils.setSystemOut
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
@@ -23,10 +29,11 @@ import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
-import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.SwingSolver
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 
 
 @ConsoleFrontEndImplementation
@@ -37,6 +44,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
         }
         val coroutineName = coroutineContext[CoroutineName]?.name ?: "<unnamed>"
         MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
+        ExceptionWithWindows(throwable)
     }
 ) {
     override val rootPath: Path =
@@ -68,10 +76,12 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
+    override val composeBotList: MutableList<ComposeBot> = mutableStateListOf()
+
     override var isReady by mutableStateOf(false)
 
     @Suppress("UNCHECKED_CAST")
-    override val jvmPluginList: List<JvmPlugin> by lazy {  PluginManager.plugins as List<JvmPlugin> }
+    override val jvmPluginList: List<JvmPlugin> by lazy { PluginManager.plugins as List<JvmPlugin> }
 
     @Suppress("UNCHECKED_CAST")
     override fun getConfig(plugin: Plugin): List<PluginConfig> =
@@ -94,7 +104,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
     override fun postPhase(phase: String) {
         if (phase == "auto-login bots") {
             Bot.instances.forEach {
-                ComposeBot.instances.add(ComposeBot(it))
+                composeBotList.add(ComposeBot(it))
             }
         }
         if (phase == "load configurations") {
@@ -116,7 +126,6 @@ object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val vendor: String = "Noire"
     override val version: SemVersion = SemVersion("1.1.0")
 }
-
 
 internal object InternalHook :
     KotlinPlugin(JvmPluginDescription("com.youngerhousea.internal", MiraiComposeDescription.version)),

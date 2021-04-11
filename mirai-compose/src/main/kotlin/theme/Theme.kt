@@ -152,9 +152,9 @@ internal class AppTheme {
     var materialLight: Colors =
         lightColors(
             surface = Color(0xff979595),
-            onSurface = Color.White,
+            onSurface = Color(0xFFFFFFFF),
             primary = Color(0xf5f5f5f5),
-            onPrimary = Color.Black
+            onPrimary = Color(0xFF000000)
         )
 }
 

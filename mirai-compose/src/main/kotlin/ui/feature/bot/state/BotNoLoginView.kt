@@ -27,8 +27,6 @@ import com.youngerhousea.miraicompose.utils.HorizontalDottedProgressBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
 
@@ -36,7 +34,6 @@ class BotNoLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit
 ) : ComponentContext by componentContext {
-    private val coroutineScope = MiraiConsole.childScope("BotNoLogin")
 
     var account by mutableStateOf(TextFieldValue())
 
@@ -79,7 +76,7 @@ class BotNoLogin(
                     "未知异常，请反馈"
                 }
             }
-            delay(3000)
+            delay(1000)
             hasAccountError = false
             hasPasswordError = false
         }
@@ -91,7 +88,7 @@ class BotNoLogin(
             hasAccountError = false
         } else {
             hasAccountError = true
-            delay(3000)
+            delay(1000)
             hasAccountError = false
         }
     }
