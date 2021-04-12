@@ -1,0 +1,7 @@
+AppTheme: 
+  logColors: 
+    verbose: '#ff00ff00'
+    info: '#ff00ff00'
+    warning: '#ffffff00'
+    error: '#ffffff00'
+    debug: '#ffcccccc'

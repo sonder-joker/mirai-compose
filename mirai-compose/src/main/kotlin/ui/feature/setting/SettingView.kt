@@ -8,6 +8,7 @@ import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
@@ -20,11 +21,32 @@ import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.console.ComposeDataScope
 import com.youngerhousea.miraicompose.theme.ComposeSetting
+import com.youngerhousea.miraicompose.utils.getRGB
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 @Suppress("NOTHING_TO_INLINE")
 private inline fun String.toColor() = Color(this.removePrefix("#").toULong(16))
+
+@Suppress("NOTHING_TO_INLINE")
+@Throws(InputMismatchException::class, NumberFormatException::class)
+private inline fun String.toColorFromRGB():Color = run{
+    // x, x, x in rgb to color
+    val tmp = this.split(",")
+    if(tmp.size < 3){
+        throw InputMismatchException()
+    }
+    return Color(tmp[0].toInt(), tmp[1].toInt(), tmp[2].toInt())
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun String.toColorFromRGBHex():Color = run {
+        // hex in rgb to color
+        val tmp = getRGB(this.removePrefix("#"))
+        return Color(tmp[0], tmp[1], tmp[2])
+    }
+
 
 class Setting(
     componentContext: ComponentContext
@@ -41,7 +63,7 @@ fun SettingUi() {
                 .fillMaxSize()
         ) {
             Row(Modifier.fillMaxWidth()) {
-                Text("自定义日志配色")
+                Text("自定义主题配色")
             }
             Column(
                 Modifier
@@ -63,16 +85,46 @@ fun SettingUi() {
                 SimpleSetWindows("DEBUG", ComposeSetting.AppTheme.logColors.debug) {
                     ComposeSetting.AppTheme.logColors.debug = it.toColor()
                 }
-//                SimpleSetWindows("Primary",) {
-//                    ComposeSetting.AppTheme.materialLight =
-//                        ComposeSetting.AppTheme.materialLight
-//                            .copy(primary = it.toColor())
-//                }
-//                SimpleSetWindows("onPrimary",) {
-//                    ComposeSetting.AppTheme.materialLight =
-//                        ComposeSetting.AppTheme.materialLight
-//                            .copy(onPrimary = it.toColor())
-//                }
+                SimpleSetWindows("主题颜色", ComposeSetting.AppTheme.materialLight.primary) {
+                    ComposeSetting.AppTheme.materialLight =
+                        if(it.contains(',')){
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(primary = it.toColorFromRGB())
+                        }else{
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(primary = it.toColor())
+                        }
+                }
+                SimpleSetWindows("文字颜色", ComposeSetting.AppTheme.materialLight.onPrimary) {
+                    ComposeSetting.AppTheme.materialLight =
+                        if(it.contains(',')){
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(onPrimary = it.toColorFromRGB())
+                        }else{
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(onPrimary = it.toColor())
+                        }
+                }
+                SimpleSetWindows("输入框背景颜色", ComposeSetting.AppTheme.materialLight.onSurface) {
+                    ComposeSetting.AppTheme.materialLight =
+                        if(it.contains(',')){
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(onSurface = it.toColorFromRGB())
+                        }else{
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(onSurface = it.toColor())
+                        }
+                }
+                SimpleSetWindows("头像默认颜色", ComposeSetting.AppTheme.materialLight.surface) {
+                    ComposeSetting.AppTheme.materialLight =
+                        if(it.contains(',')){
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(surface = it.toColorFromRGB())
+                        }else{
+                            ComposeSetting.AppTheme.materialLight
+                                .copy(surface = it.toColor())
+                        }
+                }
             }
         }
         VerticalScrollbar(
@@ -123,9 +175,19 @@ private fun SimpleSetWindows(textValue: String, color: Color, action: (value: St
                 }.onFailure {
                     errorTip = if (it is NumberFormatException) {
                         "Wrong string"
-                    } else {
-                        "Unknown string"
+                    }else if(it is InputMismatchException){
+                        "Wrong formation"
                     }
+                    else {
+                        "Unknown string" + it.message
+                    }
+                    isError = true
+                    delay(3 * 1000)
+                    isError = false
+                    errorTip = ""
+                }.onSuccess {
+                    // TODO change the color of tip to green
+                    errorTip = "Success"
                     isError = true
                     delay(3 * 1000)
                     isError = false

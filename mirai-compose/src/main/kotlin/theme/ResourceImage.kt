@@ -12,7 +12,7 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 object ResourceImage {
-    val emptyIcon = loadImageResource("emptyIcon.png")
+    //val emptyIcon = loadImageResource("emptyIcon.png")
     val mirai = loadImageVector("ic_mirai.xml")
     val icon = loadImageResource("mirai.png")
     val close = loadImageVector("ic_close.xml")

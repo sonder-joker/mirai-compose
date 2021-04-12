@@ -1,0 +1,5 @@
+build/
+.run/
+.gradle/
+.idea/
+mirai-compose/log/

@@ -163,6 +163,7 @@ fun BotItem(
                 .weight(2f, fill = false)
                 .requiredSize(60.dp),
             shape = CircleShape,
+
             color = MaterialTheme.colors.surface.copy(alpha = 0.12f)
         ) {
             Image(bot.avatar, null)

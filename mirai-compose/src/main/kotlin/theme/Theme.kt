@@ -4,6 +4,8 @@ package com.youngerhousea.miraicompose.theme
 
 import androidx.compose.material.Colors
 import androidx.compose.material.lightColors
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -144,20 +146,30 @@ internal class LogColor {
     var error: Color = Color(0xFFFFFF00)
     var debug: Color = Color(0xFFCCCCCC)
 }
-
+object ThemeColors{
+    // 当前主题颜色
+    var colors : MutableState<Colors> = mutableStateOf(lightColors(
+        // 目前为头像默认颜色
+        surface = Color.Black,
+        // 输入框背景颜色
+        onSurface = Color.Gray,
+        // 主页面侧边栏颜色
+        primary = Color(211,211,211),
+        // 文字颜色
+        onPrimary = Color.White
+    ))
+}
 @Serializable
 internal class AppTheme {
     val logColors: LogColor = LogColor()
-
-    var materialLight: Colors =
-        lightColors(
-            surface = Color(0xff979595),
-            onSurface = Color.White,
-            primary = Color(0xf5f5f5f5),
-            onPrimary = Color.Black
-        )
+    var materialLight: Colors
+        get(){
+            return ThemeColors.colors.value
+        }
+        set(value) {
+            ThemeColors.colors.value = value
+        }
 }
-
 internal object ComposeSetting : AutoSavePluginConfig("ComposeSetting") {
     val AppTheme by value(AppTheme())
 }

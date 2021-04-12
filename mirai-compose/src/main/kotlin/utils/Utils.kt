@@ -23,6 +23,14 @@ import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
 import java.io.PrintStream
 
+//https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
+fun getRGB(rgb: String): IntArray {
+    val r = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
+    val g = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
+    val b = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
+    return intArrayOf(r, g, b)
+}
+
 @Composable
 inline fun ComposeDataScopeEffect(key:Any?, crossinline effect:() -> Unit ) =
     DisposableEffect(key) {
