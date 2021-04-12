@@ -89,6 +89,7 @@ private fun SimpleSetWindows(textValue: String, color: Color, action: (value: St
     var textFieldValue by remember(textValue) { mutableStateOf("") }
     var errorTip by remember(textValue) { mutableStateOf("") }
     var isError by remember(textValue) { mutableStateOf(false) }
+
     Row(
         Modifier
             .fillMaxWidth()

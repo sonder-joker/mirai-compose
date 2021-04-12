@@ -45,7 +45,6 @@ interface ComposeBot {
     }
 }
 
-
 private class ComposeBotImpl(
     var _bot: Bot?,
 ) : ComposeBot {

@@ -16,10 +16,8 @@ import net.mamoe.mirai.console.plugin.Plugin
 class PluginList(
     componentContext: ComponentContext,
     val plugins: List<Plugin>,
-    val onItemSelected: (plugin: Plugin) -> Unit
-) : ComponentContext by componentContext {
-
-}
+    val onPluginCardSelected: (plugin: Plugin) -> Unit
+) : ComponentContext by componentContext
 
 @Composable
 fun PluginListUi(pluginList: PluginList) {
@@ -32,7 +30,7 @@ fun PluginListUi(pluginList: PluginList) {
             Card(
                 Modifier
                     .padding(10.dp)
-                    .clickable(onClick = { pluginList.onItemSelected(plugin) })
+                    .clickable(onClick = { pluginList.onPluginCardSelected(plugin) })
                     .requiredHeight(150.dp)
                     .fillMaxWidth()
             ) {

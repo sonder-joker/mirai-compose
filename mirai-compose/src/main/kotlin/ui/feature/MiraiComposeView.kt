@@ -53,7 +53,7 @@ private fun SetDefaultExceptionHandler() {
     }
 }
 
-internal fun ExceptionWithWindows(exception: Throwable) {
+private fun ExceptionWithWindows(exception: Throwable) {
 
     Window(onDismissRequest = {
         exitProcess(1)

@@ -1,21 +1,24 @@
 package com.youngerhousea.miraicompose.console
 
 import com.youngerhousea.miraicompose.model.ComposeBot
+import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
-interface MiraiConsoleRepository {
+interface MiraiConsoleRepository : AccessibleHolder {
+
     val composeBotList: MutableList<ComposeBot>
 
-    val isReady:Boolean
+    val isReady: Boolean
 
-    val jvmPluginList: List<JvmPlugin>
+    val loadedPlugins: List<Plugin>
 
-    fun getConfig(plugin: Plugin):List<PluginData>
-
-    fun getData(plugin: Plugin): List<PluginData>
-
-    fun getDataWithConfig(plugin: Plugin) = getConfig(plugin) + getData(plugin)
 }
 
+interface AccessibleHolder {
+
+    val JvmPlugin.data: List<PluginData>
+
+    val JvmPlugin.config: List<PluginConfig>
+}

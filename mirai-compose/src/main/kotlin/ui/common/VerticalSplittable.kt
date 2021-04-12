@@ -30,6 +30,70 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import java.awt.Cursor
 
+@Composable
+internal fun VerticalSplittableSimple(resizablePanelContent: @Composable () -> Unit, rightContent: @Composable () -> Unit) {
+    val panelState = remember { PanelState() }
+    val animatedSize = if (panelState.splitter.isResizing)
+        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
+    else
+        animateDpAsState(
+            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
+            SpringSpec(stiffness = Spring.StiffnessLow)
+        ).value
+
+    VerticalSplittable(
+        Modifier
+            .fillMaxSize(),
+        panelState.splitter,
+        onResize = {
+            panelState.expandedSize = (panelState.expandedSize + it).coerceAtLeast(panelState.expandedSizeMin)
+        }
+    ) {
+        ResizablePanel(
+            Modifier
+                .width(animatedSize)
+                .fillMaxHeight(),
+            panelState,
+            content = resizablePanelContent
+        )
+        rightContent()
+    }
+}
+
+@Composable
+private fun VerticalSplittable(
+    modifier: Modifier,
+    splitterState: SplitterState,
+    onResize: (delta: Dp) -> Unit,
+    children: @Composable () -> Unit
+) = Layout({
+    children()
+    VerticalSplitter(splitterState, onResize)
+}, modifier, measurePolicy = { measurables, constraints ->
+    require(measurables.size == 3)
+
+    val firstPlaceable = measurables[0].measure(constraints.copy(minWidth = 0))
+    val secondWidth = constraints.maxWidth - firstPlaceable.width
+    val secondPlaceable = measurables[1].measure(
+        Constraints(
+            minWidth = secondWidth,
+            maxWidth = secondWidth,
+            minHeight = constraints.maxHeight,
+            maxHeight = constraints.maxHeight
+        )
+    )
+    val splitterPlaceable = measurables[2].measure(constraints)
+    layout(constraints.maxWidth, constraints.maxHeight) {
+        firstPlaceable.place(0, 0)
+        secondPlaceable.place(firstPlaceable.width, 0)
+        splitterPlaceable.place(firstPlaceable.width, 0)
+    }
+})
+
+private class SplitterState {
+    var isResizing by mutableStateOf(false)
+    var isResizeEnabled by mutableStateOf(true)
+}
 
 @Composable
 private fun ResizablePanel(
@@ -76,72 +140,6 @@ private class PanelState {
 }
 
 @Composable
-internal fun VerticalSplittableSimple(resizablePanelContent: @Composable () -> Unit, rightContent: @Composable () -> Unit) {
-    val panelState = remember { PanelState() }
-    val animatedSize = if (panelState.splitter.isResizing)
-        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
-    else
-        animateDpAsState(
-            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
-            SpringSpec(stiffness = Spring.StiffnessLow)
-        ).value
-
-    VerticalSplittable(
-        Modifier
-            .fillMaxSize(),
-        panelState.splitter,
-        onResize = {
-            panelState.expandedSize = (panelState.expandedSize + it).coerceAtLeast(panelState.expandedSizeMin)
-        }
-    ) {
-        ResizablePanel(
-            Modifier
-                .width(animatedSize)
-                .fillMaxHeight(),
-            panelState,
-            content = resizablePanelContent
-        )
-        rightContent()
-    }
-}
-
-
-@Composable
-internal fun VerticalSplittable(
-    modifier: Modifier,
-    splitterState: SplitterState,
-    onResize: (delta: Dp) -> Unit,
-    children: @Composable () -> Unit
-) = Layout({
-    children()
-    VerticalSplitter(splitterState, onResize)
-}, modifier, measurePolicy = { measurables, constraints ->
-    require(measurables.size == 3)
-
-    val firstPlaceable = measurables[0].measure(constraints.copy(minWidth = 0))
-    val secondWidth = constraints.maxWidth - firstPlaceable.width
-    val secondPlaceable = measurables[1].measure(
-        Constraints(
-            minWidth = secondWidth,
-            maxWidth = secondWidth,
-            minHeight = constraints.maxHeight,
-            maxHeight = constraints.maxHeight
-        )
-    )
-    val splitterPlaceable = measurables[2].measure(constraints)
-    layout(constraints.maxWidth, constraints.maxHeight) {
-        firstPlaceable.place(0, 0)
-        secondPlaceable.place(firstPlaceable.width, 0)
-        splitterPlaceable.place(firstPlaceable.width, 0)
-    }
-})
-
-class SplitterState {
-    var isResizing by mutableStateOf(false)
-    var isResizeEnabled by mutableStateOf(true)
-}
-
-@Composable
 private fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
@@ -174,7 +172,7 @@ private fun VerticalSplitter(
     )
 }
 
-internal fun Modifier.cursorForHorizontalResize(): Modifier = composed {
+private fun Modifier.cursorForHorizontalResize(): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {

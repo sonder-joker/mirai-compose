@@ -1,15 +1,11 @@
 package com.youngerhousea.miraicompose.ui.feature.plugin
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,17 +13,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.Router
+import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.push
-import com.arkivanov.decompose.router
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.ui.common.*
+import com.youngerhousea.miraicompose.console.AccessibleHolder
+import com.youngerhousea.miraicompose.ui.common.EditView
+import com.youngerhousea.miraicompose.ui.common.annotatedDescription
+import com.youngerhousea.miraicompose.ui.common.annotatedExplain
+import com.youngerhousea.miraicompose.ui.common.simpleDescription
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
+import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
 import net.mamoe.mirai.console.data.PluginData
@@ -35,12 +33,11 @@ import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 
-class PluginDetailed(
+class CJvmPlugin(
     componentContext: ComponentContext,
-    val plugin: Plugin,
-    val data: List<PluginData>,
-    val onExit: () -> Unit
-) : ComponentContext by componentContext {
+    val plugin: JvmPlugin,
+    accessibleHolder: AccessibleHolder
+) : ComponentContext by componentContext, AccessibleHolder by accessibleHolder {
 
     sealed class Setting : Parcelable {
         object Description : Setting()
@@ -57,12 +54,11 @@ class PluginDetailed(
                 is Setting.Description ->
                     DetailedDescription(componentContext, plugin).asComponent { DetailedDescriptionUi(it) }
                 is Setting.Data ->
-//                    when (plugin) {
-//                        is JvmPlugin ->
-                    DetailedData(componentContext, plugin as JvmPlugin, data).asComponent { DetailedDataUi(it) }
-//                        else ->
-//                            error("Other Plugin!")
-//                    }
+                    DetailedData(
+                        componentContext,
+                        coroutineScope = plugin,
+                        data = plugin.data + plugin.config
+                    ).asComponent { DetailedDataUi(it) }
                 is Setting.Command ->
                     DetailedCommand(componentContext, plugin.registeredCommands).asComponent { DetailedCommandUi(it) }
             }
@@ -91,39 +87,30 @@ class PluginDetailed(
     }
 }
 
+@OptIn(ExperimentalDecomposeApi::class)
 @Composable
-fun PluginDetailedUi(pluginDetailed: PluginDetailed) = Column {
-    Box(Modifier.fillMaxWidth().requiredHeight(34.dp), contentAlignment = Alignment.CenterStart) {
-        Icon(Icons.Default.KeyboardArrowLeft, null, Modifier.clickable(onClick = pluginDetailed.onExit))
-        Text(
-            pluginDetailed.plugin.annotatedName,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            modifier = Modifier.align(Alignment.Center)
-        )
-    }
-
-    TabRow(pluginDetailed.index) {
+fun CJvmPluginUi(CJvmPlugin: CJvmPlugin) = Column {
+    TabRow(CJvmPlugin.index) {
         Tab(
             selectedContentColor = Color.Black,
             text = { Text("Description") },
-            selected = pluginDetailed.index == 0,
-            onClick = pluginDetailed::onDescriptionClick
+            selected = CJvmPlugin.index == 0,
+            onClick = CJvmPlugin::onDescriptionClick
         )
         Tab(
             selectedContentColor = Color.Black,
             text = { Text("Data") },
-            selected = pluginDetailed.index == 1,
-            onClick = pluginDetailed::onDataClick
+            selected = CJvmPlugin.index == 1,
+            onClick = CJvmPlugin::onDataClick
         )
         Tab(
             selectedContentColor = Color.Black,
             text = { Text("Command") },
-            selected = pluginDetailed.index == 2,
-            onClick = pluginDetailed::onCommandClick
+            selected = CJvmPlugin.index == 2,
+            onClick = CJvmPlugin::onCommandClick
         )
     }
-    Children(pluginDetailed.state) { child ->
+    Children(CJvmPlugin.state, crossfade()) { child ->
         child.instance()
     }
 }
@@ -144,9 +131,10 @@ fun DetailedDescriptionUi(detailedDescription: DetailedDescription) {
     }
 }
 
+
 class DetailedData(
     componentContext: ComponentContext,
-    internal val plugin: JvmPlugin,
+    val coroutineScope: CoroutineScope,
     val data: List<PluginData>,
 ) : ComponentContext by componentContext
 
@@ -156,10 +144,9 @@ fun DetailedDataUi(detailedData: DetailedData) =
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         items(detailedData.data) { pluginData ->
             Text(pluginData.annotatedExplain, Modifier.padding(bottom = 40.dp))
-            EditView(pluginData, detailedData.plugin)
+            EditView(pluginData, detailedData.coroutineScope)
         }
     }
 

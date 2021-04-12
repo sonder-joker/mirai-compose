@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.ui.feature.ExceptionWithWindows
-import com.youngerhousea.miraicompose.utils.setSystemOut
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -16,6 +14,7 @@ import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.data.PluginDataHolder
@@ -32,6 +31,7 @@ import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.SwingSolver
+import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -44,7 +44,6 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
         }
         val coroutineName = coroutineContext[CoroutineName]?.name ?: "<unnamed>"
         MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
-        ExceptionWithWindows(throwable)
     }
 ) {
     override val rootPath: Path =
@@ -58,11 +57,11 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
 
     override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath.resolve("data"))
 
-    override val dataStorageForBuiltIns = ReadablePluginDataStorage(rootPath.resolve("data"))
+    override val dataStorageForBuiltIns = MultiFilePluginDataStorage(rootPath.resolve("data"))
 
-    override val configStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath.resolve("config"))
+    override val configStorageForJvmPluginLoader = ReadablePluginConfigStorage(rootPath.resolve("config"))
 
-    override val configStorageForBuiltIns = ReadablePluginDataStorage(rootPath.resolve("config"))
+    override val configStorageForBuiltIns = MultiFilePluginDataStorage(rootPath.resolve("config"))
 
     override val consoleInput: ConsoleInput =
         MiraiComposeInput
@@ -81,20 +80,21 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
     override var isReady by mutableStateOf(false)
 
     @Suppress("UNCHECKED_CAST")
-    override val jvmPluginList: List<JvmPlugin> by lazy { PluginManager.plugins as List<JvmPlugin> }
+    override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun getConfig(plugin: Plugin): List<PluginConfig> =
-        if (plugin is PluginDataHolder) configStorageForJvmPluginLoader[plugin] as List<PluginConfig> else error("Plugin is Not Holder!")
+    override val JvmPlugin.data: List<PluginData>
+        get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
-    override fun getData(plugin: Plugin): List<PluginData> =
-        if (plugin is PluginDataHolder) dataStorageForJvmPluginLoader[plugin] else error("Plugin is Not Holder!")
+    override val JvmPlugin.config: List<PluginConfig>
+        get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
+
 
     override fun preStart() {
         if (!DEBUG)
             setSystemOut(MiraiComposeLogger.out)
     }
 
+    //useless current
     override fun prePhase(phase: String) {
         if (phase == "auto-login bots") {
             backendAccess.globalComponentStorage.contribute(BotConfigurationAlterer, InternalHook, InternalHook)
@@ -134,5 +134,26 @@ internal object InternalHook :
         println("114514")
         return configuration
     }
+}
+
+internal fun setSystemOut(out: MiraiLogger) {
+    System.setOut(
+        PrintStream(
+            BufferedOutputStream(
+                logger = out.run { ({ line: String? -> info(line) }) }
+            ),
+            false,
+            "UTF-8"
+        )
+    )
+    System.setErr(
+        PrintStream(
+            BufferedOutputStream(
+                logger = out.run { ({ line: String? -> warning(line) }) }
+            ),
+            false,
+            "UTF-8"
+        )
+    )
 }
 

@@ -17,10 +17,7 @@ class AllLog(
     componentContext: ComponentContext,
     val loggerStorage: List<AnnotatedString>,
     val logger: MiraiLogger
-) : ComponentContext by componentContext {
-
-}
-
+) : ComponentContext by componentContext
 
 @Composable
 fun AllLogUi(allLog: AllLog) {

@@ -12,14 +12,11 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
-import com.youngerhousea.miraicompose.console.BufferedOutputStream
 import com.youngerhousea.miraicompose.console.ComposeDataScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
-import java.io.PrintStream
 import java.net.URL
 import java.net.URLDecoder
 import java.util.*
@@ -141,45 +138,4 @@ private fun checkWindowSizeStep(size: Int, step: Int) {
         else
             "size $size must be greater than zero."
     }
-}
-
-
-internal fun setSystemOut(out: MiraiLogger) {
-    System.setOut(
-        PrintStream(
-            BufferedOutputStream(
-                logger = out.run { ({ line: String? -> info(line) }) }
-            ),
-            false,
-            "UTF-8"
-        )
-    )
-    System.setErr(
-        PrintStream(
-            BufferedOutputStream(
-                logger = out.run { ({ line: String? -> warning(line) }) }
-            ),
-            false,
-            "UTF-8"
-        )
-    )
-}
-
-internal fun <T, K> CrossFade(): @Composable (currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) -> Unit =
-    { currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit ->
-        KeyedCrossFade(currentChild, currentKey, children)
-    }
-
-
-@Composable
-private fun <T, K> KeyedCrossFade(currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) {
-    androidx.compose.animation.Crossfade(ChildWrapper(currentChild, currentKey)) {
-        children(it.child, it.key)
-    }
-}
-
-
-internal class ChildWrapper<out T, out C>(val child: T, val key: C) {
-    override fun equals(other: Any?): Boolean = key == (other as? ChildWrapper<*, *>)?.key
-    override fun hashCode(): Int = key.hashCode()
 }

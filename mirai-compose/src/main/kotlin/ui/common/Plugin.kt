@@ -1,8 +1,6 @@
 package com.youngerhousea.miraicompose.ui.common
 
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -20,17 +18,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youngerhousea.miraicompose.theme.ResourceImage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.Command.Companion.allNames
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.*
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
-import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.yamlkt.Yaml
-
-private val yaml = Yaml.default
 
 internal inline val Plugin.annotatedName: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
@@ -42,7 +38,7 @@ internal inline val Plugin.annotatedName: AnnotatedString
 
 private inline val Plugin.annotatedAuthor: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle( fontSize = 13.sp))
+        pushStyle(SpanStyle(fontSize = 13.sp))
         append("Author:")
         append(author.ifEmpty { "Unknown" })
         toAnnotatedString()
@@ -50,7 +46,7 @@ private inline val Plugin.annotatedAuthor: AnnotatedString
 
 private inline val Plugin.annotatedInfo: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle( fontSize = 13.sp))
+        pushStyle(SpanStyle(fontSize = 13.sp))
         append("Info:")
         append(info.ifEmpty { "Unknown" })
         toAnnotatedString()
@@ -58,7 +54,7 @@ private inline val Plugin.annotatedInfo: AnnotatedString
 
 private inline val Plugin.annotatedKind: AnnotatedString
     get() = with(AnnotatedString.Builder()) {
-        pushStyle(SpanStyle( fontSize = 13.sp))
+        pushStyle(SpanStyle(fontSize = 13.sp))
         append(
             when (this@annotatedKind) {
                 is JavaPlugin -> {
@@ -137,10 +133,10 @@ internal inline val PluginData.annotatedExplain: AnnotatedString
     }
 
 @Composable
-internal fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
+internal fun EditView(pluginData: PluginData, coroutineScope: CoroutineScope) {
     var value by remember(pluginData) {
         mutableStateOf(
-            yaml.encodeToString(
+            Yaml.default.encodeToString(
                 pluginData.updaterSerializer,
                 Unit
             )
@@ -159,14 +155,11 @@ internal fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
         })
         Button(
             {
-                plugin.launch {
-                    kotlin.runCatching {
-                        yaml.decodeFromString(pluginData.updaterSerializer, textField.text)
+                coroutineScope.launch {
+                    runCatching {
+                        Yaml.default.decodeFromString(pluginData.updaterSerializer, textField.text)
                     }.onSuccess {
                         value = textField.text
-                    }.onFailure {
-                        ErrorWindow(it)
-                        it.printStackTrace()
                     }
                 }
             },
@@ -180,7 +173,6 @@ internal fun EditView(pluginData: PluginData, plugin: JvmPlugin) {
 }
 
 
-
 internal inline val Command.simpleDescription: AnnotatedString
     get() =
         with(AnnotatedString.Builder()) {
@@ -192,9 +184,5 @@ internal inline val Command.simpleDescription: AnnotatedString
             toAnnotatedString()
         }
 
-fun ErrorWindow(error:Throwable) = Window {
-    Text("出现错误！$error")
-    Text("请上报日志issue")
-}
 
 

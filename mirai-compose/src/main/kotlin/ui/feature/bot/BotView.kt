@@ -1,19 +1,6 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.pop
@@ -24,14 +11,10 @@ import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.ui.feature.bot.state.*
 import com.youngerhousea.miraicompose.utils.asComponent
 import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
-import net.mamoe.mirai.event.events.BotLeaveEvent
 import net.mamoe.mirai.utils.LoginSolver
 import kotlin.coroutines.resume
 
@@ -145,7 +128,6 @@ class BotState(
 
 }
 
-
 @Composable
 fun BotStateUi(botState: BotState) {
     Children(botState.state) { child ->
@@ -153,121 +135,6 @@ fun BotStateUi(botState: BotState) {
     }
 }
 
-@Composable
-fun TopView(modifier: Modifier) =
-    Row(
-        modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            "Events",
-            color = LocalContentColor.current.copy(alpha = 0.60f),
-            fontSize = 12.sp,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
-    }
 
-@OptIn(InternalCoroutinesApi::class)
-@Composable
-fun EventListView(event: MutableList<BotEvent>) {
-    LazyColumn {
-        items(event) { botEvent ->
-            Text(ParseEventString(botEvent), color = Color.Red)
-        }
-    }
-}
-
-@Composable
-fun ParseEventString(botEvent: BotEvent): String {
-    return when (botEvent) {
-        is BotInvitedJoinGroupRequestEvent -> "BotInvitedJoinGroupRequestEvent"
-        is BotLeaveEvent -> "BotLeaveEvent"
-        else -> "Unknown Event"
-    }
-}
-
-@Composable
-fun BotItem(
-    bot: ComposeBot,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .aspectRatio(2f),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.weight(1f))
-        Surface(
-            modifier = Modifier
-                .weight(3f, fill = false),
-            shape = CircleShape,
-            color = MaterialTheme.colors.surface.copy(alpha = 0.12f)
-        ) {
-            Image(bot.avatar, null)
-        }
-
-        Column(
-            Modifier
-                .weight(6f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(bot.nick, fontWeight = FontWeight.Bold, maxLines = 1)
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(bot.id, style = MaterialTheme.typography.body2)
-            }
-        }
-        Spacer(Modifier.weight(1f))
-    }
-}
-
-//@Composable
-//fun BotListView(
-//    model: MutableList<ComposeBot>,
-//    modifier: Modifier = Modifier,
-//    onAddButtonClick: () -> Unit,
-//    onItemClick: (bot: ComposeBot) -> Unit,
-//    onItemRemove: (bot: ComposeBot) -> Unit
-//) = Box(modifier) {
-//    val scrollState = rememberLazyListState()
-//    val itemHeight = 100.dp
-//
-//    LazyColumn(
-//        Modifier
-//            .fillMaxSize()
-//            .withoutWidthConstraints(),
-//        state = scrollState
-//    ) {
-//        items(model) { item ->
-//            BotItem(
-//                item,
-//                Modifier
-//                    .requiredHeight(itemHeight),
-//                onItemClick = {
-//                    onItemClick(item)
-//                },
-//            )
-//        }
-//
-//        item {
-//            Button(
-//                onClick = onAddButtonClick,
-//                modifier = Modifier
-//                    .requiredHeight(itemHeight)
-//                    .aspectRatio(2f)
-//                    .padding(24.dp),
-//            ) {
-//                Text("Add a bot")
-//            }
-//
-//        }
-//    }
-//    VerticalScrollbar(
-//        Modifier.align(Alignment.CenterEnd),
-//        scrollState,
-//        model.size + 1,
-//        itemHeight
-//    )
-//}
 
 

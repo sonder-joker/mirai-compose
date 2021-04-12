@@ -24,7 +24,6 @@ interface ReadablePluginDataStorage : MultiFilePluginDataStorage {
 
     }
 }
-
 private class ReadablePluginDataStorageImpl(
     private val delegete: MultiFilePluginDataStorage
 ) : MultiFilePluginDataStorage by delegete, ReadablePluginDataStorage {
@@ -39,6 +38,37 @@ private class ReadablePluginDataStorageImpl(
         delegete.store(holder, instance)
     }
 }
+
+interface ReadablePluginConfigStorage : MultiFilePluginDataStorage {
+    val dataMap: MutableMap<PluginDataHolder, MutableList<PluginConfig>>
+
+    operator fun get(pluginDataHolder: PluginDataHolder): List<PluginConfig> =
+        this.dataMap[pluginDataHolder] ?: emptyList()
+
+    companion object {
+        /**
+         * 创建一个 [ReadablePluginConfigStorage] 实例，实现为[MultiFilePluginDataStorage].
+         */
+        operator fun invoke(directory: Path): ReadablePluginConfigStorage =
+            ReadablePluginConfigStorageImpl(MultiFilePluginDataStorage(directory))
+    }
+}
+
+private class ReadablePluginConfigStorageImpl(
+    private val delegete: MultiFilePluginDataStorage
+) : MultiFilePluginDataStorage by delegete, ReadablePluginConfigStorage {
+    override val dataMap = mutableMapOf<PluginDataHolder, MutableList<PluginConfig>>()
+
+    override fun load(holder: PluginDataHolder, instance: PluginData) {
+        delegete.load(holder, instance)
+        dataMap.getOrPut(holder, ::mutableListOf).add(instance as PluginConfig)
+    }
+
+    override fun store(holder: PluginDataHolder, instance: PluginData) {
+        delegete.store(holder, instance as PluginConfig)
+    }
+}
+
 
 val ConfigStorageForCompose = ReadablePluginDataStorage(MiraiConsole.rootPath.resolve("config"))
 
