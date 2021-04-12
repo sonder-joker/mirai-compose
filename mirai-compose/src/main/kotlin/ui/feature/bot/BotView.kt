@@ -56,7 +56,7 @@ class BotState(
         },
         key = model.hashCode().toString(),
         handleBackButton = true,
-        componentFactory = { configuration: BotStatus, componentContext ->
+        childFactory = { configuration: BotStatus, componentContext ->
             when (configuration) {
                 is BotStatus.NoLogin ->
                     BotNoLogin(componentContext, onClick = ::onClick)
@@ -148,8 +148,8 @@ class BotState(
 
 @Composable
 fun BotStateUi(botState: BotState) {
-    Children(botState.state) { child, _ ->
-        child()
+    Children(botState.state) { child ->
+        child.instance()
     }
 }
 

@@ -3,7 +3,9 @@ package com.youngerhousea.miraicompose.ui.feature.bot
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.model.ComposeBot
@@ -24,7 +26,7 @@ class BotChoose(
     private val router = router(
         initialConfiguration = bot?.let { RightSight.Bot(it) } ?: RightSight.Default,
         handleBackButton = true,
-        componentFactory = { configuration: RightSight, componentContext: ComponentContext ->
+        childFactory = { configuration: RightSight, componentContext: ComponentContext ->
             when (configuration) {
                 is RightSight.Default -> {
                     Default.asComponent { DefaultUi() }
@@ -37,10 +39,11 @@ class BotChoose(
     )
 }
 
+@OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun BotChooseUi(botChoose: BotChoose) {
-    Children(botChoose.state) { child, _ ->
-        child()
+    Children(botChoose.state, crossfade()) { child ->
+        child.instance()
     }
 }
 

@@ -1,18 +1,14 @@
 package com.youngerhousea.miraicompose.ui.feature.plugin
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.pop
-import com.arkivanov.decompose.push
-import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.MiraiConsoleRepository
 import com.youngerhousea.miraicompose.utils.Component
-import com.youngerhousea.miraicompose.utils.CrossFade
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.plugin.Plugin
-import net.mamoe.mirai.console.plugin.PluginManager
 
 
 class LoadedPlugin(
@@ -29,7 +25,7 @@ class LoadedPlugin(
         initialConfiguration = Configuration.List,
         key = "PluginRouter",
         handleBackButton = true,
-        componentFactory = { configuration: Configuration, componentContext ->
+        childFactory = { configuration: Configuration, componentContext ->
             when (configuration) {
                 is Configuration.List ->
                     PluginList(
@@ -60,9 +56,15 @@ class LoadedPlugin(
     }
 }
 
+@OptIn(ExperimentalDecomposeApi::class, androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun LoadedPluginUi(loadedPlugin: LoadedPlugin) {
-    Children(loadedPlugin.state, animation = CrossFade()) { child, _ ->
-        child()
+    Children(loadedPlugin.state, animation = { c, content ->
+        AnimatedVisibility(c.activeChild.configuration is PluginDetailed.Setting) {
+            content(c.activeChild)
+        }
+    }) { child ->
+        child.instance()
     }
 }
+

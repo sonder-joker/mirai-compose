@@ -17,12 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
@@ -30,16 +26,12 @@ import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.ui.common.*
-import com.youngerhousea.miraicompose.ui.common.EditView
-import com.youngerhousea.miraicompose.ui.common.annotatedExplain
-import com.youngerhousea.miraicompose.ui.common.annotatedName
-import com.youngerhousea.miraicompose.ui.common.simpleDescription
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
 import net.mamoe.mirai.console.data.PluginData
-import net.mamoe.mirai.console.plugin.*
+import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 
@@ -60,7 +52,7 @@ class PluginDetailed(
         initialConfiguration = Setting.Description,
         handleBackButton = true,
         key = "PluginDetailedRouter",
-        componentFactory = { configuration, componentContext ->
+        childFactory = { configuration, componentContext ->
             when (configuration) {
                 is Setting.Description ->
                     DetailedDescription(componentContext, plugin).asComponent { DetailedDescriptionUi(it) }
@@ -131,17 +123,15 @@ fun PluginDetailedUi(pluginDetailed: PluginDetailed) = Column {
             onClick = pluginDetailed::onCommandClick
         )
     }
-    Children(pluginDetailed.state) { child, _ ->
-        child()
+    Children(pluginDetailed.state) { child ->
+        child.instance()
     }
 }
 
 class DetailedDescription(
     componentContext: ComponentContext,
     val plugin: Plugin
-) : ComponentContext by componentContext {
-
-}
+) : ComponentContext by componentContext
 
 @Composable
 fun DetailedDescriptionUi(detailedDescription: DetailedDescription) {
