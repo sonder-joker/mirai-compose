@@ -1,10 +1,14 @@
 package com.youngerhousea.miraicompose.utils
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.material.Slider
+import androidx.compose.material.SliderColors
+import androidx.compose.material.SliderDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -13,27 +17,52 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
-import com.youngerhousea.miraicompose.console.ComposeDataScope
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.request.*
-import kotlinx.coroutines.launch
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
 import java.io.PrintStream
+import java.util.*
+
+//https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
+fun getARGB(rgb: String): IntArray {
+    if (rgb.length == 6) {
+        val r = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
+        val g = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
+        val b = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
+        return intArrayOf(r, g, b)
+    } else if (rgb.length == 8) {
+        val a = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
+        val r = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
+        val g = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
+        val b = Integer.parseInt(rgb.substring(6, 8), 16) // 16 for hex
+        return intArrayOf(a, r, g, b)
+    } else {
+        throw InputMismatchException()
+    }
+}
 
 @Composable
-inline fun ComposeDataScopeEffect(key:Any?, crossinline effect:() -> Unit ) =
-    DisposableEffect(key) {
-        val job = ComposeDataScope.launch {
-            effect()
-        }
-        onDispose {
-            job.cancel()
-        }
-    }
-
+fun IntSlider(
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    valueRange: IntRange = 0..1,
+    /*@IntRange(from = 0)*/
+    steps: Int = 0,
+    onValueChangeFinished: (() -> Unit)? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    colors: SliderColors = SliderDefaults.colors()
+) = Slider(
+    value = value.toFloat(),
+    onValueChange = { onValueChange(it.toInt()) },
+    modifier,
+    enabled,
+    valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
+    steps,
+    onValueChangeFinished,
+    interactionSource,
+    colors
+)
 
 @Composable
 internal fun VerticalScrollbar(
@@ -48,7 +77,8 @@ internal fun VerticalScrollbar(
 
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap = Image.makeFromEncoded(byteArray).asImageBitmap()
+internal inline fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
+    Image.makeFromEncoded(byteArray).asImageBitmap()
 
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))
