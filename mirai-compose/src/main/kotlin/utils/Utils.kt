@@ -22,13 +22,25 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
 import java.io.PrintStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 //https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
-fun getRGB(rgb: String): IntArray {
-    val r = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
-    val g = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
-    val b = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
-    return intArrayOf(r, g, b)
+fun getARGB(rgb: String): IntArray {
+    if(rgb.length == 6) {
+        val r = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
+        val g = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
+        val b = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
+        return intArrayOf(r, g, b)
+    }else if(rgb.length == 8){
+        val a = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
+        val r = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
+        val g = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
+        val b = Integer.parseInt(rgb.substring(6, 8), 16) // 16 for hex
+        return intArrayOf(a, r, g, b)
+    }else{
+        throw InputMismatchException()
+    }
 }
 
 @Composable
