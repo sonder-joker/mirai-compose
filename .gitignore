@@ -1,6 +1,0 @@
-build/
-.run/
-.gradle/
-.idea/
-mirai-compose/log/
-mirai-compose/config/
