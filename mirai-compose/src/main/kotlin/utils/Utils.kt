@@ -1,14 +1,10 @@
 package com.youngerhousea.miraicompose.utils
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderColors
-import androidx.compose.material.SliderDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -17,6 +13,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
 import com.youngerhousea.miraicompose.console.BufferedOutputStream
+import com.youngerhousea.miraicompose.console.ComposeDataScope
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.launch
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
 import java.io.PrintStream
@@ -75,10 +77,25 @@ internal fun VerticalScrollbar(
     modifier
 )
 
+fun URL.splitQuery(): Map<String, String> {
+    val queryPairs: MutableMap<String, String> = LinkedHashMap()
+    val query: String = this.query
+    val pairs = query.split("&".toRegex()).toTypedArray()
+    for (pair in pairs) {
+        val idx = pair.indexOf("=")
+        queryPairs[URLDecoder.decode(pair.substring(0, idx), "UTF-8")] =
+            URLDecoder.decode(pair.substring(idx + 1), "UTF-8")
+    }
+    return queryPairs
+}
 
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
+internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
     Image.makeFromEncoded(byteArray).asImageBitmap()
+
+internal fun Base64ImageDecode(data: String): ImageBitmap {
+    val base64Image = data.split(",").last()
+    return SkiaImageDecode(Base64.getDecoder().decode(base64Image))
+}
 
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))
@@ -164,23 +181,4 @@ internal fun setSystemOut(out: MiraiLogger) {
             "UTF-8"
         )
     )
-}
-
-internal fun <T, K> CrossFade(): @Composable (currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) -> Unit =
-    { currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit ->
-        KeyedCrossFade(currentChild, currentKey, children)
-    }
-
-
-@Composable
-private fun <T, K> KeyedCrossFade(currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) {
-    androidx.compose.animation.Crossfade(ChildWrapper(currentChild, currentKey)) {
-        children(it.child, it.key)
-    }
-}
-
-
-internal class ChildWrapper<out T, out C>(val child: T, val key: C) {
-    override fun equals(other: Any?): Boolean = key == (other as? ChildWrapper<*, *>)?.key
-    override fun hashCode(): Int = key.hashCode()
 }

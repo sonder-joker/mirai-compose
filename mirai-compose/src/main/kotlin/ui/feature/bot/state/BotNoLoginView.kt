@@ -2,14 +2,13 @@
 
 package com.youngerhousea.miraicompose.ui.feature.bot.state
 
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.RemoveRedEye
@@ -17,18 +16,18 @@ import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ResourceImage
-import com.youngerhousea.miraicompose.utils.HorizontalDottedProgressBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
 
@@ -36,7 +35,6 @@ class BotNoLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit
 ) : ComponentContext by componentContext {
-    private val coroutineScope = MiraiConsole.childScope("BotNoLogin")
 
     var account by mutableStateOf(TextFieldValue())
 
@@ -79,7 +77,7 @@ class BotNoLogin(
                     "未知异常，请反馈"
                 }
             }
-            delay(3000)
+            delay(1000)
             hasAccountError = false
             hasPasswordError = false
         }
@@ -91,7 +89,7 @@ class BotNoLogin(
             hasAccountError = false
         } else {
             hasAccountError = true
-            delay(3000)
+            delay(1000)
             hasAccountError = false
         }
     }
@@ -228,3 +226,60 @@ private inline fun LoginButton(
         Text("Login")
 }
 
+@Composable
+private fun HorizontalDottedProgressBar() {
+    val color = MaterialTheme.colors.onPrimary
+    val transition = rememberInfiniteTransition()
+    val state by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 700,
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    DrawCanvas(state = state, color = color)
+}
+
+
+@Composable
+private fun DrawCanvas(
+    state: Float,
+    color: Color,
+) {
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp),
+    ) {
+
+        val radius = (4.dp).value
+        val padding = (6.dp).value
+
+        for (i in 1..5) {
+            if (i - 1 == state.toInt()) {
+                drawCircle(
+                    radius = radius * 2,
+                    brush = SolidColor(color),
+                    center = Offset(
+                        x = this.center.x + radius * 2 * (i - 3) + padding * (i - 3),
+                        y = this.center.y
+                    )
+                )
+            } else {
+                drawCircle(
+                    radius = radius,
+                    brush = SolidColor(color),
+                    center = Offset(
+                        x = this.center.x + radius * 2 * (i - 3) + padding * (i - 3),
+                        y = this.center.y
+                    )
+                )
+            }
+        }
+    }
+}

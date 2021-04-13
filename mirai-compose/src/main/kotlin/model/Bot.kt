@@ -5,20 +5,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
-import io.ktor.client.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.alsoLogin
+import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.utils.BotConfiguration
-import org.jetbrains.skija.Image
 
 interface ComposeBot {
 
@@ -38,18 +34,16 @@ interface ComposeBot {
         NoLogin, Loading, Online
     }
 
+    val events: MutableList<BotEvent>
+
     suspend fun login(account: Long, password: String, configuration: BotConfiguration.() -> Unit = {})
 
     fun toBot(): Bot
 
     companion object {
-        //only after longin
         operator fun invoke(bot: Bot? = null): ComposeBot = ComposeBotImpl(bot)
-
-        val instances: MutableList<ComposeBot> = mutableStateListOf()
     }
 }
-
 
 private class ComposeBotImpl(
     var _bot: Bot?,
@@ -71,7 +65,9 @@ private class ComposeBotImpl(
     override suspend fun login(account: Long, password: String, configuration: BotConfiguration.() -> Unit) {
         kotlin.runCatching {
             state = ComposeBot.State.Loading
-            _bot = MiraiConsole.addBot(account, password, configuration).alsoLogin()
+            _bot = MiraiConsole.addBot(account, password, configuration)
+            subscribeEvent()
+            _bot!!.login()
         }.onSuccess {
             state = ComposeBot.State.Online
             _bot!!.launch { loadResource() }
@@ -84,6 +80,8 @@ private class ComposeBotImpl(
     private var _messagePerMinute by mutableStateOf(0f)
 
     override val messagePerMinute: Float get() = _messagePerMinute
+
+    override val events: MutableList<BotEvent> = mutableStateListOf()
 
     override fun toBot(): Bot = _bot ?: throw Exception("not bot")
 
@@ -112,28 +110,22 @@ private class ComposeBotImpl(
         when (state) {
             ComposeBot.State.NoLogin -> Unit
             ComposeBot.State.Loading -> Unit
-            ComposeBot.State.Online -> _bot!!.launch { loadResource() }
+            ComposeBot.State.Online -> _bot!!.launch {
+                loadResource()
+                subscribeEvent()
+            }
         }
     }
 
     private suspend fun loadResource() {
-        loadAvatar()
-        startTiming()
-    }
-
-    private suspend fun loadAvatar() {
         _avatar = SkiaImageDecode(
-            client.get(_bot!!.avatarUrl) {
+            Mirai.Http.get(_bot!!.avatarUrl) {
                 header("Connection", "close")
             }
         )
-    }
-
-    private suspend fun startTiming() {
         _bot!!.eventChannel.subscribeAlways<MessageEvent> {
             _messageCount++
         }
-
         _bot!!.launch {
             while (true) {
                 val currentMessage = _messageCount
@@ -144,7 +136,12 @@ private class ComposeBotImpl(
         }
     }
 
+    private fun subscribeEvent() {
+        _bot!!.eventChannel.subscribeAlways<BotEvent> {
+            events.add(this)
+        }
+    }
+
 }
 
-private val client = HttpClient()
 
