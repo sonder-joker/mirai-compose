@@ -1,5 +1,3 @@
-@file:Suppress("TYPE_INFERENCE_ONLY_INPUT_TYPES_WARNING")
-
 package com.youngerhousea.miraicompose.console
 
 import com.youngerhousea.miraicompose.theme.ComposeSetting
