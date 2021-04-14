@@ -84,7 +84,14 @@ fun SettingUi() {
                     .fillMaxWidth()
                     .animateContentSize()
             ) {
-                SlideSetWindow()
+                SlideSetWindow(ComposeSetting.AppTheme.materialLight.primary, {it: Int, v: MutableState<Int> ->
+                    v.value = it
+                    ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight
+                        .copy(primary = it.toColor())},"Primary")
+                SlideSetWindow(ComposeSetting.AppTheme.materialLight.onPrimary,{ it: Int, v: MutableState<Int> ->
+                    v.value = it
+                    ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight
+                        .copy(onPrimary = it.toColor())},"onPrimary")
             }
         }
         VerticalScrollbar(
@@ -98,7 +105,7 @@ fun SettingUi() {
 
 
 @Composable
-fun SlideSetWindow() {
+fun SlideSetWindow(begin: Color, onValueChangeFunc:(Int, MutableState<Int>)->Unit, Label: String) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -107,17 +114,13 @@ fun SlideSetWindow() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("Primary")
-        val v = remember { mutableStateOf(ComposeSetting.AppTheme.materialLight.primary.toInt()) }
+        Text(Label)
+        val tmp = remember { mutableStateOf(begin.toInt()) }
         IntSlider(
-            value = v.value,
-            onValueChange = {
-                v.value = it
-                ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight
-                    .copy(primary = it.toColor())
-            },
+            value = tmp.value,
+            onValueChange = { onValueChangeFunc(it, tmp) },
             valueRange = 0..0xffffff,
-            colors = SliderDefaults.colors(thumbColor = v.value.toColor())
+            colors = SliderDefaults.colors(thumbColor = tmp.value.toColor(), activeTrackColor = tmp.value.toColor())
         )
     }
 }
