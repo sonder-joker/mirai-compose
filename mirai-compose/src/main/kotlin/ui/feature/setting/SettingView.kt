@@ -27,6 +27,8 @@ import com.youngerhousea.miraicompose.utils.IntSlider
 import com.youngerhousea.miraicompose.utils.getARGB
 import java.util.*
 
+
+
 @Suppress("NOTHING_TO_INLINE")
 private inline fun String.toColor(): Color = run {
     // r, g, b or a, r, g, b
@@ -49,6 +51,16 @@ private inline fun String.toColor(): Color = run {
     }
 }
 
+// before construct color, converting the int in dec to hex
+private fun Int.toColor(): Color = run{
+    val hex = this.toString(16).toInt(16)
+    val r = hex and 0xFF0000 shr 16
+    val g = hex and 0xFF00 shr 8
+    val b = hex and 0xFF
+    return Color(r,g,b)
+}
+// in formation aarrggbb00000...
+private fun Color.toInt() = this.value.toString(16).substring(2,8).toInt(16)
 
 class Setting(
     componentContext: ComponentContext
@@ -95,15 +107,17 @@ fun SlideSetWindow() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("Verbose")
+        Text("Primary")
+        val v = remember { mutableStateOf(ComposeSetting.AppTheme.materialLight.primary.toInt()) }
         IntSlider(
-            value = ComposeSetting.AppTheme.logColors.verbose.toArgb(),
+            value = v.value,
             onValueChange = {
-                println(it)
-                ComposeSetting.AppTheme.logColors.verbose = Color(it)
+                v.value = it
+                ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight
+                    .copy(primary = it.toColor())
             },
             valueRange = 0..0xffffff,
-            colors = SliderDefaults.colors(thumbColor = ComposeSetting.AppTheme.logColors.verbose)
+            colors = SliderDefaults.colors(thumbColor = v.value.toColor())
         )
     }
 }

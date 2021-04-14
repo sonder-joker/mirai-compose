@@ -90,19 +90,16 @@ internal class AppTheme {
 
     val logColors: LogColor = LogColor()
 
-    val materialLight: Colors
+    var materialLight: Colors
         get() = _materialLight.value
+        set(value) {
+            _materialLight.value = value
+        }
 }
 
 internal object ComposeSetting : AutoSavePluginConfig("ComposeSetting") {
-
     val AppTheme: AppTheme by value(AppTheme())
 }
 
 private fun saveSetting(block: suspend CoroutineScope.() -> Unit) =
     ComposeDataScope.launch(block = block)
-
-
-
-
-
