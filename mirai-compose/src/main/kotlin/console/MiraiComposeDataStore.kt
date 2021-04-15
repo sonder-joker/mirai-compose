@@ -22,6 +22,7 @@ interface ReadablePluginDataStorage : MultiFilePluginDataStorage {
 
     }
 }
+
 private class ReadablePluginDataStorageImpl(
     private val delegete: MultiFilePluginDataStorage
 ) : MultiFilePluginDataStorage by delegete, ReadablePluginDataStorage {
@@ -69,6 +70,7 @@ private class ReadablePluginConfigStorageImpl(
 
 
 val ConfigStorageForCompose = ReadablePluginDataStorage(MiraiConsole.rootPath.resolve("config"))
+
 
 internal object ComposeDataScope : CoroutineScope by MiraiConsole.childScope("ComposeDataScope") {
     private val configs: MutableList<PluginConfig> = mutableListOf(ComposeSetting)

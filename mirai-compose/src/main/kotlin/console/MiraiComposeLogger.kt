@@ -1,55 +1,28 @@
 package com.youngerhousea.miraicompose.console
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import com.youngerhousea.miraicompose.theme.ComposeSetting
-import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
-import java.nio.file.Files
-import java.nio.file.StandardOpenOption
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.io.path.createDirectories
+
+const val debug = true
 
 
+private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
 
-class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBase() {
+class MiraiComposeLogger(
+    override val identity: String?,
+    val logStorage: MutableList<AnnotatedString>
+) : MiraiLoggerPlatformBase() {
 
-    private val currentTimeFormatted: String get() = timeFormat.format(Date())
-
-    companion object {
-        private val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd-HH：mm：ss", Locale.SIMPLIFIED_CHINESE)
-
-        val staticTimeFormatted: String = timeFormat.format(Date())
-
-        val loggerStorage = mutableStateListOf<AnnotatedString>()
-
-        val Bot.logs get() = loggerStorage.filter { it.text.contains("Bot.${this.id}") }
-
-        val out = MiraiLogger.create("stdout")
-
-        val logFiles = MiraiConsole.rootPath.resolve("log").createDirectories()
-    }
-
-
-    private fun writeToFile(it: String) {
-        Files.write(
-            logFiles.resolve(
-                "$staticTimeFormatted.txt"
-            ),
-            "$it\n".toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND
-        )
-        if(DEBUG)
-            println(it)
-    }
+    private inline val currentDate: String get() = logTimeFormat.format(Date())
 
     private val SimpleLogger.LogPriority.color: Color
         get() = when (this) {
@@ -64,16 +37,14 @@ class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBa
         if (message != null) {
             val annotatedLog =
                 AnnotatedString(
-                    "$currentTimeFormatted ${priority.simpleName}/$identity: $message",
+                    "$currentDate ${priority.simpleName}/$identity: $message",
                     SpanStyle(priority.color)
                 )
-
-            loggerStorage.add(annotatedLog)
-            writeToFile(message)
+            if (debug)
+                systemOut.println(message)
+            logStorage.add(annotatedLog)
         }
     }
-
-
 
     public override fun verbose0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.VERBOSE)
     public override fun verbose0(message: String?, e: Throwable?) {
@@ -107,6 +78,8 @@ class MiraiComposeLogger(override val identity: String?) : MiraiLoggerPlatformBa
 
 }
 
+
+internal class T : ByteArrayOutputStream()
 
 internal class BufferedOutputStream constructor(
     private val size: Int = 1024 * 1024,

@@ -13,24 +13,24 @@ import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
 
 
-class AllLog(
+class MainLog(
     componentContext: ComponentContext,
     val loggerStorage: List<AnnotatedString>,
     val logger: MiraiLogger
 ) : ComponentContext by componentContext
 
 @Composable
-fun AllLogUi(allLog: AllLog) {
+fun MainLogUi(mainLog: MainLog) {
     Column {
         LogBox(
             Modifier
                 .fillMaxSize()
                 .weight(8f)
                 .padding(horizontal = 40.dp, vertical = 20.dp),
-            allLog.loggerStorage,
+            mainLog.loggerStorage,
         )
         CommandSendBox(
-            allLog.logger,
+            mainLog.logger,
             Modifier
                 .weight(1f)
                 .padding(horizontal = 40.dp),

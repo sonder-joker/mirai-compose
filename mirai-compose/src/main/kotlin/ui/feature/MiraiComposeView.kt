@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.IntSize
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.youngerhousea.miraicompose.console.MiraiCompose
-import com.youngerhousea.miraicompose.console.MiraiConsoleRepository
+import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.future.Application
 import com.youngerhousea.miraicompose.future.ApplicationScope
 import com.youngerhousea.miraicompose.theme.ComposeSetting
@@ -26,6 +26,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import kotlin.system.exitProcess
+
+val LocalMiraiCompose: ProvidableCompositionLocal<MiraiComposeRepository> =
+    staticCompositionLocalOf { error("No thing") }
 
 fun MiraiComposeView() {
     SetDefaultExceptionHandler()
@@ -38,23 +41,20 @@ fun MiraiComposeView() {
                 compose.cancel()
             }
         }
-
         if (compose.isReady)
             Ready(compose)
         else
             Loading()
-
     }
 }
 
 private fun SetDefaultExceptionHandler() {
-    Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
+    Thread.setDefaultUncaughtExceptionHandler { _, exception ->
         ExceptionWithWindows(exception)
     }
 }
 
 private fun ExceptionWithWindows(exception: Throwable) {
-
     Window(onDismissRequest = {
         exitProcess(1)
     }) {
@@ -97,9 +97,9 @@ fun ApplicationScope.Loading() {
 }
 
 @Composable
-fun ApplicationScope.Ready(compose: MiraiConsoleRepository) {
+fun ApplicationScope.Ready(compose: MiraiCompose) {
     ComposableWindow(
-        title = "",
+        title = "Mirai compose",
         size = IntSize(1280, 768),
         icon = ResourceImage.icon
     ) {
@@ -110,5 +110,6 @@ fun ApplicationScope.Ready(compose: MiraiConsoleRepository) {
                 NavHost(componentContext, compose)
             }.asComponent { NavHostUi(it) }()
         }
+
     }
 }

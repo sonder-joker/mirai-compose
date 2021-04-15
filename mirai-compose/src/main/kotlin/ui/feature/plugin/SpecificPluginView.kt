@@ -16,7 +16,7 @@ import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.MiraiConsoleRepository
+import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.ui.common.annotatedName
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
@@ -28,7 +28,7 @@ class SpecificPlugin(
     component: ComponentContext,
     val plugin: Plugin,
     val onExitButtonClicked: () -> Unit,
-    repository: MiraiConsoleRepository
+    accessibleHolder: MiraiComposeRepository,
 ) : ComponentContext by component {
 
     sealed class Setting : Parcelable {
@@ -53,14 +53,14 @@ class SpecificPlugin(
                 is Setting.Java -> CJvmPlugin(
                     componentContext,
                     plugin = configuration.javaPlugin,
-                    accessibleHolder = repository
+                    accessibleHolder = accessibleHolder
                 ).asComponent {
                     CJvmPluginUi(it)
                 }
                 is Setting.Kotlin -> CJvmPlugin(
                     componentContext,
                     plugin = configuration.kotlinPlugin,
-                    accessibleHolder = repository
+                    accessibleHolder = accessibleHolder
                 ).asComponent {
                     CJvmPluginUi(it)
                 }

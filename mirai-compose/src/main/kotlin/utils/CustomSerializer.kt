@@ -13,10 +13,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.*
 
-private fun Int.toHexString(): String = Integer.toHexString(this)
-
-private fun Color.toArgbHexString() = this.toArgb().toHexString()
-
+private fun Int.toHexString(): String = Integer.toHexString(this).padStart(6, '0')
 
 @OptIn(ExperimentalSerializationApi::class)
 internal object ColorSerializer : KSerializer<Color> {

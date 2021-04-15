@@ -25,7 +25,6 @@ import com.youngerhousea.miraicompose.ui.common.annotatedExplain
 import com.youngerhousea.miraicompose.ui.common.simpleDescription
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
-import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
 import net.mamoe.mirai.console.data.PluginData
@@ -56,7 +55,6 @@ class CJvmPlugin(
                 is Setting.Data ->
                     DetailedData(
                         componentContext,
-                        coroutineScope = plugin,
                         data = plugin.data + plugin.config
                     ).asComponent { DetailedDataUi(it) }
                 is Setting.Command ->
@@ -134,7 +132,6 @@ fun DetailedDescriptionUi(detailedDescription: DetailedDescription) {
 
 class DetailedData(
     componentContext: ComponentContext,
-    val coroutineScope: CoroutineScope,
     val data: List<PluginData>,
 ) : ComponentContext by componentContext
 
@@ -146,7 +143,7 @@ fun DetailedDataUi(detailedData: DetailedData) =
     ) {
         items(detailedData.data) { pluginData ->
             Text(pluginData.annotatedExplain, Modifier.padding(bottom = 40.dp))
-            EditView(pluginData, detailedData.coroutineScope)
+            EditView(pluginData)
         }
     }
 

@@ -6,7 +6,7 @@ import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.MiraiConsoleRepository
+import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.plugin.Plugin
@@ -14,10 +14,10 @@ import net.mamoe.mirai.console.plugin.Plugin
 
 class Plugins(
     component: ComponentContext,
-    val repository: MiraiConsoleRepository
+    miraiComposeRepository: MiraiComposeRepository,
 ) : ComponentContext by component {
 
-    private inline val plugins get() = repository.loadedPlugins
+    private val plugins = miraiComposeRepository.loadedPlugins
 
     sealed class Configuration : Parcelable {
         object List : Configuration()
@@ -42,7 +42,7 @@ class Plugins(
                         componentContext,
                         plugin = configuration.plugin,
                         onExitButtonClicked = ::popToPluginList,
-                        repository = repository
+                        accessibleHolder = miraiComposeRepository
                     ).asComponent { SpecificPluginUi(it) }
                 }
             }

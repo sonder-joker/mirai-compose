@@ -16,10 +16,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
-import com.youngerhousea.miraicompose.console.BufferedOutputStream
-import net.mamoe.mirai.utils.MiraiLogger
 import org.jetbrains.skija.Image
-import java.io.PrintStream
 import java.net.URL
 import java.net.URLDecoder
 import java.util.*
@@ -164,26 +161,4 @@ private fun checkWindowSizeStep(size: Int, step: Int) {
         else
             "size $size must be greater than zero."
     }
-}
-
-
-internal fun setSystemOut(out: MiraiLogger) {
-    System.setOut(
-        PrintStream(
-            BufferedOutputStream(
-                logger = out.run { ({ line: String? -> info(line) }) }
-            ),
-            false,
-            "UTF-8"
-        )
-    )
-    System.setErr(
-        PrintStream(
-            BufferedOutputStream(
-                logger = out.run { ({ line: String? -> warning(line) }) }
-            ),
-            false,
-            "UTF-8"
-        )
-    )
 }

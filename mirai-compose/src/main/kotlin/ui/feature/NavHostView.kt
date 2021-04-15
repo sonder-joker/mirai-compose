@@ -19,15 +19,16 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.cros
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.MiraiComposeLogger
-import com.youngerhousea.miraicompose.console.MiraiConsoleRepository
+import com.youngerhousea.miraicompose.console.ComposeBuiltInConfigHolder
+import com.youngerhousea.miraicompose.console.ConfigStorageForCompose
+import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
 import com.youngerhousea.miraicompose.ui.feature.bot.BotChoose
 import com.youngerhousea.miraicompose.ui.feature.bot.BotChooseUi
-import com.youngerhousea.miraicompose.ui.feature.log.AllLog
-import com.youngerhousea.miraicompose.ui.feature.log.AllLogUi
+import com.youngerhousea.miraicompose.ui.feature.log.MainLog
+import com.youngerhousea.miraicompose.ui.feature.log.MainLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
 import com.youngerhousea.miraicompose.ui.feature.plugin.PluginsUi
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
@@ -35,14 +36,16 @@ import com.youngerhousea.miraicompose.ui.feature.setting.SettingUi
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import com.youngerhousea.miraicompose.utils.items
+import net.mamoe.mirai.console.MiraiConsole
+
 
 class NavHost(
     component: ComponentContext,
-    val compose: MiraiConsoleRepository,
+    private val miraiComposeRepository: MiraiComposeRepository,
 ) : ComponentContext by component {
     private var _currentBot: ComposeBot? by mutableStateOf(instance.firstOrNull())
 
-    private inline val _instance get() = compose.composeBotList
+    private inline val _instance get() = miraiComposeRepository.composeBotList
 
     private var _index by mutableStateOf(0)
 
@@ -66,22 +69,23 @@ class NavHost(
                     ).asComponent { BotChooseUi(it) }
                 is Config.Setting ->
                     Setting(
-                        componentContext
-                    ).asComponent { SettingUi() }
+                        componentContext,
+                        data = ConfigStorageForCompose[ComposeBuiltInConfigHolder]
+                    ).asComponent { SettingUi(it) }
                 is Config.About ->
                     About(
                         componentContext
                     ).asComponent { AboutUi(it) }
                 is Config.Log ->
-                    AllLog(
+                    MainLog(
                         componentContext,
-                        loggerStorage = MiraiComposeLogger.loggerStorage,
-                        logger = MiraiComposeLogger.out
-                    ).asComponent { AllLogUi(it) }
+                        loggerStorage = miraiComposeRepository.annotatedLogStorage,
+                        logger = MiraiConsole.mainLogger
+                    ).asComponent { MainLogUi(it) }
                 is Config.Plugin -> {
                     Plugins(
                         componentContext,
-                        repository = compose
+                        miraiComposeRepository
                     ).asComponent { PluginsUi(it) }
                 }
             }
@@ -100,7 +104,7 @@ class NavHost(
         _index = 0
 
         val newBot = ComposeBot()
-        _instance.add(newBot)
+        miraiComposeRepository.addBot(newBot)
 
         _currentBot = newBot
     }

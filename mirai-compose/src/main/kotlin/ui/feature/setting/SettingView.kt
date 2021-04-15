@@ -2,29 +2,22 @@ package com.youngerhousea.miraicompose.ui.feature.setting
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollbarAdapter
-import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.Button
-import androidx.compose.material.SliderDefaults
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ComposeSetting
-import com.youngerhousea.miraicompose.utils.IntSlider
 import com.youngerhousea.miraicompose.utils.getARGB
+import net.mamoe.mirai.console.data.PluginData
+import okhttp3.internal.toHexString
 import java.util.*
 
 @Suppress("NOTHING_TO_INLINE")
@@ -51,12 +44,79 @@ private inline fun String.toColor(): Color = run {
 
 
 class Setting(
-    componentContext: ComponentContext
-) : ComponentContext by componentContext
+    componentContext: ComponentContext,
+    data: List<PluginData>,
+) : ComponentContext by componentContext {
+    val debug get() = ComposeSetting.AppTheme.logColors.debug
+
+    val verbose get() = ComposeSetting.AppTheme.logColors.verbose
+
+    val info get() = ComposeSetting.AppTheme.logColors.info
+
+    val warning get() = ComposeSetting.AppTheme.logColors.warning
+
+    val error get() = ComposeSetting.AppTheme.logColors.error
+
+    val primary get() = ComposeSetting.AppTheme.materialLight.primary
+
+    val onPrimary get() = ComposeSetting.AppTheme.materialLight.onPrimary
+
+    val secondary get() = ComposeSetting.AppTheme.materialLight.secondary
+
+    val onSecondary get() = ComposeSetting.AppTheme.materialLight.onSecondary
+
+    val surface get() = ComposeSetting.AppTheme.materialLight.surface
+
+    val onSurface get() = ComposeSetting.AppTheme.materialLight.onSurface
+
+    fun onDebugColorSet(color: Color) {
+        ComposeSetting.AppTheme.logColors.debug = color
+    }
+
+    fun onVerboseColorSet(color: Color) {
+        ComposeSetting.AppTheme.logColors.verbose = color
+    }
+
+    fun onInfoColorSet(color: Color) {
+        ComposeSetting.AppTheme.logColors.info = color
+    }
+
+    fun onWarningColorSet(color: Color) {
+        ComposeSetting.AppTheme.logColors.warning = color
+    }
+
+    fun onErrorColorSet(color: Color) {
+        ComposeSetting.AppTheme.logColors.error = color
+    }
+
+    fun onPrimaryColorSet(color: Color) {
+        ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight.copy(primary = color)
+    }
+
+    fun onOnPrimaryColorSet(color: Color) {
+        ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight.copy(onPrimary = color)
+    }
+
+    fun onSecondaryColorSet(color: Color) {
+        ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight.copy(secondary = color)
+    }
+
+    fun onOnSecondaryColorSet(color: Color) {
+        ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight.copy(onSecondary = color)
+    }
+
+    fun onSurfaceColorSet(color: Color) {
+        ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight.copy(surface = color)
+    }
+
+    fun onOnSurfaceColorSet(color: Color) {
+        ComposeSetting.AppTheme.materialLight = ComposeSetting.AppTheme.materialLight.copy(onSurface = color)
+    }
+}
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingUi() {
+fun SettingUi(setting: Setting) {
     Box(Modifier.fillMaxSize()) {
         val scrollState = rememberScrollState()
         Column(
@@ -72,7 +132,17 @@ fun SettingUi() {
                     .fillMaxWidth()
                     .animateContentSize()
             ) {
-                SlideSetWindow()
+                ColorSetSlider("Debug", value = setting.debug, onValueChange = setting::onDebugColorSet)
+                ColorSetSlider("Verbose", setting.verbose, onValueChange = setting::onVerboseColorSet)
+                ColorSetSlider("Info", setting.info, onValueChange = setting::onInfoColorSet)
+                ColorSetSlider("Warning", setting.warning, onValueChange = setting::onWarningColorSet)
+                ColorSetSlider("Error", setting.error, onValueChange = setting::onErrorColorSet)
+                ColorSetSlider("Primary", setting.primary, onValueChange = setting::onPrimaryColorSet)
+                ColorSetSlider("OnPrimary", setting.onPrimary, onValueChange = setting::onOnPrimaryColorSet)
+                ColorSetSlider("Secondary", setting.secondary, onValueChange = setting::onSecondaryColorSet)
+                ColorSetSlider("OnSecondary", setting.onSecondary, onValueChange = setting::onOnSecondaryColorSet)
+                ColorSetSlider("Surface", setting.surface, onValueChange = setting::onSurfaceColorSet)
+                ColorSetSlider("OnSurface", setting.onSurface, onValueChange = setting::onOnSurfaceColorSet)
             }
         }
         VerticalScrollbar(
@@ -86,98 +156,110 @@ fun SettingUi() {
 
 
 @Composable
-fun SlideSetWindow() {
+fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
             .height(40.dp),
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("Verbose")
-        IntSlider(
-            value = ComposeSetting.AppTheme.logColors.verbose.toArgb(),
-            onValueChange = {
-                println(it)
-                ComposeSetting.AppTheme.logColors.verbose = Color(it)
-            },
-            valueRange = 0..0xffffff,
-            colors = SliderDefaults.colors(thumbColor = ComposeSetting.AppTheme.logColors.verbose)
-        )
+        Image(ColorPainter(value), null, Modifier.width(200.dp))
+        OutlinedTextField(value.toArgb().toHexString(), onValueChange = {
+            onValueChange(Color(it.removePrefix("#").toInt(16)))
+        })
+//        Button({
+//            onValueChange(Color(it.removePrefix("#").toInt(16)))
+//        }){
+//            Text("Sure")
+//        }
+//        IntSlider(
+//            value = value.toArgb(),
+//            onValueChange = { onValueChange(Color(it)) },
+//            valueRange = 0..0xffffff,
+//            colors = SliderDefaults.colors(activeTrackColor = value)
+//        )
     }
 }
 
 @Composable
-private fun SimpleSetWindows(textValue: String, color: Color, action: (value: String) -> Unit) {
-    var textFieldValue by remember(textValue) { mutableStateOf("") }
-    var errorTip by remember(textValue) { mutableStateOf("") }
-    var isError by remember(textValue) { mutableStateOf(false) }
+fun ColorSpliter() {
+    Canvas(Modifier) {
 
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)
-            .height(40.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(textValue, Modifier.weight(2f), fontSize = 15.sp)
-        Spacer(Modifier.weight(2f))
-        ColorImage(color, null, Modifier.weight(1f))
-        Spacer(Modifier.weight(1f))
-        ColorImage(Color.Black, null, Modifier.weight(1f))
-        Spacer(Modifier.weight(2f))
-        TextField(
-            value = textFieldValue,
-            onValueChange = {
-                textFieldValue = it
-            },
-            modifier = Modifier
-                .weight(2f)
-                .padding(end = 20.dp)
-                .shortcuts {
-                    on(Key.Enter) {
-                        //TODO click the button
-                    }
-                },
-            isError = isError,
-            label = {
-                Text(errorTip)
-            }
-        )
-
-        Button({
-            runCatching {
-                action(textFieldValue)
-            }.onFailure {
-                errorTip = when (it) {
-                    is NumberFormatException -> {
-                        "Wrong string"
-                    }
-                    is InputMismatchException -> {
-                        "Wrong formation"
-                    }
-                    else -> {
-                        "Unknown string"
-                    }
-                }
-//                isError = true
-//                delay(1000)
-//                isError = false
-//                errorTip = ""
-            }.onSuccess {
-                // TODO change the color of tip to green
-//                errorTip = "Success"
-//                isError = true
-//                delay(1000)
-//                isError = false
-//                errorTip = ""
-            }
-        }) { Text("修改") }
     }
 }
 
-@Composable
-fun ColorImage(color: Color, contentDescription: String?, modifier: Modifier = Modifier) =
-    Image(painter = ColorPainter(color), contentDescription, modifier)
+//@Composable
+//private fun SimpleSetWindows(textValue: String, color: Color, action: (value: String) -> Unit) {
+//    var textFieldValue by remember(textValue) { mutableStateOf("") }
+//    var errorTip by remember(textValue) { mutableStateOf("") }
+//    var isError by remember(textValue) { mutableStateOf(false) }
+//
+//    Row(
+//        Modifier
+//            .fillMaxWidth()
+//            .padding(vertical = 10.dp)
+//            .height(40.dp),
+//        horizontalArrangement = Arrangement.Center,
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        Text(textValue, Modifier.weight(2f), fontSize = 15.sp)
+//        Spacer(Modifier.weight(2f))
+//        ColorImage(color, null, Modifier.weight(1f))
+//        Spacer(Modifier.weight(1f))
+//        ColorImage(Color.Black, null, Modifier.weight(1f))
+//        Spacer(Modifier.weight(2f))
+//        TextField(
+//            value = textFieldValue,
+//            onValueChange = {
+//                textFieldValue = it
+//            },
+//            modifier = Modifier
+//                .weight(2f)
+//                .padding(end = 20.dp)
+//                .shortcuts {
+//                    on(Key.Enter) {
+//                        //TODO click the button
+//                    }
+//                },
+//            isError = isError,
+//            label = {
+//                Text(errorTip)
+//            }
+//        )
+//
+//        Button({
+//            runCatching {
+//                action(textFieldValue)
+//            }.onFailure {
+//                errorTip = when (it) {
+//                    is NumberFormatException -> {
+//                        "Wrong string"
+//                    }
+//                    is InputMismatchException -> {
+//                        "Wrong formation"
+//                    }
+//                    else -> {
+//                        "Unknown string"
+//                    }
+//                }
+////                isError = true
+////                delay(1000)
+////                isError = false
+////                errorTip = ""
+//            }.onSuccess {
+//                // TODO change the color of tip to green
+////                errorTip = "Success"
+////                isError = true
+////                delay(1000)
+////                isError = false
+////                errorTip = ""
+//            }
+//        }) { Text("修改") }
+//    }
+//}
+//
+//@Composable
+//fun ColorImage(color: Color, contentDescription: String?, modifier: Modifier = Modifier) =
+//    Image(painter = ColorPainter(color), contentDescription, modifier)
