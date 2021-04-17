@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import com.youngerhousea.miraicompose.theme.ComposeSetting
+import com.youngerhousea.miraicompose.ui.feature.systemOut
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.ByteArrayOutputStream

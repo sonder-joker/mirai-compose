@@ -11,7 +11,7 @@ interface MiraiComposeRepository : AccessibleHolder {
 
     val composeBotList: List<ComposeBot>
 
-    val isReady: Boolean
+    val already: Boolean
 
     val loadedPlugins: List<Plugin>
 

@@ -34,7 +34,6 @@ import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
 
-lateinit var systemOut: PrintStream
 
 @ConsoleFrontEndImplementation
 class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, CoroutineScope by CoroutineScope(
@@ -79,7 +78,8 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override val composeBotList: List<ComposeBot> get() = _composeBotList
 
-    override var isReady by mutableStateOf(false)
+    override var already by mutableStateOf(false)
+
 
     override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
 
@@ -100,7 +100,6 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     @OptIn(ConsoleInternalApi::class)
     override fun preStart() {
-        systemOut = System.out
         setSystemOut(MiraiConsole.mainLogger)
     }
 
@@ -116,7 +115,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     }
 
     override fun postStart() {
-        isReady = true
+        already = true
     }
 
 }

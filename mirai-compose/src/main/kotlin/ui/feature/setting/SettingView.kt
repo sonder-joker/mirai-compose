@@ -3,16 +3,27 @@ package com.youngerhousea.miraicompose.ui.feature.setting
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.utils.getARGB
@@ -157,6 +168,7 @@ fun SettingUi(setting: Setting) {
 
 @Composable
 fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
+    var isExpand by remember(text) { mutableStateOf(false) }
     Row(
         Modifier
             .fillMaxWidth()
@@ -165,15 +177,16 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.width(200.dp)) {
+            Text(text)
+        }
+
         Image(ColorPainter(value), null, Modifier.width(200.dp))
-        OutlinedTextField(value.toArgb().toHexString(), onValueChange = {
-            onValueChange(Color(it.removePrefix("#").toInt(16)))
-        })
-//        Button({
-//            onValueChange(Color(it.removePrefix("#").toInt(16)))
-//        }){
-//            Text("Sure")
-//        }
+
+        if (isExpand)
+            Popup {
+
+            }
 //        IntSlider(
 //            value = value.toArgb(),
 //            onValueChange = { onValueChange(Color(it)) },
@@ -185,81 +198,23 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
 
 @Composable
 fun ColorSpliter() {
-    Canvas(Modifier) {
 
-    }
 }
 
-//@Composable
-//private fun SimpleSetWindows(textValue: String, color: Color, action: (value: String) -> Unit) {
-//    var textFieldValue by remember(textValue) { mutableStateOf("") }
-//    var errorTip by remember(textValue) { mutableStateOf("") }
-//    var isError by remember(textValue) { mutableStateOf(false) }
-//
-//    Row(
-//        Modifier
-//            .fillMaxWidth()
-//            .padding(vertical = 10.dp)
-//            .height(40.dp),
-//        horizontalArrangement = Arrangement.Center,
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        Text(textValue, Modifier.weight(2f), fontSize = 15.sp)
-//        Spacer(Modifier.weight(2f))
-//        ColorImage(color, null, Modifier.weight(1f))
-//        Spacer(Modifier.weight(1f))
-//        ColorImage(Color.Black, null, Modifier.weight(1f))
-//        Spacer(Modifier.weight(2f))
-//        TextField(
-//            value = textFieldValue,
-//            onValueChange = {
-//                textFieldValue = it
-//            },
-//            modifier = Modifier
-//                .weight(2f)
-//                .padding(end = 20.dp)
-//                .shortcuts {
-//                    on(Key.Enter) {
-//                        //TODO click the button
-//                    }
-//                },
-//            isError = isError,
-//            label = {
-//                Text(errorTip)
-//            }
-//        )
-//
-//        Button({
-//            runCatching {
-//                action(textFieldValue)
-//            }.onFailure {
-//                errorTip = when (it) {
-//                    is NumberFormatException -> {
-//                        "Wrong string"
-//                    }
-//                    is InputMismatchException -> {
-//                        "Wrong formation"
-//                    }
-//                    else -> {
-//                        "Unknown string"
-//                    }
-//                }
-////                isError = true
-////                delay(1000)
-////                isError = false
-////                errorTip = ""
-//            }.onSuccess {
-//                // TODO change the color of tip to green
-////                errorTip = "Success"
-////                isError = true
-////                delay(1000)
-////                isError = false
-////                errorTip = ""
-//            }
-//        }) { Text("修改") }
-//    }
-//}
-//
-//@Composable
-//fun ColorImage(color: Color, contentDescription: String?, modifier: Modifier = Modifier) =
-//    Image(painter = ColorPainter(color), contentDescription, modifier)
+private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
+    var event: PointerEvent
+    do {
+        event = awaitPointerEvent()
+    } while (
+        !event.changes.all { it.changedToDown() }
+    )
+    return event
+}
+
+private fun DrawScope.drawBackground(x: Int, y: Int, color: Color, widthRate: Int, heightRate: Int) {
+    drawRect(
+        color = color,
+        topLeft = Offset(x = x * widthRate.toFloat(), y = y * heightRate.toFloat()),
+        size = Size(widthRate.toFloat(), heightRate.toFloat())
+    )
+}

@@ -19,10 +19,12 @@ dependencies {
 
     implementation(yamlkt)
     implementation(compose.materialIconsExtended)
+    implementation(koin)
 
     //may remove in future
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
 
+    testImplementation ("io.insert-koin:koin-test:${Versions.koin}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
