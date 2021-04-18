@@ -17,7 +17,7 @@ import net.mamoe.mirai.console.data.value
 
 
 @Serializable
-internal class LogColor {
+class LogColor {
     @SerialName("debug")
     @Serializable(MutableStateSerializer::class)
     private var _debug: MutableState<@Serializable(ColorSerializer::class) Color> = mutableStateOf(Color.Cyan)
@@ -50,7 +50,7 @@ internal class LogColor {
 }
 
 @Serializable
-internal class AppTheme {
+class AppTheme {
     @SerialName("materialLight")
     @Serializable(MutableStateSerializer::class)
     private val _materialLight: MutableState<@Serializable(ColorsSerializer::class) Colors> = mutableStateOf(

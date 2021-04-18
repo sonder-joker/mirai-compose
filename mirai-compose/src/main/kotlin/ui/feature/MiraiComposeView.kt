@@ -21,7 +21,6 @@ import com.youngerhousea.miraicompose.future.Application
 import com.youngerhousea.miraicompose.future.ApplicationScope
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.ResourceImage
-import com.youngerhousea.miraicompose.ui.feature.bot.BotChoose
 import com.youngerhousea.miraicompose.utils.asComponent
 import kotlinx.coroutines.cancel
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
@@ -33,7 +32,6 @@ import kotlin.system.exitProcess
 fun MiraiComposeView() {
     SetDefaultExceptionHandler()
 
-    val compose = MiraiCompose()
 
     val module = module {
 //        single { parma -> BotChoose(parma.get(), )  }

@@ -19,10 +19,9 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.cros
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.ComposeBuiltInConfigHolder
-import com.youngerhousea.miraicompose.console.ConfigStorageForCompose
 import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
 import com.youngerhousea.miraicompose.ui.feature.bot.BotChoose
@@ -70,7 +69,7 @@ class NavHost(
                 is Config.Setting ->
                     Setting(
                         componentContext,
-                        data = ConfigStorageForCompose[ComposeBuiltInConfigHolder]
+                        ComposeSetting.AppTheme
                     ).asComponent { SettingUi(it) }
                 is Config.About ->
                     About(
