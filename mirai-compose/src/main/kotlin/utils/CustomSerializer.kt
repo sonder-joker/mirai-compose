@@ -13,21 +13,17 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.*
 
-private fun Int.toHexString(): String = Integer.toHexString(this)
-
-private fun Color.toArgbHexString() = this.toArgb().toHexString()
-
+private fun Int.toHexString(): String = Integer.toHexString(this).padStart(8, '0')
 
 @OptIn(ExperimentalSerializationApi::class)
 internal object ColorSerializer : KSerializer<Color> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Color", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: Color) {
-        encoder.encodeString("#${value.toArgb().toHexString()}")
-    }
+    override fun serialize(encoder: Encoder, value: Color) =
+        encoder.encodeString(value.toArgb().toHexString())
 
     override fun deserialize(decoder: Decoder): Color =
-        Color(decoder.decodeString().removePrefix("#").toLong(16))
+        Color(decoder.decodeString().toLong(16))
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -142,3 +138,11 @@ internal object ColorsSerializer : KSerializer<Colors> {
             )
         }
 }
+
+val Color.r get() = toArgb() and 0xff000000.toInt() ushr 24
+
+val Color.g get() = toArgb() and 0x00ff0000 ushr 16
+
+val Color.b get() = toArgb() and 0x0000ff00 ushr 8
+
+val Color.a get() = toArgb() and 0x000000ff

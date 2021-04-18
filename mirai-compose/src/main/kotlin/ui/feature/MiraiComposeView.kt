@@ -1,34 +1,44 @@
 package com.youngerhousea.miraicompose.ui.feature
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Color.Companion.DarkGray
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.youngerhousea.miraicompose.console.MiraiCompose
-import com.youngerhousea.miraicompose.console.MiraiConsoleRepository
+import com.youngerhousea.miraicompose.console.debug
 import com.youngerhousea.miraicompose.future.Application
 import com.youngerhousea.miraicompose.future.ApplicationScope
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.asComponent
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+import java.io.PrintStream
 import kotlin.system.exitProcess
 
 fun MiraiComposeView() {
     SetDefaultExceptionHandler()
+
+
+    val module = module {
+//        single { parma -> BotChoose(parma.get(), )  }
+    }
+    startKoin {
+        modules(module)
+    }
 
     Application {
         val compose: MiraiCompose = remember { MiraiCompose() }
@@ -38,23 +48,24 @@ fun MiraiComposeView() {
                 compose.cancel()
             }
         }
-
-        if (compose.isReady)
+        if (compose.already)
             Ready(compose)
         else
-            Loading()
-
+            Loading(compose.annotatedLogStorage)
     }
 }
 
 private fun SetDefaultExceptionHandler() {
-    Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
+    Thread.setDefaultUncaughtExceptionHandler { _, exception ->
         ExceptionWithWindows(exception)
     }
 }
 
-private fun ExceptionWithWindows(exception: Throwable) {
+val systemOut: PrintStream = System.out
 
+private fun ExceptionWithWindows(exception: Throwable) {
+    if (debug)
+        systemOut.println(exception.stackTraceToString())
     Window(onDismissRequest = {
         exitProcess(1)
     }) {
@@ -65,41 +76,21 @@ private fun ExceptionWithWindows(exception: Throwable) {
 }
 
 @Composable
-fun ApplicationScope.Loading() {
-    var circleSize by remember { mutableStateOf(50f) }
-    val animateCircleSize by animateFloatAsState(circleSize)
-
+fun ApplicationScope.Loading(annotatedLogStorage: List<AnnotatedString>) {
     ComposableWindow(
         undecorated = true,
         size = IntSize(400, 400),
     ) {
-        LaunchedEffect(Unit) {
-            while (true) {
-                delay(10)
-                circleSize++
-                if (circleSize > 200f) {
-                    circleSize = 0f
-                }
-            }
-        }
-
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .background(Color(0xffe8e0cb))
-        ) {
-            drawCircle(Color.Red, radius = animateCircleSize, style = Stroke(1.5f))
-            drawCircle(Color.Red, radius = 100f, style = Stroke(1.5f))
-            drawCircle(Color.Red, radius = 150f, style = Stroke(1.5f))
+        Box(Modifier.fillMaxSize().background(DarkGray)) {
+            annotatedLogStorage.takeIf { it.isNotEmpty() }?.apply { Text(last()) }
         }
     }
 }
 
 @Composable
-fun ApplicationScope.Ready(compose: MiraiConsoleRepository) {
+fun ApplicationScope.Ready(compose: MiraiCompose) {
     ComposableWindow(
-        title = "",
+        title = "Mirai compose",
         size = IntSize(1280, 768),
         icon = ResourceImage.icon
     ) {
@@ -110,5 +101,6 @@ fun ApplicationScope.Ready(compose: MiraiConsoleRepository) {
                 NavHost(componentContext, compose)
             }.asComponent { NavHostUi(it) }()
         }
+
     }
 }

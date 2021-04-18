@@ -1,13 +1,10 @@
 package com.youngerhousea.miraicompose.theme
 
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.loadVectorXmlResource
 import androidx.compose.ui.unit.Density
-import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import org.xml.sax.InputSource
 import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
 import java.net.URL
 import javax.imageio.ImageIO
 

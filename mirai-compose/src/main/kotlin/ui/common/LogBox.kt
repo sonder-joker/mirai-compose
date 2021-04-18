@@ -36,27 +36,30 @@ import kotlin.reflect.full.isSubclassOf
 
 @Composable
 internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) {
+
     BoxWithConstraints(modifier) {
-        val listLog = logs.flatMap {
-            it.chunked(constraints.maxWidth / 9)
+        val adaptiveLog = remember(logs) {
+            logs.flatMap {
+                it.chunked(constraints.maxWidth / 9)
+            }
         }
-        val itemHeight = 40.dp
-        val state = remember(listLog) { LazyListState() }
+        val adaptiveLogHeight = 40.dp
+        val state = remember(logs) { LazyListState() }
 
         LazyColumn(
             Modifier
-                .fillMaxWidth(),
+                .fillMaxSize(),
             state = state
         ) {
             items(
-                listLog
+                adaptiveLog
             ) {
                 //TODO:HapticFeedback.performHapticFeedback not implemented yet
                 SelectionContainer {
                     Text(
                         it,
                         modifier = Modifier
-                            .height(itemHeight)
+                            .height(adaptiveLogHeight)
                     )
                 }
             }
@@ -65,13 +68,13 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
         VerticalScrollbar(
             Modifier.align(Alignment.CenterEnd),
             state,
-            listLog.size,
-            itemHeight
+            adaptiveLog.size,
+            adaptiveLogHeight
         )
 
-        LaunchedEffect(listLog) {
-            if (listLog.isNotEmpty())
-                state.scrollToItem(listLog.size - 1, 0)
+        LaunchedEffect(adaptiveLog) {
+            if (adaptiveLog.isNotEmpty())
+                state.scrollToItem(adaptiveLog.size - 1, 0)
         }
     }
 }
@@ -86,7 +89,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
         scope.launch {
             try {
                 SolveCommandResult(currentCommand, logger)
-            } catch (e :Exception) {
+            } catch (e: Exception) {
 
             } finally {
                 currentCommand = ""

@@ -2,7 +2,6 @@ package com.youngerhousea.miraicompose.ui.feature.bot.state
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,9 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.console.MiraiComposeLogger.Companion.logs
 import com.youngerhousea.miraicompose.model.ComposeBot
-import com.youngerhousea.miraicompose.ui.common.LogBox
 import com.youngerhousea.miraicompose.ui.common.VerticalSplittableSimple
 import kotlinx.coroutines.InternalCoroutinesApi
 import net.mamoe.mirai.event.events.BotEvent
@@ -37,12 +34,15 @@ fun BotOnlineUi(botOnline: BotOnline) {
                 EventListView(botOnline.bot.events)
             }
         }, rightContent = {
-            LogBox(
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 40.dp, vertical = 20.dp),
-                botOnline.bot.toBot().logs,
-            )
+//            LogBox(
+//                Modifier
+//                    .fillMaxSize()
+//                    .padding(horizontal = 40.dp, vertical = 20.dp),
+//                botOnline.bot.toBot(),
+//            )
+            Column {
+
+            }
         })
 }
 

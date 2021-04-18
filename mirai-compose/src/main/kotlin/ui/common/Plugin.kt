@@ -18,8 +18,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youngerhousea.miraicompose.theme.ResourceImage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.Command.Companion.allNames
 import net.mamoe.mirai.console.data.*
@@ -133,7 +131,7 @@ internal inline val PluginData.annotatedExplain: AnnotatedString
     }
 
 @Composable
-internal fun EditView(pluginData: PluginData, coroutineScope: CoroutineScope) {
+internal fun EditView(pluginData: PluginData) {
     var value by remember(pluginData) {
         mutableStateOf(
             Yaml.default.encodeToString(
@@ -155,12 +153,10 @@ internal fun EditView(pluginData: PluginData, coroutineScope: CoroutineScope) {
         })
         Button(
             {
-                coroutineScope.launch {
-                    runCatching {
-                        Yaml.default.decodeFromString(pluginData.updaterSerializer, textField.text)
-                    }.onSuccess {
-                        value = textField.text
-                    }
+                runCatching {
+                    Yaml.default.decodeFromString(pluginData.updaterSerializer, textField.text)
+                }.onSuccess {
+                    value = textField.text
                 }
             },
             Modifier

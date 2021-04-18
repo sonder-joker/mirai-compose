@@ -8,3 +8,4 @@ object MiraiComposeLoader {
     fun main(arg:Array<String> = emptyArray()) =
         MiraiComposeView()
 }
+

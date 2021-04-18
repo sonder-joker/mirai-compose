@@ -1,79 +1,156 @@
 package com.youngerhousea.miraicompose.ui.feature.setting
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.theme.ComposeSetting
-import com.youngerhousea.miraicompose.utils.IntSlider
-import com.youngerhousea.miraicompose.utils.getARGB
-import java.util.*
+import com.youngerhousea.miraicompose.theme.AppTheme
+import com.youngerhousea.miraicompose.ui.common.ColorPicker
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun String.toColor(): Color = run {
-    // r, g, b or a, r, g, b
-    val tmp: List<Int> =
-        if (this.contains(',')) {
-            this.split(',').map { it.toInt() }
-        } else if (this.startsWith('#')) {
-            getARGB(this.removePrefix("#")).toList()
-        } else {
-            throw InputMismatchException()
-        }
-    return if (tmp.count() == 4) {
-        //argb
-        Color(tmp[1], tmp[2], tmp[3], tmp[0])
-    } else if (tmp.count() == 3) {
-        //rgb
-        Color(tmp[0], tmp[1], tmp[2])
-    } else {
-        throw InputMismatchException()
+class Setting(
+    componentContext: ComponentContext,
+    val theme: AppTheme,
+) : ComponentContext by componentContext {
+    private inline val logColors get() = theme.logColors
+
+    var material = theme.materialLight
+
+    val debug get() = logColors.debug
+
+    val verbose get() = logColors.verbose
+
+    val info get() = logColors.info
+
+    val warning get() = logColors.warning
+
+    val error get() = logColors.error
+
+    fun onDebugColorSet(color: Color) {
+        logColors.debug = color
+    }
+
+    fun onVerboseColorSet(color: Color) {
+        logColors.verbose = color
+    }
+
+    fun onInfoColorSet(color: Color) {
+        logColors.info = color
+    }
+
+    fun onWarningColorSet(color: Color) {
+        logColors.warning = color
+    }
+
+    fun onErrorColorSet(color: Color) {
+        logColors.error = color
+    }
+
+    fun setPrimary(color: Color) {
+        material = material.copy(primary = color)
+    }
+
+    fun setPrimaryVariant(color: Color) {
+        material = material.copy(primaryVariant = color)
+    }
+
+    fun setSecondary(color: Color) {
+        material = material.copy(secondary = color)
+    }
+
+    fun setSecondaryVariant(color: Color) {
+        material = material.copy(secondaryVariant = color)
+    }
+
+    fun setBackground(color: Color) {
+        material = material.copy(background = color)
+    }
+
+    fun setSurface(color: Color) {
+        material = material.copy(surface = color)
+    }
+
+    fun setError(color: Color) {
+        material = material.copy(error = color)
+    }
+
+    fun setOnPrimary(color: Color) {
+        material = material.copy(onPrimary = color)
+    }
+
+    fun setOnSecondary(color: Color) {
+        material = material.copy(onSecondary = color)
+    }
+
+    fun setOnBackground(color: Color) {
+        material = material.copy(onBackground = color)
+    }
+
+    fun setOnSurface(color: Color) {
+        material = material.copy(onSurface = color)
+    }
+
+    fun setOnError(color: Color) {
+        material = material.copy(onError = color)
+    }
+
+    fun setIsLight(isLight: Boolean) {
+        material = material.copy(isLight = isLight)
     }
 }
 
-
-class Setting(
-    componentContext: ComponentContext
-) : ComponentContext by componentContext
-
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingUi() {
+fun SettingUi(setting: Setting) {
     Box(Modifier.fillMaxSize()) {
         val scrollState = rememberScrollState()
         Column(
             Modifier
+                .verticalScroll(scrollState)
                 .padding(20.dp)
                 .fillMaxSize()
         ) {
             Row(Modifier.fillMaxWidth()) {
+                Text("自定义日志配色")
+            }
+            ColorSetSlider("Debug", value = setting.debug, onValueChange = setting::onDebugColorSet)
+            ColorSetSlider("Verbose", setting.verbose, onValueChange = setting::onVerboseColorSet)
+            ColorSetSlider("Info", setting.info, onValueChange = setting::onInfoColorSet)
+            ColorSetSlider("Warning", setting.warning, onValueChange = setting::onWarningColorSet)
+            ColorSetSlider("Error", setting.error, onValueChange = setting::onErrorColorSet)
+            Row(Modifier.fillMaxWidth()) {
                 Text("自定义主题配色")
             }
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .animateContentSize()
-            ) {
-                SlideSetWindow()
-            }
+            ColorSetSlider("Primary", setting.material.primary, onValueChange = setting::setPrimary)
+            ColorSetSlider(
+                "PrimaryVariant",
+                setting.material.primaryVariant,
+                onValueChange = setting::setPrimaryVariant
+            )
+            ColorSetSlider("Secondary", setting.material.secondary, onValueChange = setting::setSecondary)
+            ColorSetSlider(
+                "SecondaryVariant",
+                setting.material.secondaryVariant,
+                onValueChange = setting::setSecondaryVariant
+            )
+            ColorSetSlider("Background", setting.material.background, onValueChange = setting::setBackground)
+            ColorSetSlider("Surface", setting.material.surface, onValueChange = setting::setSurface)
+            ColorSetSlider("Error", setting.material.error, onValueChange = setting::setError)
+            ColorSetSlider("OnPrimary", setting.material.onPrimary, onValueChange = setting::setOnPrimary)
+            ColorSetSlider("OnSecondary", setting.material.onSecondary, onValueChange = setting::setOnSecondary)
+            ColorSetSlider("OnBackground", setting.material.onBackground, onValueChange = setting::setOnBackground)
+            ColorSetSlider("OnSurface", setting.material.onSurface, onValueChange = setting::setOnSurface)
+            ColorSetSlider("OnError", setting.material.onError, onValueChange = setting::setOnError)
         }
         VerticalScrollbar(
             modifier = Modifier
@@ -85,99 +162,33 @@ fun SettingUi() {
 }
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SlideSetWindow() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)
-            .height(40.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("Verbose")
-        IntSlider(
-            value = ComposeSetting.AppTheme.logColors.verbose.toArgb(),
-            onValueChange = {
-                println(it)
-                ComposeSetting.AppTheme.logColors.verbose = Color(it)
-            },
-            valueRange = 0..0xffffff,
-            colors = SliderDefaults.colors(thumbColor = ComposeSetting.AppTheme.logColors.verbose)
-        )
+fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
+    var isExpand by remember(text) { mutableStateOf(false) }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
+                .height(40.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.width(200.dp)) {
+                Text(text, color = value)
+            }
+
+            Button({
+                isExpand = !isExpand
+            }) {
+                Text("?")
+            }
+        }
+        AnimatedVisibility(isExpand) {
+            ColorPicker(value) { red, green, blue, alpha ->
+                onValueChange(Color(red, green, blue, alpha))
+            }
+        }
     }
 }
-
-@Composable
-private fun SimpleSetWindows(textValue: String, color: Color, action: (value: String) -> Unit) {
-    var textFieldValue by remember(textValue) { mutableStateOf("") }
-    var errorTip by remember(textValue) { mutableStateOf("") }
-    var isError by remember(textValue) { mutableStateOf(false) }
-
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)
-            .height(40.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(textValue, Modifier.weight(2f), fontSize = 15.sp)
-        Spacer(Modifier.weight(2f))
-        ColorImage(color, null, Modifier.weight(1f))
-        Spacer(Modifier.weight(1f))
-        ColorImage(Color.Black, null, Modifier.weight(1f))
-        Spacer(Modifier.weight(2f))
-        TextField(
-            value = textFieldValue,
-            onValueChange = {
-                textFieldValue = it
-            },
-            modifier = Modifier
-                .weight(2f)
-                .padding(end = 20.dp)
-                .shortcuts {
-                    on(Key.Enter) {
-                        //TODO click the button
-                    }
-                },
-            isError = isError,
-            label = {
-                Text(errorTip)
-            }
-        )
-
-        Button({
-            runCatching {
-                action(textFieldValue)
-            }.onFailure {
-                errorTip = when (it) {
-                    is NumberFormatException -> {
-                        "Wrong string"
-                    }
-                    is InputMismatchException -> {
-                        "Wrong formation"
-                    }
-                    else -> {
-                        "Unknown string"
-                    }
-                }
-//                isError = true
-//                delay(1000)
-//                isError = false
-//                errorTip = ""
-            }.onSuccess {
-                // TODO change the color of tip to green
-//                errorTip = "Success"
-//                isError = true
-//                delay(1000)
-//                isError = false
-//                errorTip = ""
-            }
-        }) { Text("修改") }
-    }
-}
-
-@Composable
-fun ColorImage(color: Color, contentDescription: String?, modifier: Modifier = Modifier) =
-    Image(painter = ColorPainter(color), contentDescription, modifier)

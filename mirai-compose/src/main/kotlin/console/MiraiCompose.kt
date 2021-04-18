@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.AnnotatedString
 import com.youngerhousea.miraicompose.model.ComposeBot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,14 +19,12 @@ import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.data.PluginDataHolder
-import net.mamoe.mirai.console.extensions.BotConfigurationAlterer
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.PluginManager
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
-import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
-import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.mirai.console.util.ConsoleInput
+import net.mamoe.mirai.console.util.ConsoleInternalApi
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.BotConfiguration
@@ -37,7 +36,7 @@ import java.nio.file.Paths
 
 
 @ConsoleFrontEndImplementation
-class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, CoroutineScope by CoroutineScope(
+class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, CoroutineScope by CoroutineScope(
     NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
         if (throwable is CancellationException) {
             return@CoroutineExceptionHandler
@@ -66,21 +65,31 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
     override val consoleInput: ConsoleInput =
         MiraiComposeInput
 
-    override val consoleCommandSender =
+    override val consoleCommandSender: MiraiComposeSender =
         MiraiComposeSender
 
     override fun createLogger(identity: String?): MiraiLogger =
-        MiraiComposeLogger(identity)
+        MiraiComposeLogger(identity, _annotatedLogStorage)
 
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    override val composeBotList: MutableList<ComposeBot> = mutableStateListOf()
+    private val _composeBotList: MutableList<ComposeBot> = mutableStateListOf()
 
-    override var isReady by mutableStateOf(false)
+    override val composeBotList: List<ComposeBot> get() = _composeBotList
 
-    @Suppress("UNCHECKED_CAST")
+    override var already by mutableStateOf(false)
+
+
     override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
+
+    private val _annotatedLogStorage: MutableList<AnnotatedString> = mutableStateListOf()
+
+    override val annotatedLogStorage: List<AnnotatedString> get() = _annotatedLogStorage
+
+    override fun addBot(bot: ComposeBot) {
+        _composeBotList.add(bot)
+    }
 
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
@@ -89,22 +98,15 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
 
+    @OptIn(ConsoleInternalApi::class)
     override fun preStart() {
-        if (!DEBUG)
-            setSystemOut(MiraiComposeLogger.out)
-    }
-
-    //useless current
-    override fun prePhase(phase: String) {
-        if (phase == "auto-login bots") {
-            backendAccess.globalComponentStorage.contribute(BotConfigurationAlterer, InternalHook, InternalHook)
-        }
+        setSystemOut(MiraiConsole.mainLogger)
     }
 
     override fun postPhase(phase: String) {
         if (phase == "auto-login bots") {
             Bot.instances.forEach {
-                composeBotList.add(ComposeBot(it))
+                _composeBotList.add(ComposeBot(it))
             }
         }
         if (phase == "load configurations") {
@@ -113,27 +115,15 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiConsoleRepository, Corouti
     }
 
     override fun postStart() {
-        isReady = true
+        already = true
     }
 
 }
-
-const val DEBUG = true
-
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val name: String = "MiraiCompose"
     override val vendor: String = "Noire"
     override val version: SemVersion = SemVersion("1.1.0")
-}
-
-internal object InternalHook :
-    KotlinPlugin(JvmPluginDescription("com.youngerhousea.internal", MiraiComposeDescription.version)),
-    BotConfigurationAlterer {
-    override fun alterConfiguration(botId: Long, configuration: BotConfiguration): BotConfiguration {
-        println("114514")
-        return configuration
-    }
 }
 
 internal fun setSystemOut(out: MiraiLogger) {

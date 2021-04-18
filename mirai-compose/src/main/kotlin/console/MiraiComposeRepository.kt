@@ -1,19 +1,23 @@
 package com.youngerhousea.miraicompose.console
 
+import androidx.compose.ui.text.AnnotatedString
 import com.youngerhousea.miraicompose.model.ComposeBot
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
-interface MiraiConsoleRepository : AccessibleHolder {
+interface MiraiComposeRepository : AccessibleHolder {
 
-    val composeBotList: MutableList<ComposeBot>
+    val composeBotList: List<ComposeBot>
 
-    val isReady: Boolean
+    val already: Boolean
 
     val loadedPlugins: List<Plugin>
 
+    val annotatedLogStorage: List<AnnotatedString>
+
+    fun addBot(bot: ComposeBot)
 }
 
 interface AccessibleHolder {
