@@ -20,7 +20,7 @@ private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", 
 
 class MiraiComposeLogger(
     override val identity: String?,
-    val logStorage: MutableList<AnnotatedString>
+    private val logStorage: MutableList<AnnotatedString>
 ) : MiraiLoggerPlatformBase() {
 
     private inline val currentDate: String get() = logTimeFormat.format(Date())

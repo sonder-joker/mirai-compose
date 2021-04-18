@@ -80,7 +80,6 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override var already by mutableStateOf(false)
 
-
     override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
 
     private val _annotatedLogStorage: MutableList<AnnotatedString> = mutableStateListOf()

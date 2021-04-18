@@ -244,7 +244,6 @@ private fun AvatarWithMenu(
 
             items(composeBotList) {
                 DropdownMenuItem(onClick = {
-                    isExpand = !isExpand
                     onMenuItemSelected(it)
                 }) {
                     BotItem(it)
