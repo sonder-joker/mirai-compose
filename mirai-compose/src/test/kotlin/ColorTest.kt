@@ -1,3 +1,7 @@
+import androidx.compose.ui.graphics.Color
+import com.youngerhousea.miraicompose.utils.r
+import okhttp3.internal.toHexString
+
 //package com.youngerhousea.miraicompose
 //
 //import androidx.compose.material.Colors
@@ -66,3 +70,8 @@
 ////    }
 //}
 //
+
+fun main() {
+    val c = Color(0x3cfdfafa)
+    println(c.r.toHexString())
+}
