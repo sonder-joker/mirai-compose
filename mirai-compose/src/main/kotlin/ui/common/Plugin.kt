@@ -134,7 +134,7 @@ internal inline val PluginData.annotatedExplain: AnnotatedString
 internal fun EditView(pluginData: PluginData) {
     var value by remember(pluginData) {
         mutableStateOf(
-            Yaml.default.encodeToString(
+            Yaml.Default.encodeToString(
                 pluginData.updaterSerializer,
                 Unit
             )
@@ -154,7 +154,7 @@ internal fun EditView(pluginData: PluginData) {
         Button(
             {
                 runCatching {
-                    Yaml.default.decodeFromString(pluginData.updaterSerializer, textField.text)
+                    Yaml.Default.decodeFromString(pluginData.updaterSerializer, textField.text)
                 }.onSuccess {
                     value = textField.text
                 }

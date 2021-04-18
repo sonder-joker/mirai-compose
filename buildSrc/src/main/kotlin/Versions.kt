@@ -3,14 +3,14 @@
 object Versions {
     const val mirai_compose = "1.1.1"
 
-    const val kotlin = "1.4.32"
+    const val kotlin = "1.4.31"
 
-    const val mirai = "2.5.0"
+    const val mirai = "2.6.1"
 
-    const val compose = "0.4.0-build183"
+    const val compose = "0.3.2"
     const val decompose = "0.2.1"
 
-    const val yamlkt = "0.7.5"
+    const val yamlkt = "0.9.0"
 
     const val koin = "3.0.1"
 

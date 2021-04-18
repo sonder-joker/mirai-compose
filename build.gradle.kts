@@ -7,7 +7,7 @@ plugins {
     kotlin("jvm") version Versions.kotlin
     kotlin("plugin.serialization") version Versions.kotlin apply false
     id("org.jetbrains.compose") version Versions.compose apply false
-    id("de.undercouch.download") version Versions.download
+//    id("de.undercouch.download") version Versions.download
 }
 
 allprojects {
