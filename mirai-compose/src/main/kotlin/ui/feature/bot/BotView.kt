@@ -121,6 +121,7 @@ class BotState(
                 router.push(BotStatus.Online(model))
             }.onFailure {
                 router.pop()
+                throw it
             }
         }
     }

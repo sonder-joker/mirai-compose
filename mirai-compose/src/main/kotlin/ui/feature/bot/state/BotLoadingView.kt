@@ -9,14 +9,16 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.splitQuery
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.network.CustomLoginFailedException
 import java.net.URL
@@ -31,13 +33,12 @@ class BotSolvePicCaptcha(
 @Composable
 fun BotSolvePicCaptchaUi(botSolvePicCaptcha: BotSolvePicCaptcha) {
     val image = SkiaImageDecode(botSolvePicCaptcha.data)
-    val scope = rememberCoroutineScope()
     var value by mutableStateOf(TextFieldValue())
     Column {
         Text("Mirai PicCaptcha(${botSolvePicCaptcha.bot.id})")
         Image(image, null)
         TextField(value = value, onValueChange = { value = it })
-        Button(onClick = { scope.launch { botSolvePicCaptcha.result(value.text) } }) {
+        Button(onClick = { botSolvePicCaptcha.result(value.text) }) {
             Text("Sure")
         }
     }

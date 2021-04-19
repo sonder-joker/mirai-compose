@@ -38,7 +38,7 @@ fun BotOnlineUi(botOnline: BotOnline) {
 //                Modifier
 //                    .fillMaxSize()
 //                    .padding(horizontal = 40.dp, vertical = 20.dp),
-//                botOnline.bot.toBot(),
+//                botOnline.bot.toBot().,
 //            )
             Column {
 

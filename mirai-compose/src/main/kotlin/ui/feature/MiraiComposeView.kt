@@ -2,16 +2,11 @@ package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
@@ -81,9 +76,9 @@ fun ApplicationScope.Loading(annotatedLogStorage: List<AnnotatedString>) {
         undecorated = true,
         size = IntSize(400, 400),
     ) {
-        Box(Modifier.fillMaxSize().background(DarkGray)) {
-            annotatedLogStorage.takeIf { it.isNotEmpty() }?.apply { Text(last()) }
-        }
+//        Box(Modifier.fillMaxSize().background(DarkGray)) {
+//            annotatedLogStorage.takeIf { it.isNotEmpty() }?.apply { Text(last()) }
+//        }
     }
 }
 
