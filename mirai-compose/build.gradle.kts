@@ -22,7 +22,13 @@ dependencies {
     implementation(koin)
 
     //may remove in future
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+        version {
+            strictly("1.4.2")
+        }
+    }
 
     testImplementation("io.insert-koin:koin-test:${Versions.koin}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
