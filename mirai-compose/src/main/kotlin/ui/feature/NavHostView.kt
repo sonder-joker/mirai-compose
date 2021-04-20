@@ -232,7 +232,7 @@ private fun AvatarWithMenu(
 
         DropdownMenu(isExpand, onDismissRequest = { /*isExpand = !isExpand*/ }) {
             DropdownMenuItem(onClick = { isExpand = !isExpand }) {
-                Text("Log out")
+                Text("Logout")
             }
 
             DropdownMenuItem(onClick = {
