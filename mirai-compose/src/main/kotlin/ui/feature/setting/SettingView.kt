@@ -186,7 +186,7 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
             Button({
                 isExpand = !isExpand
             }) {
-                Text("?")
+                Text("#" + value.value.toString(16).substring(0,8))
             }
         }
         AnimatedVisibility(isExpand) {
