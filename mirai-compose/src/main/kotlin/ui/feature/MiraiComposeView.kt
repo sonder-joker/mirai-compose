@@ -2,15 +2,20 @@ package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.youngerhousea.miraicompose.console.MiraiCompose
+import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.console.debug
 import com.youngerhousea.miraicompose.future.Application
 import com.youngerhousea.miraicompose.future.ApplicationScope
@@ -27,16 +32,16 @@ import kotlin.system.exitProcess
 fun MiraiComposeView() {
     SetDefaultExceptionHandler()
 
+    val compose = MiraiCompose()
 
     val module = module {
-//        single { parma -> BotChoose(parma.get(), )  }
+        single<MiraiComposeRepository> { compose }
     }
     startKoin {
         modules(module)
     }
 
     Application {
-        val compose: MiraiCompose = remember { MiraiCompose() }
         DisposableEffect(Unit) {
             compose.start()
             onDispose {
@@ -44,7 +49,7 @@ fun MiraiComposeView() {
             }
         }
         if (compose.already)
-            Ready(compose)
+            Ready()
         else
             Loading(compose.annotatedLogStorage)
     }
@@ -76,14 +81,14 @@ fun ApplicationScope.Loading(annotatedLogStorage: List<AnnotatedString>) {
         undecorated = true,
         size = IntSize(400, 400),
     ) {
-//        Box(Modifier.fillMaxSize().background(DarkGray)) {
-//            annotatedLogStorage.takeIf { it.isNotEmpty() }?.apply { Text(last()) }
-//        }
+        Box(Modifier.fillMaxSize().background(Color.DarkGray)) {
+            annotatedLogStorage.takeIf { it.isNotEmpty() }?.apply { Text(last()) }
+        }
     }
 }
 
 @Composable
-fun ApplicationScope.Ready(compose: MiraiCompose) {
+fun ApplicationScope.Ready() {
     ComposableWindow(
         title = "Mirai compose",
         size = IntSize(1280, 768),
@@ -93,7 +98,7 @@ fun ApplicationScope.Ready(compose: MiraiCompose) {
             colors = ComposeSetting.AppTheme.materialLight
         ) {
             rememberRootComponent { componentContext ->
-                NavHost(componentContext, compose)
+                NavHost(componentContext)
             }.asComponent { NavHostUi(it) }()
         }
 

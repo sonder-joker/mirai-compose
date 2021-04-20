@@ -57,7 +57,7 @@ class BotNoLogin(
 
     var errorTip by mutableStateOf("")
 
-    var _passwordVisualTransformation by mutableStateOf<VisualTransformation>(
+    private var _passwordVisualTransformation by mutableStateOf<VisualTransformation>(
         PasswordVisualTransformation()
     )
 

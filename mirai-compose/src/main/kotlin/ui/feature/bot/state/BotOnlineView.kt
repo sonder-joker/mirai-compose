@@ -8,20 +8,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.ui.common.VerticalSplittableSimple
+import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import kotlinx.coroutines.InternalCoroutinesApi
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.EventChannel
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.BotLeaveEvent
 
-class BotOnline(context: ComponentContext, val bot: ComposeBot) : ComponentContext by context
+class BotOnline(context: ComponentContext, val bot: Bot) : ComponentContext by context {
+    val scope = ComponentChildScope()
+
+    init {
+        bot.eventChannel.parentScope(scope)
+    }
+}
 
 @Composable
 fun BotOnlineUi(botOnline: BotOnline) {
@@ -31,14 +41,14 @@ fun BotOnlineUi(botOnline: BotOnline) {
                 TopView(
                     Modifier.padding(8.dp)
                 )
-                EventListView(botOnline.bot.events)
+                EventListView(botOnline.bot.eventChannel)
             }
         }, rightContent = {
 //            LogBox(
 //                Modifier
 //                    .fillMaxSize()
 //                    .padding(horizontal = 40.dp, vertical = 20.dp),
-//                botOnline.bot.toBot().,
+//                botOnline.bot.logg,
 //            )
             Column {
 
@@ -62,9 +72,16 @@ private fun TopView(modifier: Modifier) =
 
 @OptIn(InternalCoroutinesApi::class)
 @Composable
-private fun EventListView(event: MutableList<BotEvent>) {
+private fun EventListView(event: EventChannel<BotEvent>) {
+    val list = mutableStateListOf<BotEvent>()
+    SideEffect {
+        event.subscribeAlways<BotEvent> {
+            list.add(this)
+        }
+    }
+
     LazyColumn {
-        items(event) { botEvent ->
+        items(list) { botEvent ->
             Text(ParseEventString(botEvent), color = Color.Red)
         }
     }
@@ -78,5 +95,6 @@ private fun ParseEventString(botEvent: BotEvent): String {
         else -> "Unknown Event"
     }
 }
+
 
 
