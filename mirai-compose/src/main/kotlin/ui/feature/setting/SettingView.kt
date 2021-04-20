@@ -25,6 +25,10 @@ class Setting(
     private inline val logColors get() = theme.logColors
 
     var material = theme.materialLight
+        set(value){
+            theme.materialLight = value
+            field = value
+        }
 
     val debug get() = logColors.debug
 

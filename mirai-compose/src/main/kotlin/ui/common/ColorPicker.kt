@@ -52,6 +52,7 @@ fun ColorPicker(
             green = position.y.toInt() / secondCanvasSingleElementSize
             true
         }).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+            trueRed = red
             trueGreen = green
             trueBlue = blue
             result(trueRed, trueGreen, trueBlue, trueAlpha)
