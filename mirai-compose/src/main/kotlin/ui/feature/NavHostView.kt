@@ -236,8 +236,8 @@ private fun AvatarWithMenu(
             }
 
             DropdownMenuItem(onClick = {
-                isExpand = !isExpand
                 onNewItemButtonSelected()
+                isExpand = !isExpand
             }) {
                 Text("Add")
             }
@@ -245,6 +245,7 @@ private fun AvatarWithMenu(
             items(composeBotList) {
                 DropdownMenuItem(onClick = {
                     onMenuItemSelected(it)
+                    isExpand = !isExpand
                 }) {
                     BotItem(it)
                 }
