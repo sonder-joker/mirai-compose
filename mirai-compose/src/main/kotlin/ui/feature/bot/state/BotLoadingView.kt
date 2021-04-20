@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.input.TextFieldValue
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
@@ -26,17 +27,16 @@ import java.net.URL
 class BotSolvePicCaptcha(
     context: ComponentContext,
     val bot: Bot,
-    val data: ByteArray,
+    val imageBitmap: ImageBitmap,
     val result: (String?) -> Unit
 ) : ComponentContext by context
 
 @Composable
 fun BotSolvePicCaptchaUi(botSolvePicCaptcha: BotSolvePicCaptcha) {
-    val image = SkiaImageDecode(botSolvePicCaptcha.data)
     var value by mutableStateOf(TextFieldValue())
     Column {
         Text("Mirai PicCaptcha(${botSolvePicCaptcha.bot.id})")
-        Image(image, null)
+        Image(botSolvePicCaptcha.imageBitmap, null)
         TextField(value = value, onValueChange = { value = it })
         Button(onClick = { botSolvePicCaptcha.result(value.text) }) {
             Text("Sure")

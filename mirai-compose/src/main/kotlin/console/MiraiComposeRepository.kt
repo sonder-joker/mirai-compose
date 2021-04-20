@@ -1,7 +1,7 @@
 package com.youngerhousea.miraicompose.console
 
 import androidx.compose.ui.text.AnnotatedString
-import com.youngerhousea.miraicompose.model.ComposeBot
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.plugin.Plugin
@@ -9,7 +9,7 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 interface MiraiComposeRepository : AccessibleHolder {
 
-    val composeBotList: List<ComposeBot>
+    val botList: List<Bot?>
 
     val already: Boolean
 
@@ -17,7 +17,7 @@ interface MiraiComposeRepository : AccessibleHolder {
 
     val annotatedLogStorage: List<AnnotatedString>
 
-    fun addBot(bot: ComposeBot)
+    fun addBot(bot: Bot?)
 }
 
 interface AccessibleHolder {
