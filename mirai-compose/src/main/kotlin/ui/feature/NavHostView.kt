@@ -25,8 +25,8 @@ import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
-import com.youngerhousea.miraicompose.ui.feature.bot.BotChoose
-import com.youngerhousea.miraicompose.ui.feature.bot.BotChooseUi
+import com.youngerhousea.miraicompose.ui.feature.bot.BotState
+import com.youngerhousea.miraicompose.ui.feature.bot.BotStateUi
 import com.youngerhousea.miraicompose.ui.feature.log.MainLog
 import com.youngerhousea.miraicompose.ui.feature.log.MainLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
@@ -35,7 +35,7 @@ import com.youngerhousea.miraicompose.ui.feature.setting.Setting
 import com.youngerhousea.miraicompose.ui.feature.setting.SettingUi
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
-import com.youngerhousea.miraicompose.utils.items
+import com.youngerhousea.miraicompose.utils.itemsWithIndexed
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 
@@ -45,35 +45,40 @@ class NavHost(
 ) : ComponentContext by component {
     private val miraiComposeRepository: MiraiComposeRepository by inject()
 
-    private var _currentBot: Bot? by mutableStateOf(instance.firstOrNull())
+    private var _botIndex by mutableStateOf(0)
 
-    private inline val _instance get() = miraiComposeRepository.botList
+    private var _navigationIndex by mutableStateOf(0)
 
-    private var _index by mutableStateOf(0)
+    // 表示当前bot的list
+    val botList: List<Bot?> get() = miraiComposeRepository.botList
 
-    val currentBot get() = _currentBot
-
-    val instance: List<Bot?> get() = _instance
+    val currentBot get() = botList[_botIndex]
 
     val state get() = router.state
 
-    val index get() = _index
+    val navigationIndex get() = _navigationIndex
 
     private val router = router<Config, Component>(
-        initialConfiguration = Config.BotR(_currentBot),
+        initialConfiguration = Config.BotR,
         handleBackButton = true,
+        key = "NavHost",
         childFactory = { config, componentContext ->
             when (config) {
-                is Config.BotR ->
-                    BotChoose(
+                is Config.BotR -> {
+                    BotState(
                         componentContext,
-                        bot = config.bot,
-                        onLoginSuccess = miraiComposeRepository::addBot
-                    ).asComponent { BotChooseUi(it) }
+                        bot = currentBot,
+                        // need clear
+                        index = _botIndex,
+                        onLoginSuccess = { index, bot ->
+                            miraiComposeRepository.setNullToBot(index, bot)
+                        }
+                    ).asComponent { BotStateUi(it) }
+                }
                 is Config.Setting ->
                     Setting(
                         componentContext,
-                        ComposeSetting.AppTheme
+                        theme = ComposeSetting.AppTheme
                     ).asComponent { SettingUi(it) }
                 is Config.About ->
                     About(
@@ -96,56 +101,53 @@ class NavHost(
     )
 
     sealed class Config : Parcelable {
-        class BotR(val bot: Bot?) : Config()
+        object BotR : Config()
         object Setting : Config()
         object About : Config()
         object Log : Config()
         object Plugin : Config()
     }
 
-    fun onRouteNewBot() {
-        _index = 0
-
+    fun onMenuAddNewBot() {
         miraiComposeRepository.addBot(null)
-
-        _currentBot = null
+        _botIndex = botList.lastIndex
+        onRouteBot()
     }
 
-    fun onRouteCurrentBot() {
-        _index = 0
+    fun onMenuToCurrentBot() = onRouteBot()
 
-        router.push(Config.BotR(_currentBot))
+    fun onMenuToSpecificBot(index: Int) {
+        _botIndex = index
+        onRouteBot()
     }
 
-    fun onRouteSpecificBot(bot: Bot) {
-        _index = 0
+    //  分别对于SideColumn的五个index
+    fun onRouteBot() {
+        _navigationIndex = 0
 
-        _currentBot = bot
-
-        router.push(Config.BotR(_currentBot))
+        router.push(Config.BotR)
     }
-
 
     fun onRoutePlugin() {
-        _index = 1
+        _navigationIndex = 1
 
         router.push(Config.Plugin)
     }
 
     fun onRouteSetting() {
-        _index = 2
+        _navigationIndex = 2
 
         router.push(Config.Setting)
     }
 
     fun onRouteLog() {
-        _index = 3
+        _navigationIndex = 3
 
         router.push(Config.Log)
     }
 
     fun onRouteAbout() {
-        _index = 4
+        _navigationIndex = 4
 
         router.push(Config.About)
     }
@@ -157,7 +159,7 @@ fun NavHostUi(navHost: NavHost) {
     Row(Modifier.fillMaxSize()) {
         SideColumn(navHost)
         Children(
-            navHost.state, crossfade()
+            navHost.state, /*crossfade()*/
         ) { child ->
             child.instance()
         }
@@ -174,35 +176,35 @@ private fun SideColumn(navHost: NavHost) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AvatarWithMenu(
-            navHost.instance,
+            navHost.botList,
             navHost.currentBot,
-            onMenuItemSelected = navHost::onRouteSpecificBot,
-            onNewItemButtonSelected = navHost::onRouteNewBot,
-            onClick = navHost::onRouteCurrentBot
+            onMenuItemSelected = navHost::onMenuToSpecificBot,
+            onNewItemButtonSelected = navHost::onMenuAddNewBot,
+            onClick = navHost::onMenuToCurrentBot
         )
         SelectEdgeText(
             "Robot",
-            isWishWindow = navHost.index == 0,
-            onClick = navHost::onRouteCurrentBot
+            isWishWindow = navHost.navigationIndex == 0,
+            onClick = navHost::onRouteBot
         )
         SelectEdgeText(
             "Plugin",
-            isWishWindow = navHost.index == 1,
+            isWishWindow = navHost.navigationIndex == 1,
             onClick = navHost::onRoutePlugin
         )
         SelectEdgeText(
             "Setting",
-            isWishWindow = navHost.index == 2,
+            isWishWindow = navHost.navigationIndex == 2,
             onClick = navHost::onRouteSetting
         )
         SelectEdgeText(
             "Log",
-            isWishWindow = navHost.index == 3,
+            isWishWindow = navHost.navigationIndex == 3,
             onClick = navHost::onRouteLog
         )
         SelectEdgeText(
             "About",
-            isWishWindow = navHost.index == 4,
+            isWishWindow = navHost.navigationIndex == 4,
             onClick = navHost::onRouteAbout
         )
     }
@@ -212,7 +214,7 @@ private fun SideColumn(navHost: NavHost) {
 private fun AvatarWithMenu(
     composeBotList: List<Bot?>,
     currentBot: Bot?,
-    onMenuItemSelected: (Bot) -> Unit,
+    onMenuItemSelected: (index: Int) -> Unit,
     onNewItemButtonSelected: () -> Unit,
     onClick: () -> Unit
 ) {
@@ -233,8 +235,10 @@ private fun AvatarWithMenu(
             } ?: Text("No item")
         }
 
-        DropdownMenu(isExpand, onDismissRequest = { /*isExpand = !isExpand*/ }) {
-            DropdownMenuItem(onClick = { isExpand = !isExpand }) {
+        DropdownMenu(isExpand, onDismissRequest = { }) {
+            DropdownMenuItem(onClick = {
+                isExpand = !isExpand
+            }) {
                 Text("Exit")
             }
 
@@ -245,14 +249,12 @@ private fun AvatarWithMenu(
                 Text("Add")
             }
 
-            items(composeBotList) {
-                it?.let {
-                    DropdownMenuItem(onClick = {
-                        onMenuItemSelected(it)
-                        isExpand = !isExpand
-                    }) {
-                        BotItem(it)
-                    }
+            itemsWithIndexed(composeBotList) { item, index ->
+                DropdownMenuItem(onClick = {
+                    onMenuItemSelected(index)
+                    isExpand = !isExpand
+                }) {
+                    item?.let { BotItem(it) } ?: Text("Empty bot")
                 }
             }
         }

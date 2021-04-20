@@ -9,29 +9,29 @@ import net.mamoe.mirai.utils.LoginSolver
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MiraiComposeSolver(
-    val enterPicCaptcha: suspend (bot: Bot, image: ImageBitmap) -> String?,
-    val enterSliderCaptcha: suspend (bot: Bot, url: String) -> String?,
-    val enterUnsafeDevice: suspend (bot: Bot, url: String) -> String?,
+    val enterPicCaptcha: suspend (image: ImageBitmap) -> String?,
+    val enterSliderCaptcha: suspend (url: String) -> String?,
+    val enterUnsafeDevice: suspend (url: String) -> String?,
 ) : LoginSolver() {
     // 图片验证码
     override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? =
-        enterPicCaptcha(bot, SkiaImageDecode(data))
+        enterPicCaptcha(SkiaImageDecode(data))
 
     // 滑动验证码
     override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? =
-        enterSliderCaptcha(bot, url)
+        enterSliderCaptcha(url)
 
     // 不安全设备验证
     override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? =
-        enterUnsafeDevice(bot, url)
+        enterUnsafeDevice(url)
 }
 
 suspend fun MiraiConsole.routeLogin(
     account: Long,
     password: String,
-    enterPicCaptcha: suspend (bot: Bot, image: ImageBitmap) -> String?,
-    enterSliderCaptcha: suspend (bot: Bot, url: String) -> String?,
-    enterUnsafeDevice: suspend (bot: Bot, url: String) -> String?,
+    enterPicCaptcha: suspend (image: ImageBitmap) -> String?,
+    enterSliderCaptcha: suspend (url: String) -> String?,
+    enterUnsafeDevice: suspend (url: String) -> String?,
     onLoginSuccess: (bot: Bot) -> Unit,
     onExitHappened: (throwable: Throwable) -> Unit
 ) {

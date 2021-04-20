@@ -36,6 +36,7 @@ fun MiraiComposeView() {
 
     val module = module {
         single<MiraiComposeRepository> { compose }
+        single { compose.annotatedLogStorage }
     }
     startKoin {
         modules(module)
