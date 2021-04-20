@@ -73,6 +73,7 @@ private class ComposeBotImpl(
             _bot!!.launch { loadResource() }
         }.onFailure {
             state = ComposeBot.State.NoLogin
+            // TODO handle exception
         }
     }
 
