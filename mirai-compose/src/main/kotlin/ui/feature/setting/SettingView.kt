@@ -25,6 +25,10 @@ class Setting(
     private inline val logColors get() = theme.logColors
 
     var material = theme.materialLight
+        set(value){
+            theme.materialLight = value
+            field = value
+        }
 
     val debug get() = logColors.debug
 
@@ -182,7 +186,7 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
             Button({
                 isExpand = !isExpand
             }) {
-                Text("?")
+                Text("#" + value.value.toString(16).substring(0,8))
             }
         }
         AnimatedVisibility(isExpand) {
