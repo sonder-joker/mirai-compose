@@ -1,6 +1,5 @@
 package com.youngerhousea.miraicompose.ui.common
 
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,7 +30,6 @@ import net.mamoe.mirai.console.util.cast
 import net.mamoe.mirai.console.util.safeCast
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.warning
-import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -50,19 +48,34 @@ private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
 internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) {
     var isExpand by remember { mutableStateOf(false) }
     var offset by remember { mutableStateOf(DpOffset.Zero) }
-    DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }, offset = offset) {
-        DropdownMenuItem(onClick = { isExpand = !isExpand }) {
+    DropdownMenu(isExpand, onDismissRequest = { isExpand = false }, offset = offset) {
+        DropdownMenuItem(onClick = { isExpand = false }) {
             Text("OpenLog")
             //TODO open log file in edit such as notepad
         }
-        DropdownMenuItem(onClick = {
-            isExpand = !isExpand
-        }) {
+        DropdownMenuItem(onClick = { isExpand = false }) {
             Text("Report")
             //TODO report error or else
         }
     }
-    BoxWithConstraints(modifier) {
+    BoxWithConstraints(
+        modifier.pointerInput(Unit) {
+            forEachGesture {
+                awaitPointerEventScope {
+                    awaitEventFirstDown().also { it1 ->
+                        it1.changes.forEach { it.consumeDownChange() }
+                    }.mouseEvent?.run {
+                        if(this.button == MouseEvent.BUTTON3) {
+                            isExpand = true
+                            //TODO position of offsite incorrect
+                            offset = DpOffset(this.xOnScreen.dp, this.yOnScreen.dp)
+                            println(offset)
+                        }
+                    }
+                }
+            }
+        }
+    ) {
         val adaptiveLog = remember(logs) {
             logs.flatMap {
                 it.chunked(constraints.maxWidth / 9)
@@ -73,22 +86,7 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
 
         LazyColumn(
             Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            awaitEventFirstDown().also { it1 ->
-                                it1.changes.forEach { it.consumeDownChange() }
-                            }.mouseEvent?.run {
-                                if(this.button == MouseEvent.BUTTON3) {
-                                    isExpand = isExpand.not()
-                                    //TODO position of offsite incorrect
-                                    offset = DpOffset(this.xOnScreen.dp, this.yOnScreen.dp)
-                                }
-                            }
-                        }
-                    }
-                },
+                .fillMaxSize(),
             state = state
         ) {
             items(
@@ -159,9 +157,9 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
                 .weight(2f),
             backgroundColor = MaterialTheme.colors.background,
         ) {
-            Text("发送")
+            Text("Send")
         }
-        }
+    }
 
 }
 
