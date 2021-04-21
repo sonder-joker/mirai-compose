@@ -125,6 +125,16 @@ inline fun <T> ColumnScope.items(
     }
 }
 
+@Composable
+inline fun <T> ColumnScope.itemsWithIndexed(
+    items: List<T>,
+    crossinline itemContent: @Composable ColumnScope.(item: T, index: Int) -> Unit
+) {
+    for ((index, item) in items.withIndex()) {
+        itemContent(item, index)
+    }
+}
+
 internal fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
     return windowed(size, size, partialWindows = true)
 }
@@ -168,7 +178,7 @@ private fun checkWindowSizeStep(size: Int, step: Int) {
     }
 }
 
-class ComponentChildScope(val scope: CoroutineScope = MiraiConsole.childScope()) : InstanceKeeper.Instance,
+class ComponentChildScope(private val scope: CoroutineScope = MiraiConsole.childScope()) : InstanceKeeper.Instance,
     CoroutineScope by scope {
     override fun onDestroy() {
         scope.cancel()

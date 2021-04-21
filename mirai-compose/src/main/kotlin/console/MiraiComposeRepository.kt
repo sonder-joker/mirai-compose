@@ -18,6 +18,8 @@ interface MiraiComposeRepository : AccessibleHolder {
     val annotatedLogStorage: List<AnnotatedString>
 
     fun addBot(bot: Bot?)
+
+    fun setNullToBot(index:Int, bot: Bot)
 }
 
 interface AccessibleHolder {

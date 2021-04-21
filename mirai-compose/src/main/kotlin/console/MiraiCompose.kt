@@ -23,7 +23,6 @@ import net.mamoe.mirai.console.plugin.PluginManager
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
-import net.mamoe.mirai.console.util.ConsoleInternalApi
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.BotConfiguration
@@ -89,13 +88,17 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
         _botList.add(bot)
     }
 
+    override fun setNullToBot(index: Int, bot: Bot) {
+        require(_botList[index] == null) { "Error" }
+        _botList[index] = bot
+    }
+
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
-    @OptIn(ConsoleInternalApi::class)
     override fun preStart() {
         setSystemOut(MiraiConsole.mainLogger)
     }
