@@ -52,14 +52,14 @@ class NavHost(
     // 表示当前bot的list
     val botList: List<Bot?> get() = miraiComposeRepository.botList
 
-    val currentBot get() = botList[_botIndex]
+    val currentBot get() = botList.getOrNull(_botIndex)
 
     val state get() = router.state
 
     val navigationIndex get() = _navigationIndex
 
     private val router = router<Config, Component>(
-        initialConfiguration = Config.BotR,
+        initialConfiguration = Config.BotR(null),
         handleBackButton = true,
         key = "NavHost",
         childFactory = { config, componentContext ->
@@ -67,7 +67,7 @@ class NavHost(
                 is Config.BotR -> {
                     BotState(
                         componentContext,
-                        bot = currentBot,
+                        bot = config.bot,
                         // need clear
                         index = _botIndex,
                         onLoginSuccess = { index, bot ->
@@ -101,7 +101,7 @@ class NavHost(
     )
 
     sealed class Config : Parcelable {
-        object BotR : Config()
+        class BotR(val bot: Bot?) : Config()
         object Setting : Config()
         object About : Config()
         object Log : Config()
@@ -125,7 +125,7 @@ class NavHost(
     fun onRouteBot() {
         _navigationIndex = 0
 
-        router.push(Config.BotR)
+        router.push(Config.BotR(currentBot))
     }
 
     fun onRoutePlugin() {
