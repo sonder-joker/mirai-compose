@@ -22,6 +22,7 @@ import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.splitQuery
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.network.CustomLoginFailedException
+import net.mamoe.mirai.network.LoginFailedException
 import java.net.URL
 
 class BotSolvePicCaptcha(
@@ -86,7 +87,7 @@ fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveU
                 Text("Sure")
             }
             Button(onClick = {
-                throw ExitException()
+                throw ReturnException()
             }) {
                 Text("Return")
             }
@@ -94,4 +95,4 @@ fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveU
     }
 }
 
-class ExitException : CustomLoginFailedException(true)
+class ReturnException(killBot: Boolean = true, message: String = "返回") : CustomLoginFailedException(killBot, message)

@@ -167,34 +167,35 @@ fun BotNoLoginUi(botNoLogin: BotNoLogin) {
 @Composable
 private fun AccountTextField(
     loginWindowState: BotNoLogin,
-) = TextField(
-    value = loginWindowState.account,
-    onValueChange = loginWindowState::onAccountTextChange,
-    modifier = Modifier
-        .padding(40.dp)
-        .shortcuts {
-            on(Key.Enter, callback = loginWindowState::onLogin)
+) {
+    TextField(
+        value = loginWindowState.account,
+        onValueChange = loginWindowState::onAccountTextChange,
+        modifier = Modifier
+            .padding(40.dp)
+            .shortcuts {
+                on(Key.Enter, callback = loginWindowState::onLogin)
+            },
+        label = {
+            Text(loginWindowState.accountLabel)
         },
-    label = {
-        Text(loginWindowState.accountLabel)
-    },
-    leadingIcon = {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            null
-        )
-    },
-    isError = loginWindowState.hasAccountError,
-    keyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Text,
-        imeAction = ImeAction.Next
-    ),
-    singleLine = true
-)
-
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                null
+            )
+        },
+        isError = loginWindowState.hasAccountError,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        ),
+        singleLine = true
+    )
+}
 
 @Composable
-private fun PasswordTextField(loginWindowState: BotNoLogin) =
+private fun PasswordTextField(loginWindowState: BotNoLogin) {
     TextField(
         value = loginWindowState.password,
         onValueChange = loginWindowState::onPasswordTextChange,
@@ -225,6 +226,7 @@ private fun PasswordTextField(loginWindowState: BotNoLogin) =
         ),
         singleLine = true
     )
+}
 
 @Composable
 private fun LoginButton(

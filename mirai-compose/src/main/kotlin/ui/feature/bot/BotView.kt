@@ -17,7 +17,7 @@ import net.mamoe.mirai.console.MiraiConsole
 
 class BotState(
     componentContext: ComponentContext,
-    val bot: Bot?,
+    bot: Bot?,
     val index: Int,
     val onLoginSuccess: (index: Int, bot: Bot) -> Unit,
 ) : ComponentContext by componentContext {
@@ -25,16 +25,16 @@ class BotState(
 
     sealed class BotStatus : Parcelable {
         object NoLogin : BotStatus()
-        class SolvePicCaptcha(val imageBitmap: ImageBitmap, val onSuccess: (String?) -> Unit) :
+        class SolvePicCaptcha(val bot: Bot, val imageBitmap: ImageBitmap, val onSuccess: (String?) -> Unit) :
             BotStatus()
 
-        class SolveSliderCaptcha(val url: String, val result: (String?) -> Unit) : BotStatus()
-        class SolveUnsafeDeviceLoginVerify(val url: String, val result: (String?) -> Unit) : BotStatus()
-        object Online : BotStatus()
+        class SolveSliderCaptcha(val bot: Bot, val url: String, val result: (String?) -> Unit) : BotStatus()
+        class SolveUnsafeDeviceLoginVerify(val bot: Bot, val url: String, val result: (String?) -> Unit) : BotStatus()
+        class Online(val bot: Bot) : BotStatus()
     }
 
     private val router = router(
-        initialConfiguration = bot?.let { BotStatus.Online } ?: BotStatus.NoLogin,
+        initialConfiguration = bot?.let { BotStatus.Online(it) } ?: BotStatus.NoLogin,
         key = bot?.stringId ?: "EmptyBot",
         handleBackButton = true,
         childFactory = { configuration: BotStatus, componentContext ->
@@ -45,34 +45,37 @@ class BotState(
                 is BotStatus.SolvePicCaptcha ->
                     BotSolvePicCaptcha(
                         componentContext,
-                        bot!!,
+                        configuration.bot,
                         configuration.imageBitmap,
                         configuration.onSuccess
                     ).asComponent { BotSolvePicCaptchaUi(it) }
                 is BotStatus.SolveSliderCaptcha ->
                     BotSolveSliderCaptcha(
                         componentContext,
-                        bot!!,
+                        configuration.bot,
                         configuration.url,
                         configuration.result
                     ).asComponent { BotSolveSliderCaptchaUi(it) }
                 is BotStatus.SolveUnsafeDeviceLoginVerify ->
                     BotSolveUnsafeDeviceLoginVerify(
                         componentContext,
-                        bot!!,
+                        configuration.bot,
                         configuration.url,
                         configuration.result
                     ).asComponent { BotSolveUnsafeDeviceLoginVerifyUi(it) }
                 is BotStatus.Online ->
-                    BotOnline(componentContext, bot!!).asComponent { BotOnlineUi(it) }
+                    BotOnline(componentContext, configuration.bot).asComponent { BotOnlineUi(it) }
             }
         }
     )
 
     private fun onExitHappened(throwable: Throwable) {
-        router.popWhile { it is BotStatus.NoLogin }
+//        router.popWhile { it is BotStatus.NoLogin }
         // better in future
-        MiraiConsole.mainLogger.error(throwable)
+        if (throwable is ReturnException) {
+            router.popWhile { it is BotStatus.NoLogin }
+        } else
+            MiraiConsole.mainLogger.error(throwable)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -83,25 +86,25 @@ class BotState(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun enterPicCaptcha(image: ImageBitmap): String? =
+    private suspend fun enterPicCaptcha(bot: Bot, image: ImageBitmap): String? =
         suspendCancellableCoroutine { continuation ->
-            router.push(BotStatus.SolvePicCaptcha(image) {
+            router.push(BotStatus.SolvePicCaptcha(bot, image) {
                 continuation.resume(it, ::onVerifyErrorHappened)
             })
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun enterUnsafeDevice(url: String): String? =
+    private suspend fun enterUnsafeDevice(bot: Bot, url: String): String? =
         suspendCancellableCoroutine { continuation ->
-            router.push(BotStatus.SolveUnsafeDeviceLoginVerify(url) {
+            router.push(BotStatus.SolveUnsafeDeviceLoginVerify(bot, url) {
                 continuation.resume(it, ::onVerifyErrorHappened)
             })
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun enterSliderCaptcha(url: String): String? =
+    private suspend fun enterSliderCaptcha(bot: Bot, url: String): String? =
         suspendCancellableCoroutine { continuation ->
-            router.push(BotStatus.SolveSliderCaptcha(url) {
+            router.push(BotStatus.SolveSliderCaptcha(bot, url) {
                 continuation.resume(it, ::onVerifyErrorHappened)
             })
         }
@@ -109,7 +112,6 @@ class BotState(
     val state get() = router.state
 
     private fun onClick(account: Long, password: String) {
-        require(bot != null) { "If this happened please report" }
         scope.launch {
             MiraiConsole.routeLogin(
                 account = account,
@@ -119,7 +121,7 @@ class BotState(
                 enterSliderCaptcha = ::enterSliderCaptcha,
                 onLoginSuccess = { bot ->
                     onLoginSuccess(index, bot)
-                    router.push(BotStatus.Online)
+                    router.push(BotStatus.Online(bot))
                 },
                 onExitHappened = ::onExitHappened
             )
