@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
-import com.youngerhousea.miraicompose.model.ComposeBot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -24,7 +23,6 @@ import net.mamoe.mirai.console.plugin.PluginManager
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
-import net.mamoe.mirai.console.util.ConsoleInternalApi
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.BotConfiguration
@@ -74,9 +72,9 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    private val _composeBotList: MutableList<ComposeBot> = mutableStateListOf()
+    private val _botList: MutableList<Bot?> = mutableStateListOf()
 
-    override val composeBotList: List<ComposeBot> get() = _composeBotList
+    override val botList: List<Bot?> get() = _botList
 
     override var already by mutableStateOf(false)
 
@@ -86,8 +84,13 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override val annotatedLogStorage: List<AnnotatedString> get() = _annotatedLogStorage
 
-    override fun addBot(bot: ComposeBot) {
-        _composeBotList.add(bot)
+    override fun addBot(bot: Bot?) {
+        _botList.add(bot)
+    }
+
+    override fun setNullToBot(index: Int, bot: Bot) {
+        require(_botList[index] == null) { "Error" }
+        _botList[index] = bot
     }
 
     override val JvmPlugin.data: List<PluginData>
@@ -96,17 +99,13 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
-
-    @OptIn(ConsoleInternalApi::class)
     override fun preStart() {
         setSystemOut(MiraiConsole.mainLogger)
     }
 
     override fun postPhase(phase: String) {
         if (phase == "auto-login bots") {
-            Bot.instances.forEach {
-                _composeBotList.add(ComposeBot(it))
-            }
+            _botList.addAll(Bot.instances)
         }
         if (phase == "load configurations") {
             ComposeDataScope.reloadAll()

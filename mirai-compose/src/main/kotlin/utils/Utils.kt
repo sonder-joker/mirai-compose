@@ -16,6 +16,11 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
+import com.arkivanov.decompose.instancekeeper.InstanceKeeper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import org.jetbrains.skija.Image
 import java.net.URL
 import java.net.URLDecoder
@@ -120,6 +125,16 @@ inline fun <T> ColumnScope.items(
     }
 }
 
+@Composable
+inline fun <T> ColumnScope.itemsWithIndexed(
+    items: List<T>,
+    crossinline itemContent: @Composable ColumnScope.(item: T, index: Int) -> Unit
+) {
+    for ((index, item) in items.withIndex()) {
+        itemContent(item, index)
+    }
+}
+
 internal fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
     return windowed(size, size, partialWindows = true)
 }
@@ -160,5 +175,12 @@ private fun checkWindowSizeStep(size: Int, step: Int) {
             "Both size $size and step $step must be greater than zero."
         else
             "size $size must be greater than zero."
+    }
+}
+
+class ComponentChildScope(private val scope: CoroutineScope = MiraiConsole.childScope()) : InstanceKeeper.Instance,
+    CoroutineScope by scope {
+    override fun onDestroy() {
+        scope.cancel()
     }
 }

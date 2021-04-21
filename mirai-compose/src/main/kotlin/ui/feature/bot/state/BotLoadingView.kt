@@ -9,35 +9,37 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.input.TextFieldValue
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.splitQuery
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.network.CustomLoginFailedException
+import net.mamoe.mirai.network.LoginFailedException
 import java.net.URL
 
 class BotSolvePicCaptcha(
     context: ComponentContext,
     val bot: Bot,
-    val data: ByteArray,
+    val imageBitmap: ImageBitmap,
     val result: (String?) -> Unit
 ) : ComponentContext by context
 
 @Composable
 fun BotSolvePicCaptchaUi(botSolvePicCaptcha: BotSolvePicCaptcha) {
-    val image = SkiaImageDecode(botSolvePicCaptcha.data)
-    val scope = rememberCoroutineScope()
     var value by mutableStateOf(TextFieldValue())
     Column {
         Text("Mirai PicCaptcha(${botSolvePicCaptcha.bot.id})")
-        Image(image, null)
+        Image(botSolvePicCaptcha.imageBitmap, null)
         TextField(value = value, onValueChange = { value = it })
-        Button(onClick = { scope.launch { botSolvePicCaptcha.result(value.text) } }) {
+        Button(onClick = { botSolvePicCaptcha.result(value.text) }) {
             Text("Sure")
         }
     }
@@ -85,7 +87,7 @@ fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveU
                 Text("Sure")
             }
             Button(onClick = {
-                throw ExitException()
+                throw ReturnException()
             }) {
                 Text("Return")
             }
@@ -93,4 +95,4 @@ fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveU
     }
 }
 
-class ExitException : CustomLoginFailedException(true)
+class ReturnException(killBot: Boolean = true, message: String = "返回") : CustomLoginFailedException(killBot, message)

@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package com.youngerhousea.miraicompose.ui.feature.bot.state
 
 import androidx.compose.animation.core.*
@@ -13,7 +11,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VpnKey
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -24,8 +25,9 @@ import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.youngerhousea.miraicompose.theme.ResourceImage
-import kotlinx.coroutines.CoroutineScope
+import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.network.RetryLaterException
@@ -35,71 +37,91 @@ class BotNoLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit
 ) : ComponentContext by componentContext {
+    private val scope = instanceKeeper.getOrCreate(::ComponentChildScope)
 
-    var account by mutableStateOf(TextFieldValue())
+    private var _account by mutableStateOf(TextFieldValue())
 
-    var password by mutableStateOf(TextFieldValue())
+    val account get() = _account
 
-    var hasAccountError by mutableStateOf(false)
+    private var _password by mutableStateOf(TextFieldValue())
 
-    var hasPasswordError by mutableStateOf(false)
+    val password get() = _password
+
+    private var _hasAccountError by mutableStateOf(false)
+
+    val hasAccountError get() = _hasAccountError
+
+    private var _hasPasswordError by mutableStateOf(false)
+
+    val hasPasswordError get() = _hasPasswordError
 
     var errorTip by mutableStateOf("")
 
-    var passwordVisualTransformation by mutableStateOf<VisualTransformation>(
+    private var _passwordVisualTransformation by mutableStateOf<VisualTransformation>(
         PasswordVisualTransformation()
     )
 
-    var loading by mutableStateOf(false)
+    val passwordVisualTransformation get() = _passwordVisualTransformation
 
-    suspend fun onLogin() {
-        runCatching {
-            loading = true
-            this.onClick(account.text.toLong(), password.text)
-        }.onSuccess {
-            loading = false
-        }.onFailure {
-            loading = false
-            errorTip = when (it) {
-                is WrongPasswordException -> {
-                    hasPasswordError = true
-                    "密码错误！"
+    private var _loading by mutableStateOf(false)
+
+    val loading get() = _loading
+
+    fun onLogin() {
+        scope.launch {
+            runCatching {
+                _loading = true
+                onClick(_account.text.toLong(), _password.text)
+            }.onSuccess {
+                _loading = false
+            }.onFailure {
+                _loading = false
+                errorTip = when (it) {
+                    is WrongPasswordException -> {
+                        _hasPasswordError = true
+                        "密码错误！"
+                    }
+                    is NumberFormatException -> {
+                        _hasAccountError = true
+                        "账号格式错误"
+                    }
+                    is RetryLaterException -> {
+                        "请稍后再试"
+                    }
+                    else -> {
+                        it.printStackTrace()
+                        "未知异常，请反馈"
+                    }
                 }
-                is NumberFormatException -> {
-                    hasAccountError = true
-                    "账号格式错误"
-                }
-                is RetryLaterException -> {
-                    "请稍后再试"
-                }
-                else -> {
-                    it.printStackTrace()
-                    "未知异常，请反馈"
+                launch {
+                    delay(1000)
+                    _hasAccountError = false
+                    _hasPasswordError = false
                 }
             }
-            delay(1000)
-            hasAccountError = false
-            hasPasswordError = false
         }
+
     }
 
-    suspend fun onAccountTextChange(textFieldValue: TextFieldValue) {
+    fun onAccountTextChange(textFieldValue: TextFieldValue) {
         if (textFieldValue.text.matches("^[0-9]{0,15}$".toRegex())) {
-            account = textFieldValue
-            hasAccountError = false
+            _account = textFieldValue
+            _hasAccountError = false
         } else {
-            hasAccountError = true
-            delay(1000)
-            hasAccountError = false
+            _hasAccountError = true
+            scope.launch {
+                delay(1000)
+                _hasAccountError = false
+            }
         }
     }
 
     fun onPasswordTextChange(textFieldValue: TextFieldValue) {
-        password = textFieldValue
+        _password = textFieldValue
     }
 
     val accountLabel =
-        if (hasAccountError)
+        if (_hasAccountError)
             errorTip
         else
             "Account"
@@ -107,24 +129,24 @@ class BotNoLogin(
 
     @Composable
     fun passwordLabel() {
-        if (hasPasswordError)
+        if (_hasPasswordError)
             Text(errorTip)
         else
             Text("Password")
     }
 
     fun passwordTrailingIconChange() {
-        passwordVisualTransformation =
-            if (passwordVisualTransformation != VisualTransformation.None)
+        _passwordVisualTransformation =
+            if (_passwordVisualTransformation != VisualTransformation.None)
                 VisualTransformation.None
             else
                 PasswordVisualTransformation()
     }
+
 }
 
 @Composable
 fun BotNoLoginUi(botNoLogin: BotNoLogin) {
-    val scope = rememberCoroutineScope()
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,55 +158,51 @@ fun BotNoLoginUi(botNoLogin: BotNoLogin) {
             modifier = Modifier
                 .padding(5.dp)
         )
-        AccountTextField(botNoLogin, scope)
-        PasswordTextField(botNoLogin, scope)
-        LoginButton(botNoLogin, scope)
+        AccountTextField(botNoLogin)
+        PasswordTextField(botNoLogin)
+        LoginButton(botNoLogin)
     }
 }
 
 @Composable
-private inline fun AccountTextField(
+private fun AccountTextField(
     loginWindowState: BotNoLogin,
-    scope: CoroutineScope
-) = TextField(
-    value = loginWindowState.account,
-    onValueChange = {
-        scope.launch {
-            loginWindowState.onAccountTextChange(it)
-        }
-    },
-    modifier = Modifier
-        .padding(40.dp)
-        .shortcuts {
-            on(Key.Enter, callback = { scope.launch { loginWindowState.onLogin() } })
+) {
+    TextField(
+        value = loginWindowState.account,
+        onValueChange = loginWindowState::onAccountTextChange,
+        modifier = Modifier
+            .padding(40.dp)
+            .shortcuts {
+                on(Key.Enter, callback = loginWindowState::onLogin)
+            },
+        label = {
+            Text(loginWindowState.accountLabel)
         },
-    label = {
-        Text(loginWindowState.accountLabel)
-    },
-    leadingIcon = {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            null
-        )
-    },
-    isError = loginWindowState.hasAccountError,
-    keyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Text,
-        imeAction = ImeAction.Next
-    ),
-    singleLine = true
-)
-
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                null
+            )
+        },
+        isError = loginWindowState.hasAccountError,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        ),
+        singleLine = true
+    )
+}
 
 @Composable
-private inline fun PasswordTextField(loginWindowState: BotNoLogin, scope: CoroutineScope) =
+private fun PasswordTextField(loginWindowState: BotNoLogin) {
     TextField(
         value = loginWindowState.password,
         onValueChange = loginWindowState::onPasswordTextChange,
         modifier = Modifier
             .padding(40.dp)
             .shortcuts {
-                on(Key.Enter, callback = { scope.launch { loginWindowState.onLogin() } })
+                on(Key.Enter, callback = loginWindowState::onLogin)
             },
         label = { loginWindowState.passwordLabel() },
         leadingIcon = {
@@ -208,13 +226,13 @@ private inline fun PasswordTextField(loginWindowState: BotNoLogin, scope: Corout
         ),
         singleLine = true
     )
+}
 
 @Composable
-private inline fun LoginButton(
+private fun LoginButton(
     loginWindowState: BotNoLogin,
-    scope: CoroutineScope
 ) = Button(
-    onClick = { scope.launch { loginWindowState.onLogin() } },
+    onClick = loginWindowState::onLogin,
     modifier = Modifier
         .requiredHeight(100.dp)
         .aspectRatio(2f)
