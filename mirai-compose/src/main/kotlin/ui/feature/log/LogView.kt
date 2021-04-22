@@ -1,9 +1,7 @@
 package com.youngerhousea.miraicompose.ui.feature.log
 
 import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
@@ -39,14 +37,26 @@ private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
 fun MainLogUi(mainLog: MainLog) {
     var offset by remember { mutableStateOf(DpOffset.Zero) }
     var isExpand by remember { mutableStateOf(false) }
-    DropdownMenu(isExpand, onDismissRequest = { isExpand = false }, offset = offset) {
-        DropdownMenuItem(onClick = { isExpand = false }) {
-            Text("OpenLog")
-            //TODO open log file in edit such as notepad
-        }
-        DropdownMenuItem(onClick = { isExpand = false }) {
-            Text("Report")
-            //TODO report error or else
+    // 160.dp is the width of nav
+    Box(
+        modifier = Modifier
+            .padding(top = offset.y)
+            .offset(x = offset.x - 160.dp)
+    ) {
+        DropdownMenu(
+            isExpand,
+            onDismissRequest = { isExpand = false }
+//            offset = DpOffset(offset.x, offset.y),
+//            modifier = Modifier.padding(top = 0.dp)
+        ) {
+            DropdownMenuItem(onClick = { isExpand = false }) {
+                Text("OpenLog")
+                //TODO open log file in edit such as notepad
+            }
+            DropdownMenuItem(onClick = { isExpand = false }) {
+                Text("Report")
+                //TODO report error or else
+            }
         }
     }
     Column {
