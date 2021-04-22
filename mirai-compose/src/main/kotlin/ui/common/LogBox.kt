@@ -1,20 +1,20 @@
 package com.youngerhousea.miraicompose.ui.common
 
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
-import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.utils.VerticalScrollbar
 import com.youngerhousea.miraicompose.utils.chunked
@@ -30,51 +30,13 @@ import net.mamoe.mirai.console.util.cast
 import net.mamoe.mirai.console.util.safeCast
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.warning
-import java.awt.event.MouseEvent
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
-    var event: PointerEvent
-    do {
-        event = awaitPointerEvent()
-    } while (
-        !event.changes.all { it.changedToDown() }
-    )
-    return event
-}
-
 @Composable
 internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) {
-    var isExpand by remember { mutableStateOf(false) }
-    var offset by remember { mutableStateOf(DpOffset.Zero) }
-    DropdownMenu(isExpand, onDismissRequest = { isExpand = false }, offset = offset) {
-        DropdownMenuItem(onClick = { isExpand = false }) {
-            Text("OpenLog")
-            //TODO open log file in edit such as notepad
-        }
-        DropdownMenuItem(onClick = { isExpand = false }) {
-            Text("Report")
-            //TODO report error or else
-        }
-    }
     BoxWithConstraints(
-        modifier.pointerInput(Unit) {
-            forEachGesture {
-                awaitPointerEventScope {
-                    awaitEventFirstDown().also { it1 ->
-                        it1.changes.forEach { it.consumeDownChange() }
-                    }.mouseEvent?.run {
-                        if(this.button == MouseEvent.BUTTON3) {
-                            isExpand = true
-                            //TODO position of offsite incorrect
-                            offset = DpOffset(this.xOnScreen.dp, this.yOnScreen.dp)
-                            println(offset)
-                        }
-                    }
-                }
-            }
-        }
+        modifier
     ) {
         val adaptiveLog = remember(logs) {
             logs.flatMap {
