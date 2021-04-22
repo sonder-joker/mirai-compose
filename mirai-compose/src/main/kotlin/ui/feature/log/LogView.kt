@@ -16,13 +16,6 @@ import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
 
-
-class MainLog(
-    componentContext: ComponentContext,
-    val loggerStorage: List<AnnotatedString>,
-    val logger: MiraiLogger
-) : ComponentContext by componentContext
-
 private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
     var event: PointerEvent
     do {
@@ -32,6 +25,12 @@ private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
     )
     return event
 }
+
+class MainLog(
+    componentContext: ComponentContext,
+    val loggerStorage: List<AnnotatedString>,
+    val logger: MiraiLogger
+) : ComponentContext by componentContext
 
 @Composable
 fun MainLogUi(mainLog: MainLog) {
@@ -46,16 +45,14 @@ fun MainLogUi(mainLog: MainLog) {
         DropdownMenu(
             isExpand,
             onDismissRequest = { isExpand = false }
-//            offset = DpOffset(offset.x, offset.y),
-//            modifier = Modifier.padding(top = 0.dp)
         ) {
             DropdownMenuItem(onClick = { isExpand = false }) {
                 Text("OpenLog")
-                //TODO open log file in edit such as notepad
+                //TODO open log file in editor such as notepad
             }
             DropdownMenuItem(onClick = { isExpand = false }) {
                 Text("Report")
-                //TODO report error or else
+                //TODO report error or do else
             }
         }
     }
@@ -73,9 +70,7 @@ fun MainLogUi(mainLog: MainLog) {
                             }.mouseEvent?.run {
                                 if (this.button == java.awt.event.MouseEvent.BUTTON3) {
                                     isExpand = true
-                                    //TODO position of offsite incorrect
                                     offset = DpOffset(this.xOnScreen.dp, this.yOnScreen.dp)
-                                    println(offset)
                                 }
                             }
                         }
