@@ -33,9 +33,20 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.network.RetryLaterException
 import net.mamoe.mirai.network.WrongPasswordException
 
+/**
+ * Bot no login
+ *
+ * @property onClick
+ * @constructor
+ *
+ * @param componentContext
+ *  表示bot还未登录的界面
+ *  分为Account, Password, LoginButton
+ *  行为分为onLogin (Account Password Enter按钮, LoginButton确定)
+ */
 class BotNoLogin(
     componentContext: ComponentContext,
-    private val onClick: (account: Long, password: String) -> Unit
+    private val onClick: (account: Long, password: String) -> Unit,
 ) : ComponentContext by componentContext {
     private val scope = instanceKeeper.getOrCreate(::ComponentChildScope)
 
@@ -68,39 +79,33 @@ class BotNoLogin(
     val loading get() = _loading
 
     fun onLogin() {
-        scope.launch {
-            runCatching {
-                _loading = true
-                onClick(_account.text.toLong(), _password.text)
-            }.onSuccess {
-                _loading = false
-            }.onFailure {
-                _loading = false
-                errorTip = when (it) {
-                    is WrongPasswordException -> {
-                        _hasPasswordError = true
-                        "密码错误！"
-                    }
-                    is NumberFormatException -> {
-                        _hasAccountError = true
-                        "账号格式错误"
-                    }
-                    is RetryLaterException -> {
-                        "请稍后再试"
-                    }
-                    else -> {
-                        it.printStackTrace()
-                        "未知异常，请反馈"
-                    }
+        _loading = true
+        try {
+            onClick(_account.text.toLong(), _password.text)
+        } catch (e: Exception) {
+            errorTip = when (e) {
+                // 应当在
+                is WrongPasswordException -> {
+                    _hasPasswordError = true
+                    "密码错误！"
                 }
-                launch {
-                    delay(1000)
-                    _hasAccountError = false
-                    _hasPasswordError = false
+                is NumberFormatException -> {
+                    _hasAccountError = true
+                    "账号格式错误"
                 }
+                is RetryLaterException -> {
+                    "请稍后再试"
+                }
+                else -> throw e
             }
+            scope.launch {
+                delay(1000)
+                _hasAccountError = false
+                _hasPasswordError = false
+            }
+        } finally {
+            _loading = false
         }
-
     }
 
     fun onAccountTextChange(textFieldValue: TextFieldValue) {
@@ -142,6 +147,14 @@ class BotNoLogin(
             else
                 PasswordVisualTransformation()
     }
+
+}
+
+class Account {
+
+}
+
+class Password {
 
 }
 
@@ -227,6 +240,17 @@ private fun PasswordTextField(loginWindowState: BotNoLogin) {
         singleLine = true
     )
 }
+
+//fun SpecificPasswordField(value:String, onValueChange:(Str) -> Unit) {
+//    TextField(
+//        value = ,
+//        onValueChange = {},
+//        keyboardOptions = KeyboardOptions(
+//            keyboardType = KeyboardType.Password,
+//            imeAction = ImeAction.Done
+//        ),
+//    )
+//}
 
 @Composable
 private fun LoginButton(

@@ -49,14 +49,16 @@ class NavHost(
 
     private var _navigationIndex by mutableStateOf(0)
 
+    val navigationIndex get() = _navigationIndex
+
     // 表示当前bot的list
-    val botList: List<Bot?> get() = miraiComposeRepository.botList
+    private val _botList get() = miraiComposeRepository.botList
+
+    val botList:List<Bot?> get() = _botList
 
     val currentBot get() = botList.getOrNull(_botIndex)
 
     val state get() = router.state
-
-    val navigationIndex get() = _navigationIndex
 
     private val router = router<Config, Component>(
         initialConfiguration = Config.BotR(null),
@@ -71,7 +73,8 @@ class NavHost(
                         // need clear
                         index = _botIndex,
                         onLoginSuccess = { index, bot ->
-                            miraiComposeRepository.setNullToBot(index, bot)
+                            require(botList[index] == null) { "Error" }
+                            _botList[index] = bot
                         }
                     ).asComponent { BotStateUi(it) }
                 }
@@ -109,7 +112,7 @@ class NavHost(
     }
 
     fun onMenuAddNewBot() {
-        miraiComposeRepository.addBot(null)
+        _botList += null
         _botIndex = botList.lastIndex
         onRouteBot()
     }
@@ -156,58 +159,51 @@ class NavHost(
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
-    Row(Modifier.fillMaxSize()) {
-        SideColumn(navHost)
+    Column(Modifier.fillMaxSize()) {
+        TopAppBar(Modifier.height(80.dp)) { SideRow(navHost) }
         Children(
-            navHost.state, /*crossfade()*/
+            navHost.state, crossfade()
         ) { child ->
             child.instance()
         }
     }
 }
 
+
 @Composable
-private fun SideColumn(navHost: NavHost) {
-    Column(
-        Modifier
-            .width(160.dp)
-            .fillMaxHeight()
-            .background(MaterialTheme.colors.primary),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        AvatarWithMenu(
-            navHost.botList,
-            navHost.currentBot,
-            onMenuItemSelected = navHost::onMenuToSpecificBot,
-            onNewItemButtonSelected = navHost::onMenuAddNewBot,
-            onClick = navHost::onMenuToCurrentBot
-        )
-        SelectEdgeText(
-            "Robot",
-            isWishWindow = navHost.navigationIndex == 0,
-            onClick = navHost::onRouteBot
-        )
-        SelectEdgeText(
-            "Plugin",
-            isWishWindow = navHost.navigationIndex == 1,
-            onClick = navHost::onRoutePlugin
-        )
-        SelectEdgeText(
-            "Setting",
-            isWishWindow = navHost.navigationIndex == 2,
-            onClick = navHost::onRouteSetting
-        )
-        SelectEdgeText(
-            "Log",
-            isWishWindow = navHost.navigationIndex == 3,
-            onClick = navHost::onRouteLog
-        )
-        SelectEdgeText(
-            "About",
-            isWishWindow = navHost.navigationIndex == 4,
-            onClick = navHost::onRouteAbout
-        )
-    }
+private fun SideRow(navHost: NavHost) {
+    AvatarWithMenu(
+        navHost.botList,
+        navHost.currentBot,
+        onMenuItemSelected = navHost::onMenuToSpecificBot,
+        onNewItemButtonSelected = navHost::onMenuAddNewBot,
+        onClick = navHost::onMenuToCurrentBot
+    )
+    SelectEdgeText(
+        "Robot",
+        isWishWindow = navHost.navigationIndex == 0,
+        onClick = navHost::onRouteBot
+    )
+    SelectEdgeText(
+        "Plugin",
+        isWishWindow = navHost.navigationIndex == 1,
+        onClick = navHost::onRoutePlugin
+    )
+    SelectEdgeText(
+        "Setting",
+        isWishWindow = navHost.navigationIndex == 2,
+        onClick = navHost::onRouteSetting
+    )
+    SelectEdgeText(
+        "Log",
+        isWishWindow = navHost.navigationIndex == 3,
+        onClick = navHost::onRouteLog
+    )
+    SelectEdgeText(
+        "About",
+        isWishWindow = navHost.navigationIndex == 4,
+        onClick = navHost::onRouteAbout
+    )
 }
 
 @Composable
@@ -227,8 +223,6 @@ private fun AvatarWithMenu(
                     onLongClick = { isExpand = !isExpand },
                     onClick = onClick
                 )
-                .fillMaxWidth()
-                .requiredHeight(80.dp)
         ) {
             currentBot?.let {
                 BotItem(currentBot)
@@ -266,10 +260,7 @@ private fun AvatarWithMenu(
 private fun SelectEdgeText(text: String, isWishWindow: Boolean, onClick: () -> Unit) {
     Box(
         Modifier
-            .clickable(onClick = onClick)
-            .fillMaxWidth()
-            .requiredHeight(80.dp)
-            .background(if (isWishWindow) MaterialTheme.colors.background else MaterialTheme.colors.primary),
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         if (isWishWindow)

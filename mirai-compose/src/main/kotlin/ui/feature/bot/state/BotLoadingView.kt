@@ -63,6 +63,9 @@ class BotSolveUnsafeDeviceLoginVerify(
     url: String,
     val result: (String?) -> Unit
 ) : ComponentContext by context {
+    init {
+        println(url)
+    }
     private val qrCodeParameter = URL(url).splitQuery()
 
     private val sig get() = qrCodeParameter["sig"] ?: error("Error to get sig")
@@ -87,7 +90,7 @@ fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveU
                 Text("Sure")
             }
             Button(onClick = {
-                throw ReturnException()
+                botSolveUnsafeDeviceLoginVerify.result(null)
             }) {
                 Text("Return")
             }

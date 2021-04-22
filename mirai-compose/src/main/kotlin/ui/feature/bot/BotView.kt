@@ -27,7 +27,6 @@ class BotState(
         object NoLogin : BotStatus()
         class SolvePicCaptcha(val bot: Bot, val imageBitmap: ImageBitmap, val onSuccess: (String?) -> Unit) :
             BotStatus()
-
         class SolveSliderCaptcha(val bot: Bot, val url: String, val result: (String?) -> Unit) : BotStatus()
         class SolveUnsafeDeviceLoginVerify(val bot: Bot, val url: String, val result: (String?) -> Unit) : BotStatus()
         class Online(val bot: Bot) : BotStatus()

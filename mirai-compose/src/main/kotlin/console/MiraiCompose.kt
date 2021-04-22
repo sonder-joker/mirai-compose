@@ -72,9 +72,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    private val _botList: MutableList<Bot?> = mutableStateListOf()
-
-    override val botList: List<Bot?> get() = _botList
+    override val botList: MutableList<Bot?> = mutableStateListOf(null)
 
     override var already by mutableStateOf(false)
 
@@ -83,15 +81,6 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     private val _annotatedLogStorage: MutableList<AnnotatedString> = mutableStateListOf()
 
     override val annotatedLogStorage: List<AnnotatedString> get() = _annotatedLogStorage
-
-    override fun addBot(bot: Bot?) {
-        _botList.add(bot)
-    }
-
-    override fun setNullToBot(index: Int, bot: Bot) {
-        require(_botList[index] == null) { "Error" }
-        _botList[index] = bot
-    }
 
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
@@ -105,7 +94,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override fun postPhase(phase: String) {
         if (phase == "auto-login bots") {
-            _botList.addAll(Bot.instances)
+            botList.addAll(Bot.instances)
         }
         if (phase == "load configurations") {
             ComposeDataScope.reloadAll()
