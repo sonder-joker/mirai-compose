@@ -1,7 +1,15 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
@@ -9,14 +17,11 @@ import com.youngerhousea.miraicompose.console.MiraiComposeSolver
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import com.youngerhousea.miraicompose.utils.asComponent
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
-import net.mamoe.mirai.network.LoginFailedException
 import kotlin.coroutines.resumeWithException
 
 class Login(
@@ -33,6 +38,24 @@ class Login(
         class SolveSliderCaptcha(val bot: Bot, val url: String, val result: (String?) -> Unit) : BotStatus()
         class SolveUnsafeDeviceLoginVerify(val bot: Bot, val url: String, val result: (String?, Exception?) -> Unit) :
             BotStatus()
+    }
+
+    @Composable
+    fun notice(isExpand: MutableState<Boolean>) {
+        // 160.dp is the width of nav
+        Box(
+            modifier = Modifier
+                .padding(bottom = 0.dp, end = 0.dp)
+        ) {
+            DropdownMenu(
+                isExpand.value,
+                onDismissRequest = { isExpand.value = false }
+            ) {
+                DropdownMenuItem(onClick = { isExpand.value = false }) {
+                    Text("OpenLog")
+                }
+            }
+        }
     }
 
     private val router: Router<BotStatus, Component> = router(

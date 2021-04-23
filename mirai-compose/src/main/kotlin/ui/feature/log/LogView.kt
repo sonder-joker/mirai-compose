@@ -49,13 +49,12 @@ class MainLog(
 
 @Composable
 fun MainLogUi(mainLog: MainLog) {
-    var offset by remember { mutableStateOf(DpOffset.Zero) }
+    var offset by remember { mutableStateOf(DpOffset(100.dp, 100.dp)) }
     var isExpand by remember { mutableStateOf(false) }
-    // 160.dp is the width of nav
     Box(
         modifier = Modifier
-            .padding(top = offset.y)
-            .offset(x = offset.x - 160.dp)
+            .padding(top = offset.y - 80.dp)
+            .offset(x = offset.x)
     ) {
         DropdownMenu(
             isExpand,
@@ -81,6 +80,7 @@ fun MainLogUi(mainLog: MainLog) {
                     onRightClick {
                         isExpand = true
                         offset = DpOffset(it.x.dp, it.y.dp)
+                        println(offset)
                     }
                 },
             mainLog.loggerStorage
