@@ -9,7 +9,7 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 interface MiraiComposeRepository : AccessibleHolder {
 
-    val botList: MutableList<Bot?>
+    val botList: MutableList<Bot>
 
     val already: Boolean
 
@@ -17,9 +17,7 @@ interface MiraiComposeRepository : AccessibleHolder {
 
     val annotatedLogStorage: List<AnnotatedString>
 
-    fun addBot(bot: Bot?)
 
-    fun setNullToBot(index:Int, bot: Bot)
 }
 
 interface AccessibleHolder {

@@ -5,21 +5,23 @@ import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.routeLogin
-import com.youngerhousea.miraicompose.ui.feature.bot.state.*
+import com.youngerhousea.miraicompose.console.MiraiComposeSolver
+import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import com.youngerhousea.miraicompose.utils.asComponent
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
+import net.mamoe.mirai.network.LoginFailedException
+import kotlin.coroutines.resumeWithException
 
-class BotState(
+class Login(
     componentContext: ComponentContext,
-    bot: Bot?,
-    val index: Int,
-    val onLoginSuccess: (index: Int, bot: Bot) -> Unit,
+    val onLoginSuccess: (bot: Bot) -> Unit,
 ) : ComponentContext by componentContext {
     private val scope = ComponentChildScope()
 
@@ -29,13 +31,13 @@ class BotState(
             BotStatus()
 
         class SolveSliderCaptcha(val bot: Bot, val url: String, val result: (String?) -> Unit) : BotStatus()
-        class SolveUnsafeDeviceLoginVerify(val bot: Bot, val url: String, val result: (String?) -> Unit) : BotStatus()
-        class Online(val bot: Bot) : BotStatus()
+        class SolveUnsafeDeviceLoginVerify(val bot: Bot, val url: String, val result: (String?, Exception?) -> Unit) :
+            BotStatus()
     }
 
-    private val router = router(
-        initialConfiguration = bot?.let { BotStatus.Online(it) } ?: BotStatus.NoLogin,
-        key = bot?.stringId ?: "EmptyBot",
+    private val router: Router<BotStatus, Component> = router(
+        initialConfiguration = BotStatus.NoLogin,
+        key = "EmptyBot",
         handleBackButton = true,
         childFactory = { configuration: BotStatus, componentContext ->
             return@router when (configuration) {
@@ -63,22 +65,18 @@ class BotState(
                         configuration.url,
                         configuration.result
                     ).asComponent { BotSolveUnsafeDeviceLoginVerifyUi(it) }
-                is BotStatus.Online ->
-                    BotOnline(componentContext, configuration.bot).asComponent { BotOnlineUi(it) }
             }
         }
     )
 
-    private fun onExitHappened(throwable: Throwable) {
-//        router.popWhile { it is BotStatus.NoLogin }
-        // better in future
-        if (throwable is ReturnException) {
-            router.popWhile { it is BotStatus.NoLogin }
-        } else
-            MiraiConsole.mainLogger.error(throwable)
+    private fun onExitHappened() {
+        router.popWhile { it is BotStatus.NoLogin }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun returnToUp() {
+        router.popWhile { it is BotStatus.NoLogin }
+    }
+
     private fun onVerifyErrorHappened(throwable: Throwable) {
         // 0router.pop()
         // better in future
@@ -96,8 +94,11 @@ class BotState(
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun enterUnsafeDevice(bot: Bot, url: String): String? =
         suspendCancellableCoroutine { continuation ->
-            router.push(BotStatus.SolveUnsafeDeviceLoginVerify(bot, url) {
-                continuation.resume(it, ::onVerifyErrorHappened)
+            router.push(BotStatus.SolveUnsafeDeviceLoginVerify(bot, url) { string, exception ->
+                exception?.let { continuation.resumeWithException(it) } ?: continuation.resume(
+                    string,
+                    ::onVerifyErrorHappened
+                )
             })
         }
 
@@ -113,26 +114,32 @@ class BotState(
 
     private fun onClick(account: Long, password: String) {
         scope.launch {
-            MiraiConsole.routeLogin(
-                account = account,
-                password = password,
-                enterPicCaptcha = ::enterPicCaptcha,
-                enterUnsafeDevice = ::enterUnsafeDevice,
-                enterSliderCaptcha = ::enterSliderCaptcha,
-                onLoginSuccess = { bot ->
-                    onLoginSuccess(index, bot)
-                    router.push(BotStatus.Online(bot))
-                },
-                onExitHappened = ::onExitHappened
-            )
+            val bot = MiraiConsole.addBot(
+                id = account,
+                password = password
+            ) {
+                loginSolver = MiraiComposeSolver(
+                    enterPicCaptcha = { bot: Bot, image: ImageBitmap -> enterPicCaptcha(bot, image) },
+                    enterSliderCaptcha = { bot: Bot, url: String -> enterSliderCaptcha(bot, url) },
+                    enterUnsafeDevice = { bot: Bot, url: String -> enterUnsafeDevice(bot, url) },
+                )
+            }
+            MiraiConsole.runCatching {
+                bot.login()
+            }.onSuccess {
+                onLoginSuccess(bot)
+            }.onFailure {
+                bot.logger.error(it)
+                onExitHappened()
+            }
         }
     }
 
 }
 
 @Composable
-fun BotStateUi(botState: BotState) {
-    Children(botState.state) { child ->
+fun LoginUi(login: Login) {
+    Children(login.state) { child ->
         child.instance()
     }
 }

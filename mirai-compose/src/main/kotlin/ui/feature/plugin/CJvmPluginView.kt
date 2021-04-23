@@ -1,5 +1,7 @@
 package com.youngerhousea.miraicompose.ui.feature.plugin
 
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,10 +15,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
+import com.arkivanov.decompose.extensions.compose.jetbrains.ChildAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.page.PageArrangement
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.AccessibleHolder
 import com.youngerhousea.miraicompose.ui.common.EditView
@@ -108,10 +114,25 @@ fun CJvmPluginUi(CJvmPlugin: CJvmPlugin) = Column {
             onClick = CJvmPlugin::onCommandClick
         )
     }
-    Children(CJvmPlugin.state, crossfade()) { child ->
+    Children(CJvmPlugin.state, com.youngerhousea.miraicompose.ui.feature.plugin.slide()) { child ->
         child.instance()
     }
 }
+
+@ExperimentalDecomposeApi
+fun <C : Any, T : Any> slide(
+    animationSpec: FiniteAnimationSpec<Float> = tween(),
+): ChildAnimation<C, T> =
+    childAnimation(animationSpec = animationSpec) { _, factor, arrangement, _, content ->
+        content(
+            Modifier.offset(
+                x = when (arrangement) {
+                    PageArrangement.PREVIOUS -> maxWidth * (factor - 1F)
+                    PageArrangement.FOLLOWING -> maxWidth * (1F - factor)
+                }
+            ).graphicsLayer()
+        )
+    }
 
 class DetailedDescription(
     componentContext: ComponentContext,

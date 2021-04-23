@@ -1,7 +1,10 @@
 package com.youngerhousea.miraicompose.ui.feature.plugin
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
@@ -62,8 +65,10 @@ class Plugins(
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun PluginsUi(plugins: Plugins) {
-    Children(plugins.state, animation = crossfadeScale()) { child ->
-        child.instance()
+    Box(Modifier.clipToBounds()) {
+        Children(plugins.state, animation = crossfadeScale()) { child ->
+            child.instance()
+        }
     }
 }
 

@@ -1,7 +1,6 @@
 package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -11,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -25,11 +23,12 @@ import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
-import com.youngerhousea.miraicompose.ui.feature.bot.BotState
-import com.youngerhousea.miraicompose.ui.feature.bot.BotStateUi
+import com.youngerhousea.miraicompose.ui.feature.bot.BotOnline
+import com.youngerhousea.miraicompose.ui.feature.bot.BotOnlineUi
+import com.youngerhousea.miraicompose.ui.feature.bot.Login
+import com.youngerhousea.miraicompose.ui.feature.bot.LoginUi
 import com.youngerhousea.miraicompose.ui.feature.log.MainLog
 import com.youngerhousea.miraicompose.ui.feature.log.MainLogUi
-import com.youngerhousea.miraicompose.ui.feature.log.onRightClick
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
 import com.youngerhousea.miraicompose.ui.feature.plugin.PluginsUi
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
@@ -46,36 +45,37 @@ class NavHost(
 ) : ComponentContext by component {
     private val miraiComposeRepository: MiraiComposeRepository by inject()
 
-    private var _botIndex by mutableStateOf(0)
-
     private var _navigationIndex by mutableStateOf(0)
-
-    // 表示当前bot的list
-    val botList: List<Bot?> get() = miraiComposeRepository.botList
-
-    val currentBot get() = botList.getOrNull(_botIndex)
-
-    val state get() = router.state
 
     val navigationIndex get() = _navigationIndex
 
+    val state get() = router.state
+
+    // 表示当前bot的list
+    private val _botList get() = miraiComposeRepository.botList
+
+    val botList: List<Bot> get() = _botList
+
+    val currentBot: Bot? = null
+
     private val router = router<Config, Component>(
-        initialConfiguration = Config.BotR(null),
+        initialConfiguration = Config.Login,
         handleBackButton = true,
         key = "NavHost",
         childFactory = { config, componentContext ->
             when (config) {
-                is Config.BotR -> {
-                    BotState(
+                is Config.Login ->
+                    Login(
                         componentContext,
-                        bot = config.bot,
-                        // need clear
-                        index = _botIndex,
-                        onLoginSuccess = { index, bot ->
-                            miraiComposeRepository.setNullToBot(index, bot)
+                        onLoginSuccess = { bot ->
+                            _botList.add(bot)
                         }
-                    ).asComponent { BotStateUi(it) }
-                }
+                    ).asComponent { LoginUi(it) }
+                is Config.OnlineBot ->
+                    BotOnline(
+                        componentContext,
+                        config.bot
+                    ).asComponent { BotOnlineUi(it) }
                 is Config.Setting ->
                     Setting(
                         componentContext,
@@ -102,40 +102,28 @@ class NavHost(
     )
 
     sealed class Config : Parcelable {
-        class BotR(val bot: Bot?) : Config()
+        class OnlineBot(val bot: Bot) : Config()
+        object Login : Config()
         object Setting : Config()
         object About : Config()
         object Log : Config()
         object Plugin : Config()
     }
 
+    //menu action
     fun onMenuAddNewBot() {
-        miraiComposeRepository.addBot(null)
-        _botIndex = botList.lastIndex
-        onRouteBot()
+        _navigationIndex = 0
+        router.push(Config.Login)
     }
 
-    fun onMenuLogOutBot() {
-        // TODO: bot.logout()
-        miraiComposeRepository.botList.removeAt(_botIndex)
-        if (miraiComposeRepository.botList.isEmpty()) {
-            miraiComposeRepository.botList.add(null)
-        }
-        _botIndex = botList.lastIndex
-    }
-
-    fun onMenuToCurrentBot() = onRouteBot()
-
-    fun onMenuToSpecificBot(index: Int) {
-        _botIndex = index
-        onRouteBot()
+    fun onMenuToSpecificBot(bot: Bot) {
+        router.push(Config.OnlineBot(bot))
     }
 
     //  分别对于SideColumn的五个index
     fun onRouteBot() {
         _navigationIndex = 0
-
-        router.push(Config.BotR(currentBot))
+        currentBot?.let { router.push(Config.OnlineBot(it)) } ?: router.push(Config.Login)
     }
 
     fun onRoutePlugin() {
@@ -166,86 +154,67 @@ class NavHost(
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
-    Row(Modifier.fillMaxSize()) {
-        SideColumn(navHost)
+    Column(Modifier.fillMaxSize()) {
+        TopAppBar(Modifier.height(80.dp)) { SideRow(navHost) }
         Children(
-            navHost.state, /*crossfade()*/
+            navHost.state, crossfade()
         ) { child ->
             child.instance()
         }
     }
 }
 
+
 @Composable
-private fun SideColumn(navHost: NavHost) {
-    Column(
-        Modifier
-            .width(160.dp)
-            .fillMaxHeight()
-            .background(MaterialTheme.colors.primary),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        AvatarWithMenu(
-            navHost.botList,
-            navHost.currentBot,
-            onMenuItemSelected = navHost::onMenuToSpecificBot,
-            onNewItemButtonSelected = navHost::onMenuAddNewBot,
-            onLogoutButtonSelected = navHost::onMenuLogOutBot,
-            onClick = navHost::onMenuToCurrentBot
-        )
-        SelectEdgeText(
-            "Robot",
-            isWishWindow = navHost.navigationIndex == 0,
-            onClick = navHost::onRouteBot
-        )
-        SelectEdgeText(
-            "Plugin",
-            isWishWindow = navHost.navigationIndex == 1,
-            onClick = navHost::onRoutePlugin
-        )
-        SelectEdgeText(
-            "Setting",
-            isWishWindow = navHost.navigationIndex == 2,
-            onClick = navHost::onRouteSetting
-        )
-        SelectEdgeText(
-            "Log",
-            isWishWindow = navHost.navigationIndex == 3,
-            onClick = navHost::onRouteLog
-        )
-        SelectEdgeText(
-            "About",
-            isWishWindow = navHost.navigationIndex == 4,
-            onClick = navHost::onRouteAbout
-        )
-    }
+private fun SideRow(navHost: NavHost) {
+    AvatarWithMenu(
+        navHost.botList,
+        navHost.currentBot,
+        onMenuItemSelected = navHost::onMenuToSpecificBot,
+        onNewItemButtonSelected = navHost::onMenuAddNewBot,
+    )
+    SelectEdgeText(
+        "Robot",
+        isWishWindow = navHost.navigationIndex == 0,
+        onClick = navHost::onRouteBot
+    )
+    SelectEdgeText(
+        "Plugin",
+        isWishWindow = navHost.navigationIndex == 1,
+        onClick = navHost::onRoutePlugin
+    )
+    SelectEdgeText(
+        "Setting",
+        isWishWindow = navHost.navigationIndex == 2,
+        onClick = navHost::onRouteSetting
+    )
+    SelectEdgeText(
+        "Log",
+        isWishWindow = navHost.navigationIndex == 3,
+        onClick = navHost::onRouteLog
+    )
+    SelectEdgeText(
+        "About",
+        isWishWindow = navHost.navigationIndex == 4,
+        onClick = navHost::onRouteAbout
+    )
 }
 
 @Composable
 private fun AvatarWithMenu(
-    composeBotList: List<Bot?>,
+    composeBotList: List<Bot>,
     currentBot: Bot?,
-    onMenuItemSelected: (index: Int) -> Unit,
+    onMenuItemSelected: (bot: Bot) -> Unit,
     onNewItemButtonSelected: () -> Unit,
-    onLogoutButtonSelected: () -> Unit,
-    onClick: () -> Unit
 ) {
     var isExpand by remember { mutableStateOf(false) }
 
     Box {
         Row(
             modifier = Modifier
-                .combinedClickable(
-                    onLongClick = { isExpand = !isExpand },
-                    onClick = onClick
-                )
-                .pointerInput(Unit) {
-                    onRightClick {
-                        isExpand = !isExpand
-                    }
+                .clickable {
+                    isExpand = !isExpand
                 }
-                .fillMaxWidth()
-                .requiredHeight(80.dp)
         ) {
             currentBot?.let {
                 BotItem(currentBot)
@@ -253,10 +222,7 @@ private fun AvatarWithMenu(
         }
 
         DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }) {
-            DropdownMenuItem(onClick = {
-                onLogoutButtonSelected()
-                isExpand = !isExpand
-            }) {
+            DropdownMenuItem(onClick = { isExpand = !isExpand }) {
                 Text("Logout")
             }
 
@@ -269,10 +235,10 @@ private fun AvatarWithMenu(
 
             itemsWithIndexed(composeBotList) { item, index ->
                 DropdownMenuItem(onClick = {
-                    onMenuItemSelected(index)
+                    onMenuItemSelected(item)
                     isExpand = !isExpand
                 }) {
-                    item?.let { BotItem(it) } ?: Text("Empty bot")
+                    BotItem(item)
                 }
             }
         }
@@ -284,10 +250,7 @@ private fun AvatarWithMenu(
 private fun SelectEdgeText(text: String, isWishWindow: Boolean, onClick: () -> Unit) {
     Box(
         Modifier
-            .clickable(onClick = onClick)
-            .fillMaxWidth()
-            .requiredHeight(80.dp)
-            .background(if (isWishWindow) MaterialTheme.colors.background else MaterialTheme.colors.primary),
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         if (isWishWindow)

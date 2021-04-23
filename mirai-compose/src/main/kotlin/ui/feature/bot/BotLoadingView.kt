@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.feature.bot.state
+package com.youngerhousea.miraicompose.ui.feature.bot
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -18,11 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.input.TextFieldValue
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.splitQuery
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.network.CustomLoginFailedException
-import net.mamoe.mirai.network.LoginFailedException
 import java.net.URL
 
 class BotSolvePicCaptcha(
@@ -61,8 +59,13 @@ class BotSolveUnsafeDeviceLoginVerify(
     context: ComponentContext,
     val bot: Bot,
     url: String,
-    val result: (String?) -> Unit
+    val result: (String?, Exception?) -> Unit,
 ) : ComponentContext by context {
+    init {
+        println(url)
+    }
+
+
     private val qrCodeParameter = URL(url).splitQuery()
 
     private val sig get() = qrCodeParameter["sig"] ?: error("Error to get sig")
@@ -82,12 +85,12 @@ fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveU
         }
         Row {
             Button(onClick = {
-                botSolveUnsafeDeviceLoginVerify.result(null)
+                botSolveUnsafeDeviceLoginVerify.result(null, null)
             }) {
                 Text("Sure")
             }
             Button(onClick = {
-                throw ReturnException()
+                botSolveUnsafeDeviceLoginVerify.result(null, ReturnException())
             }) {
                 Text("Return")
             }
