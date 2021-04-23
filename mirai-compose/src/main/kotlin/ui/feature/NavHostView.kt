@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
@@ -222,11 +221,9 @@ private fun AvatarWithMenu(
             } ?: Text("No item")
         }
 
-        DropdownMenu(isExpand, onDismissRequest = { }) {
-            DropdownMenuItem(onClick = {
-                isExpand = !isExpand
-            }) {
-                Text("Exit")
+        DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }) {
+            DropdownMenuItem(onClick = { isExpand = !isExpand }) {
+                Text("Logout")
             }
 
             DropdownMenuItem(onClick = {
