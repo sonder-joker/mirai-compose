@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.feature.bot.state
+package com.youngerhousea.miraicompose.ui.feature.bot
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

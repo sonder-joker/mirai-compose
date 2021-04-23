@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.feature.bot.state
+package com.youngerhousea.miraicompose.ui.feature.bot
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -150,13 +150,6 @@ class BotNoLogin(
 
 }
 
-class Account {
-
-}
-
-class Password {
-
-}
 
 @Composable
 fun BotNoLoginUi(botNoLogin: BotNoLogin) {

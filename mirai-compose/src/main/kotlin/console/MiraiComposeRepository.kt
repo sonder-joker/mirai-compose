@@ -9,7 +9,7 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 interface MiraiComposeRepository : AccessibleHolder {
 
-    val botList: MutableList<Bot?>
+    val botList: MutableList<Bot>
 
     val already: Boolean
 

@@ -1,7 +1,6 @@
 package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -25,8 +24,10 @@ import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
-import com.youngerhousea.miraicompose.ui.feature.bot.BotState
-import com.youngerhousea.miraicompose.ui.feature.bot.BotStateUi
+import com.youngerhousea.miraicompose.ui.feature.bot.BotOnline
+import com.youngerhousea.miraicompose.ui.feature.bot.BotOnlineUi
+import com.youngerhousea.miraicompose.ui.feature.bot.Login
+import com.youngerhousea.miraicompose.ui.feature.bot.LoginUi
 import com.youngerhousea.miraicompose.ui.feature.log.MainLog
 import com.youngerhousea.miraicompose.ui.feature.log.MainLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
@@ -45,39 +46,37 @@ class NavHost(
 ) : ComponentContext by component {
     private val miraiComposeRepository: MiraiComposeRepository by inject()
 
-    private var _botIndex by mutableStateOf(0)
-
     private var _navigationIndex by mutableStateOf(0)
 
     val navigationIndex get() = _navigationIndex
 
+    val state get() = router.state
+
     // 表示当前bot的list
     private val _botList get() = miraiComposeRepository.botList
 
-    val botList:List<Bot?> get() = _botList
+    val botList: List<Bot> get() = _botList
 
-    val currentBot get() = botList.getOrNull(_botIndex)
-
-    val state get() = router.state
+    val currentBot: Bot? = null
 
     private val router = router<Config, Component>(
-        initialConfiguration = Config.BotR(null),
+        initialConfiguration = Config.Login,
         handleBackButton = true,
         key = "NavHost",
         childFactory = { config, componentContext ->
             when (config) {
-                is Config.BotR -> {
-                    BotState(
+                is Config.Login ->
+                    Login(
                         componentContext,
-                        bot = config.bot,
-                        // need clear
-                        index = _botIndex,
-                        onLoginSuccess = { index, bot ->
-                            require(botList[index] == null) { "Error" }
-                            _botList[index] = bot
+                        onLoginSuccess = { bot ->
+                            _botList.add(bot)
                         }
-                    ).asComponent { BotStateUi(it) }
-                }
+                    ).asComponent { LoginUi(it) }
+                is Config.OnlineBot ->
+                    BotOnline(
+                        componentContext,
+                        config.bot
+                    ).asComponent { BotOnlineUi(it) }
                 is Config.Setting ->
                     Setting(
                         componentContext,
@@ -104,31 +103,28 @@ class NavHost(
     )
 
     sealed class Config : Parcelable {
-        class BotR(val bot: Bot?) : Config()
+        class OnlineBot(val bot: Bot) : Config()
+        object Login : Config()
         object Setting : Config()
         object About : Config()
         object Log : Config()
         object Plugin : Config()
     }
 
+    //menu action
     fun onMenuAddNewBot() {
-        _botList += null
-        _botIndex = botList.lastIndex
-        onRouteBot()
+        _navigationIndex = 0
+        router.push(Config.Login)
     }
 
-    fun onMenuToCurrentBot() = onRouteBot()
-
-    fun onMenuToSpecificBot(index: Int) {
-        _botIndex = index
-        onRouteBot()
+    fun onMenuToSpecificBot(bot: Bot) {
+        router.push(Config.OnlineBot(bot))
     }
 
     //  分别对于SideColumn的五个index
     fun onRouteBot() {
         _navigationIndex = 0
-
-        router.push(Config.BotR(currentBot))
+        currentBot?.let { router.push(Config.OnlineBot(it)) } ?: router.push(Config.Login)
     }
 
     fun onRoutePlugin() {
@@ -177,7 +173,6 @@ private fun SideRow(navHost: NavHost) {
         navHost.currentBot,
         onMenuItemSelected = navHost::onMenuToSpecificBot,
         onNewItemButtonSelected = navHost::onMenuAddNewBot,
-        onClick = navHost::onMenuToCurrentBot
     )
     SelectEdgeText(
         "Robot",
@@ -208,21 +203,19 @@ private fun SideRow(navHost: NavHost) {
 
 @Composable
 private fun AvatarWithMenu(
-    composeBotList: List<Bot?>,
+    composeBotList: List<Bot>,
     currentBot: Bot?,
-    onMenuItemSelected: (index: Int) -> Unit,
+    onMenuItemSelected: (bot: Bot) -> Unit,
     onNewItemButtonSelected: () -> Unit,
-    onClick: () -> Unit
 ) {
     var isExpand by remember { mutableStateOf(false) }
 
     Box {
         Row(
             modifier = Modifier
-                .combinedClickable(
-                    onLongClick = { isExpand = !isExpand },
-                    onClick = onClick
-                )
+                .clickable {
+                    isExpand = !isExpand
+                }
         ) {
             currentBot?.let {
                 BotItem(currentBot)
@@ -245,10 +238,10 @@ private fun AvatarWithMenu(
 
             itemsWithIndexed(composeBotList) { item, index ->
                 DropdownMenuItem(onClick = {
-                    onMenuItemSelected(index)
+                    onMenuItemSelected(item)
                     isExpand = !isExpand
                 }) {
-                    item?.let { BotItem(it) } ?: Text("Empty bot")
+                    BotItem(item)
                 }
             }
         }

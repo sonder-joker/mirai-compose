@@ -72,7 +72,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    override val botList: MutableList<Bot?> = mutableStateListOf(null)
+    override val botList: MutableList<Bot> = mutableStateListOf()
 
     override var already by mutableStateOf(false)
 
