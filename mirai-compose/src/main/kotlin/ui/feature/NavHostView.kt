@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -28,6 +29,7 @@ import com.youngerhousea.miraicompose.ui.feature.bot.BotState
 import com.youngerhousea.miraicompose.ui.feature.bot.BotStateUi
 import com.youngerhousea.miraicompose.ui.feature.log.MainLog
 import com.youngerhousea.miraicompose.ui.feature.log.MainLogUi
+import com.youngerhousea.miraicompose.ui.feature.log.onRightClick
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
 import com.youngerhousea.miraicompose.ui.feature.plugin.PluginsUi
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
@@ -113,6 +115,15 @@ class NavHost(
         onRouteBot()
     }
 
+    fun onMenuLogOutBot() {
+        // TODO: bot.logout()
+        miraiComposeRepository.botList.removeAt(_botIndex)
+        if (miraiComposeRepository.botList.isEmpty()) {
+            miraiComposeRepository.botList.add(null)
+        }
+        _botIndex = botList.lastIndex
+    }
+
     fun onMenuToCurrentBot() = onRouteBot()
 
     fun onMenuToSpecificBot(index: Int) {
@@ -179,6 +190,7 @@ private fun SideColumn(navHost: NavHost) {
             navHost.currentBot,
             onMenuItemSelected = navHost::onMenuToSpecificBot,
             onNewItemButtonSelected = navHost::onMenuAddNewBot,
+            onLogoutButtonSelected = navHost::onMenuLogOutBot,
             onClick = navHost::onMenuToCurrentBot
         )
         SelectEdgeText(
@@ -215,6 +227,7 @@ private fun AvatarWithMenu(
     currentBot: Bot?,
     onMenuItemSelected: (index: Int) -> Unit,
     onNewItemButtonSelected: () -> Unit,
+    onLogoutButtonSelected: () -> Unit,
     onClick: () -> Unit
 ) {
     var isExpand by remember { mutableStateOf(false) }
@@ -226,6 +239,11 @@ private fun AvatarWithMenu(
                     onLongClick = { isExpand = !isExpand },
                     onClick = onClick
                 )
+                .pointerInput(Unit) {
+                    onRightClick {
+                        isExpand = !isExpand
+                    }
+                }
                 .fillMaxWidth()
                 .requiredHeight(80.dp)
         ) {
@@ -235,7 +253,10 @@ private fun AvatarWithMenu(
         }
 
         DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }) {
-            DropdownMenuItem(onClick = { isExpand = !isExpand }) {
+            DropdownMenuItem(onClick = {
+                onLogoutButtonSelected()
+                isExpand = !isExpand
+            }) {
                 Text("Logout")
             }
 

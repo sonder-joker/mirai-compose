@@ -74,7 +74,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     private val _botList: MutableList<Bot?> = mutableStateListOf(null)
 
-    override val botList: List<Bot?> get() = _botList
+    override val botList: MutableList<Bot?> get() = _botList
 
     override var already by mutableStateOf(false)
 
