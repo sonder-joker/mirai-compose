@@ -1,13 +1,16 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
@@ -29,6 +32,7 @@ class Login(
     val onLoginSuccess: (bot: Bot) -> Unit,
 ) : ComponentContext by componentContext {
     private val scope = ComponentChildScope()
+    private var isExpand: MutableState<Boolean> = mutableStateOf(false)
 
     sealed class BotStatus : Parcelable {
         object NoLogin : BotStatus()
@@ -41,18 +45,17 @@ class Login(
     }
 
     @Composable
-    fun notice(isExpand: MutableState<Boolean>) {
-        // 160.dp is the width of nav
-        Box(
-            modifier = Modifier
-                .padding(bottom = 0.dp, end = 0.dp)
-        ) {
+    fun notice(isExpand: MutableState<Boolean>, text: String, color: Color) {
+        BoxWithConstraints {
             DropdownMenu(
                 isExpand.value,
-                onDismissRequest = { isExpand.value = false }
+                onDismissRequest = { isExpand.value = false },
+                modifier = Modifier
+                    .background(color)
+                    .padding(bottom = 0.dp)
             ) {
                 DropdownMenuItem(onClick = { isExpand.value = false }) {
-                    Text("OpenLog")
+                    Text(text)
                 }
             }
         }
@@ -66,7 +69,10 @@ class Login(
             return@router when (configuration) {
                 is BotStatus.NoLogin ->
                     BotNoLogin(componentContext, onClick = ::onClick)
-                        .asComponent { BotNoLoginUi(it) }
+                        .asComponent {
+                            BotNoLoginUi(it)
+                            notice(isExpand = isExpand, "Error", Color.Red)
+                        }
                 is BotStatus.SolvePicCaptcha ->
                     BotSolvePicCaptcha(
                         componentContext,
@@ -93,6 +99,7 @@ class Login(
     )
 
     private fun onExitHappened() {
+        isExpand.value = true
         router.popWhile { it is BotStatus.NoLogin }
     }
 
