@@ -3,6 +3,9 @@ package com.youngerhousea.miraicompose.ui.feature.bot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
@@ -44,23 +48,32 @@ class Login(
     }
 
     @Composable
-    fun notice(isExpand: MutableState<Boolean>, text: String, backgrouncolor: Color, textcolor: Color) {
+    fun verticalNotification(isExpand: MutableState<Boolean>, text: String, backgrouncolor: Color, textcolor: Color) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .padding(start = 100000.dp, top = 100000.dp)
+                .clipToBounds()
+        ) {
+            DropdownMenu(
+                isExpand.value,
+                onDismissRequest = { isExpand.value = false },
+                modifier = Modifier
+                    .background(backgrouncolor)
+            ) {
+                DropdownMenuItem(onClick = { isExpand.value = false }) {
+                    Text(text = text, color = textcolor)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun horizontalNotification(isExpand: MutableState<Boolean>, text: String, backgrouncolor: Color, textcolor: Color) {
         val bgcolor = Modifier.background(color = backgrouncolor)
         BoxWithConstraints(
             modifier = Modifier
-//                    .padding(start = 100000.dp, top = 100000.dp)
                 .clipToBounds()
         ) {
-//            DropdownMenu(
-//                isExpand.value,
-//                onDismissRequest = { isExpand.value = false },
-//                modifier = Modifier
-//                    .background(color)
-//            ) {
-//                DropdownMenuItem(onClick = { isExpand.value = false }) {
-//                    Text(text)
-//                }
-//            }
             if (isExpand.value) {
                 Snackbar(
                     action = {
@@ -89,7 +102,8 @@ class Login(
                 is BotStatus.NoLogin ->
                     BotNoLogin(componentContext, onClick = ::onClick)
                         .asComponent {
-                            notice(isExpand = isExpand, "Error", Color.Red, Color.White)
+                            horizontalNotification(isExpand = isExpand, "Error", Color.Red, Color.White)
+                            verticalNotification(isExpand = isExpand, "Error", Color.Red, Color.White)
                             BotNoLoginUi(it)
                         }
                 is BotStatus.SolvePicCaptcha ->
