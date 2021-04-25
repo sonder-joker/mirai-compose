@@ -1,0 +1,15 @@
+# java class
+*.class
+
+# idea
+.idea/
+
+# gradle
+.gradle/
+buildSrc/.gradle/
+
+# build
+/mirai-compose/build/
+/mirai-compose/run/
+buildSrc/build/
+build/
