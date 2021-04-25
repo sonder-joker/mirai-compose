@@ -2,7 +2,6 @@ package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -15,9 +14,12 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.statekeeper.consume
 import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.theme.ComposeSetting
@@ -33,11 +35,17 @@ import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
 import com.youngerhousea.miraicompose.ui.feature.plugin.PluginsUi
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
 import com.youngerhousea.miraicompose.ui.feature.setting.SettingUi
-import com.youngerhousea.miraicompose.utils.Component
-import com.youngerhousea.miraicompose.utils.asComponent
-import com.youngerhousea.miraicompose.utils.itemsWithIndexed
+import com.youngerhousea.miraicompose.utils.*
+import com.youngerhousea.miraicompose.utils.SkiaImageDecode
+import io.ktor.client.request.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.event.events.BotEvent
 
 
 class NavHost(
@@ -54,9 +62,11 @@ class NavHost(
     // 表示当前bot的list
     private val _botList get() = miraiComposeRepository.botList
 
-    val botList: List<Bot> get() = _botList
+    val botList: List<ComposeBot> get() = _botList
 
-    val currentBot: Bot? = null
+    private val _currentBot by lazy { mutableStateOf(_botList.firstOrNull()) }
+
+    var currentBot by _currentBot
 
     private val router = router<Config, Component>(
         initialConfiguration = Config.Login,
@@ -68,7 +78,10 @@ class NavHost(
                     Login(
                         componentContext,
                         onLoginSuccess = { bot ->
-                            _botList.add(bot)
+                            val composeBot = bot.toComposeBot()
+                            currentBot = composeBot
+                            _botList.add(composeBot)
+                            onMenuToSpecificBot(composeBot)
                         }
                     ).asComponent { LoginUi(it) }
                 is Config.OnlineBot ->
@@ -102,7 +115,7 @@ class NavHost(
     )
 
     sealed class Config : Parcelable {
-        class OnlineBot(val bot: Bot) : Config()
+        class OnlineBot(val bot: ComposeBot) : Config()
         object Login : Config()
         object Setting : Config()
         object About : Config()
@@ -116,7 +129,7 @@ class NavHost(
         router.push(Config.Login)
     }
 
-    fun onMenuToSpecificBot(bot: Bot) {
+    fun onMenuToSpecificBot(bot: ComposeBot) {
         router.push(Config.OnlineBot(bot))
     }
 
@@ -202,9 +215,9 @@ private fun SideRow(navHost: NavHost) {
 
 @Composable
 private fun AvatarWithMenu(
-    composeBotList: List<Bot>,
-    currentBot: Bot?,
-    onMenuItemSelected: (bot: Bot) -> Unit,
+    composeBotList: List<ComposeBot>,
+    currentBot: ComposeBot?,
+    onMenuItemSelected: (bot: ComposeBot) -> Unit,
     onNewItemButtonSelected: () -> Unit,
 ) {
     var isExpand by remember { mutableStateOf(false) }
@@ -233,7 +246,7 @@ private fun AvatarWithMenu(
                 Text("Add")
             }
 
-            itemsWithIndexed(composeBotList) { item, index ->
+            items(composeBotList) { item ->
                 DropdownMenuItem(onClick = {
                     onMenuItemSelected(item)
                     isExpand = !isExpand
@@ -264,7 +277,7 @@ private fun SelectEdgeText(text: String, isWishWindow: Boolean, onClick: () -> U
 
 @Composable
 private fun BotItem(
-    bot: Bot,
+    bot: ComposeBot,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -297,11 +310,38 @@ private fun BotItem(
     }
 }
 
-val Bot.avatar
-    get() = ImageBitmap(200, 200)
+interface ComposeBot : Bot {
+    val avatar: ImageBitmap
 
-//SkiaImageDecode(
-//Mirai.Http.get(this.avatarUrl) {
-//    header("Connection", "close")
-//}
-//)
+    val eventList: List<BotEvent>
+}
+
+fun Bot.toComposeBot(): ComposeBot = ComposeBotImpl(this)
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class ComposeBotImpl(bot: Bot) : Bot by bot, ComposeBot {
+    private var _avatar by mutableStateOf(ImageBitmap(200, 200))
+
+    private val _eventList = mutableStateListOf<BotEvent>()
+
+    override val eventList: List<BotEvent> get() = _eventList
+
+    init {
+        launch {
+            _avatar = SkiaImageDecode(
+                Mirai.Http.get(avatarUrl) {
+                    header("Connection", "close")
+                }
+            )
+        }
+        launch {
+            bot.eventChannel.asChannel().receiveAsFlow().collect {
+                _eventList.add(it)
+            }
+        }
+
+    }
+
+    override val avatar get() = _avatar
+}
+

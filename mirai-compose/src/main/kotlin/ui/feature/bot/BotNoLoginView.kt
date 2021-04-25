@@ -30,8 +30,7 @@ import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.network.RetryLaterException
-import net.mamoe.mirai.network.WrongPasswordException
+import net.mamoe.mirai.network.*
 
 /**
  * Bot no login
@@ -78,6 +77,9 @@ class BotNoLogin(
 
     val loading get() = _loading
 
+    // 应当在NoLogin所处理的异常:
+    // WrongPasswordException
+    //
     fun onLogin() {
         _loading = true
         try {
@@ -91,10 +93,22 @@ class BotNoLogin(
                 }
                 is NumberFormatException -> {
                     _hasAccountError = true
-                    "账号格式错误"
+                    "格式错误"
                 }
                 is RetryLaterException -> {
                     "请稍后再试"
+                }
+                is UnsupportedSliderCaptchaException -> {
+                    "Should not happened!"
+                }
+                is UnsupportedSMSLoginException -> {
+                    "Mirai暂未提供"
+                }
+                is NoStandardInputForCaptchaException -> {
+                    "无标准输入"
+                }
+                is NoServerAvailableException -> {
+                    "无可用服务器"
                 }
                 else -> throw e
             }

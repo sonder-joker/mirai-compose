@@ -99,10 +99,9 @@ fun URL.splitQuery(): Map<String, String> {
 internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
     Image.makeFromEncoded(byteArray).asImageBitmap()
 
-internal fun Base64ImageDecode(data: String): ImageBitmap {
-    val base64Image = data.split(",").last()
-    return SkiaImageDecode(Base64.getDecoder().decode(base64Image))
-}
+internal fun Base64ImageDecode(data: String): ImageBitmap =
+    SkiaImageDecode(Base64.getDecoder().decode(data.split(",").last()))
+
 
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))

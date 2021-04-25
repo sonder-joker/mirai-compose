@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
+import com.youngerhousea.miraicompose.ui.feature.ComposeBot
+import com.youngerhousea.miraicompose.ui.feature.toComposeBot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -72,7 +74,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    override val botList: MutableList<Bot> = mutableStateListOf()
+    override val botList: MutableList<ComposeBot> = mutableStateListOf()
 
     override var already by mutableStateOf(false)
 
@@ -94,7 +96,9 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override fun postPhase(phase: String) {
         if (phase == "auto-login bots") {
-            botList.addAll(Bot.instances)
+            Bot.instances.map { it.toComposeBot() }.forEach {
+                botList.add(it)
+            }
         }
         if (phase == "load configurations") {
             ComposeDataScope.reloadAll()
