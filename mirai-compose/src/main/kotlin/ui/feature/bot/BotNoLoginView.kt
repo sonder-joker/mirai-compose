@@ -33,17 +33,9 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.network.*
 
 /**
- * Bot no login
- *
- * @property onClick
- * @constructor
- *
- * @param componentContext
- *  表示bot还未登录的界面
- *  分为Account, Password, LoginButton
- *  行为分为onLogin (Account Password Enter按钮, LoginButton确定)
+ * bot的登录的界面
  */
-class BotNoLogin(
+class InitLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit,
 ) : ComponentContext by componentContext {
@@ -77,9 +69,7 @@ class BotNoLogin(
 
     val loading get() = _loading
 
-    // 应当在NoLogin所处理的异常:
-    // WrongPasswordException
-    //
+    // 应当在InitLogin处理部分异常
     fun onLogin() {
         _loading = true
         try {
@@ -164,9 +154,9 @@ class BotNoLogin(
 
 }
 
-
+// TODO:简化UI
 @Composable
-fun BotNoLoginUi(botNoLogin: BotNoLogin) {
+fun InitLoginUi(initLogin: InitLogin) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -178,15 +168,15 @@ fun BotNoLoginUi(botNoLogin: BotNoLogin) {
             modifier = Modifier
                 .padding(5.dp)
         )
-        AccountTextField(botNoLogin)
-        PasswordTextField(botNoLogin)
-        LoginButton(botNoLogin)
+        AccountTextField(initLogin)
+        PasswordTextField(initLogin)
+        LoginButton(initLogin)
     }
 }
 
 @Composable
 private fun AccountTextField(
-    loginWindowState: BotNoLogin,
+    loginWindowState: InitLogin,
 ) {
     TextField(
         value = loginWindowState.account,
@@ -215,7 +205,7 @@ private fun AccountTextField(
 }
 
 @Composable
-private fun PasswordTextField(loginWindowState: BotNoLogin) {
+private fun PasswordTextField(loginWindowState: InitLogin) {
     TextField(
         value = loginWindowState.password,
         onValueChange = loginWindowState::onPasswordTextChange,
@@ -261,7 +251,7 @@ private fun PasswordTextField(loginWindowState: BotNoLogin) {
 
 @Composable
 private fun LoginButton(
-    loginWindowState: BotNoLogin,
+    loginWindowState: InitLogin,
 ) = Button(
     onClick = loginWindowState::onLogin,
     modifier = Modifier

@@ -12,11 +12,13 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.Component
 
+/**
+ * 关于Compose的信息
+ *
+ */
 class About(
     componentContext: ComponentContext
-) : ComponentContext by componentContext {
-
-}
+) : ComponentContext by componentContext
 
 @Composable
 fun AboutUi(about: About) {
@@ -27,5 +29,6 @@ fun AboutUi(about: About) {
     ) {
         Image(ResourceImage.mirai, "mirai")
         Text("Mirai Compose 2021!")
+        Text("https://github.com/sonder-joker/mirai-compose")
     }
 }

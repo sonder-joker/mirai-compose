@@ -38,88 +38,110 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * 登录界面
+ *
+ * TODO: @property isExpand 是否展开
+ *
+ * @see InitLogin
+ * @see SolvePicCaptcha
+ * @see SolveSliderCaptcha
+ * @see SolveUnsafeDeviceLoginVerify
+ */
 class Login(
     componentContext: ComponentContext,
     onLoginSuccess: (bot: Bot) -> Unit,
 ) : LoginSolver(), ComponentContext by componentContext {
     private val scope = ComponentChildScope()
-    private var _isExpand by mutableStateOf(false)
-
-    val isExpand get() = _isExpand
-
-    fun setIsExpand(isExpand: Boolean) {
-        _isExpand = isExpand
-    }
 
     private val onLoginSuccess: (bot: Bot) -> Unit = {
-        router.push(BotStatus.NoLogin)
+        router.push(Configuration.InitLogin)
         onLoginSuccess(it)
     }
 
+    private var _isExpand by mutableStateOf(false)
 
-    sealed class BotStatus : Parcelable {
-        object NoLogin : BotStatus()
-        class SolvePicCaptcha(
-            val bot: Bot,
-            val imageBitmap: ImageBitmap,
-            val onSuccess: (String?, ReturnException?) -> Unit
-        ) : BotStatus()
-
-        class SolveSliderCaptcha(
-            val bot: Bot,
-            val url: String,
-            val result: (String?, ReturnException?) -> Unit
-        ) : BotStatus()
-
-        class SolveUnsafeDeviceLoginVerify(
-            val bot: Bot,
-            val url: String,
-            val result: (String?, ReturnException?) -> Unit
-        ) : BotStatus()
-    }
-
-    private val router: Router<BotStatus, Component> = router(
-        initialConfiguration = BotStatus.NoLogin,
+    private val router: Router<Configuration, Component> = router(
+        initialConfiguration = Configuration.InitLogin,
         key = "EmptyBot",
         handleBackButton = true,
-        childFactory = { configuration: BotStatus, componentContext ->
-            return@router when (configuration) {
-                is BotStatus.NoLogin ->
-                    BotNoLogin(componentContext, onClick = ::onClick)
-                        .asComponent { BotNoLoginUi(it) }
-                is BotStatus.SolvePicCaptcha ->
-                    BotSolvePicCaptcha(
+        childFactory = { configuration: Configuration, componentContext ->
+            when (configuration) {
+                is Configuration.InitLogin ->
+                    InitLogin(componentContext, onClick = ::startLogin).asComponent { InitLoginUi(it) }
+                is Configuration.SolvePicCaptcha ->
+                    //TODO:简化参数
+                    SolvePicCaptcha(
                         componentContext,
                         configuration.bot,
                         configuration.imageBitmap,
                         configuration.onSuccess
-                    ).asComponent { BotSolvePicCaptchaUi(it) }
-                is BotStatus.SolveSliderCaptcha ->
-                    BotSolveSliderCaptcha(
+                    ).asComponent { SolvePicCaptchaUi(it) }
+                is Configuration.SolveSliderCaptcha ->
+                    SolveSliderCaptcha(
                         componentContext,
                         configuration.bot,
                         configuration.url,
                         configuration.result
-                    ).asComponent { BotSolveSliderCaptchaUi(it) }
-                is BotStatus.SolveUnsafeDeviceLoginVerify ->
-                    BotSolveUnsafeDeviceLoginVerify(
+                    ).asComponent { SolveSliderCaptchaUi(it) }
+                is Configuration.SolveUnsafeDeviceLoginVerify ->
+                    SolveUnsafeDeviceLoginVerify(
                         componentContext,
                         configuration.bot,
                         configuration.url,
                         configuration.result
-                    ).asComponent { BotSolveUnsafeDeviceLoginVerifyUi(it) }
+                    ).asComponent { SolveUnsafeDeviceLoginVerifyUi(it) }
             }
         }
     )
 
-    private fun onExitHappened() {
-        _isExpand = true
-        router.push(BotStatus.NoLogin)
-    }
+    val isExpand get() = _isExpand
 
     val state get() = router.state
 
-    private fun onClick(account: Long, password: String) {
+    private fun onExitHappened() {
+        _isExpand = true
+        router.push(Configuration.InitLogin)
+    }
+
+    override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? =
+        suspendCoroutine { continuation ->
+            router.push(Configuration.SolvePicCaptcha(bot, SkiaImageDecode(data)) { string, exception ->
+                if (exception != null) {
+                    router.push(Configuration.InitLogin)
+                    continuation.resumeWithException(exception)
+                } else {
+                    continuation.resume(string)
+                }
+            })
+        }
+
+    override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? =
+        suspendCoroutine { continuation ->
+            router.push(Configuration.SolveSliderCaptcha(bot, url) { string, exception ->
+                if (exception != null) {
+                    router.push(Configuration.InitLogin)
+                    continuation.resumeWithException(exception)
+                } else {
+                    continuation.resume(string)
+                }
+            })
+        }
+
+
+    override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? =
+        suspendCoroutine { continuation ->
+            router.push(Configuration.SolveUnsafeDeviceLoginVerify(bot, url) { string, exception ->
+                if (exception != null) {
+                    router.push(Configuration.InitLogin)
+                    continuation.resumeWithException(exception)
+                } else {
+                    continuation.resume(string)
+                }
+            })
+        }
+
+    private fun startLogin(account: Long, password: String) {
         scope.launch {
             runCatching {
                 MiraiConsole.addBot(
@@ -138,42 +160,30 @@ class Login(
         }
     }
 
-    override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? =
-        suspendCoroutine { continuation ->
-            router.push(BotStatus.SolvePicCaptcha(bot, SkiaImageDecode(data)) { string, exception ->
-                if (exception != null) {
-                    router.push(BotStatus.NoLogin)
-                    continuation.resumeWithException(exception)
-                } else {
-                    continuation.resume(string)
-                }
-            })
-        }
+    fun setIsExpand(isExpand: Boolean) {
+        _isExpand = isExpand
+    }
 
-    override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? =
-        suspendCoroutine { continuation ->
-            router.push(BotStatus.SolveSliderCaptcha(bot, url) { string, exception ->
-                if (exception != null) {
-                    router.push(BotStatus.NoLogin)
-                    continuation.resumeWithException(exception)
-                } else {
-                    continuation.resume(string)
-                }
-            })
-        }
+    sealed class Configuration : Parcelable {
+        object InitLogin : Configuration()
+        class SolvePicCaptcha(
+            val bot: Bot,
+            val imageBitmap: ImageBitmap,
+            val onSuccess: (String?, ReturnException?) -> Unit
+        ) : Configuration()
 
+        class SolveSliderCaptcha(
+            val bot: Bot,
+            val url: String,
+            val result: (String?, ReturnException?) -> Unit
+        ) : Configuration()
 
-    override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? =
-        suspendCoroutine { continuation ->
-            router.push(BotStatus.SolveUnsafeDeviceLoginVerify(bot, url) { string, exception ->
-                if (exception != null) {
-                    router.push(BotStatus.NoLogin)
-                    continuation.resumeWithException(exception)
-                } else {
-                    continuation.resume(string)
-                }
-            })
-        }
+        class SolveUnsafeDeviceLoginVerify(
+            val bot: Bot,
+            val url: String,
+            val result: (String?, ReturnException?) -> Unit
+        ) : Configuration()
+    }
 }
 
 @Composable
@@ -185,13 +195,14 @@ fun LoginUi(login: Login) {
     }
 }
 
+//TODO: 简化函数
 @Composable
 fun VerticalNotification(
     isExpand: Boolean,
     setIsExpand: (Boolean) -> Unit,
     text: String,
-    backgrouncolor: Color,
-    textcolor: Color
+    backgroundColor: Color,
+    textColor: Color
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -203,10 +214,10 @@ fun VerticalNotification(
                 isExpand,
                 onDismissRequest = { setIsExpand(false) },
                 modifier = Modifier
-                    .background(backgrouncolor)
+                    .background(backgroundColor)
             ) {
                 DropdownMenuItem(onClick = { setIsExpand(false) }) {
-                    Text(text = text, color = textcolor)
+                    Text(text = text, color = textColor)
                     // TODO better style
                     Text(text = "X", color = Color.White)
                 }
@@ -215,13 +226,14 @@ fun VerticalNotification(
     }
 }
 
+//TODO: 简化函数
 @Composable
 fun HorizontalNotification(
     isExpand: Boolean,
     setIsExpand: (Boolean) -> Unit,
     text: String,
-    backgrouncolor: Color,
-    textcolor: Color
+    backgroundColor: Color,
+    textColor: Color
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -231,20 +243,19 @@ fun HorizontalNotification(
             Snackbar(
                 action = {
                     Text(
-                        modifier = Modifier.background(color = backgrouncolor)
+                        modifier = Modifier.background(color = backgroundColor)
                             .clickable {
                                 setIsExpand(false)
                             },
                         text = "X",
-                        color = textcolor
+                        color = textColor
                     )
                 },
-                backgroundColor = backgrouncolor
+                backgroundColor = backgroundColor
             ) {
-                Text(text = text, modifier = Modifier.background(color = backgrouncolor), color = textcolor)
+                Text(text = text, modifier = Modifier.background(color = backgroundColor), color = textColor)
             }
         }
-
     }
 }
 

@@ -42,7 +42,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.network.CustomLoginFailedException
 import java.net.URL
 
-class BotSolvePicCaptcha(
+class SolvePicCaptcha(
     context: ComponentContext,
     val bot: Bot,
     val imageBitmap: ImageBitmap,
@@ -50,24 +50,24 @@ class BotSolvePicCaptcha(
 ) : ComponentContext by context
 
 @Composable
-fun BotSolvePicCaptchaUi(botSolvePicCaptcha: BotSolvePicCaptcha) {
+fun SolvePicCaptchaUi(solvePicCaptcha: SolvePicCaptcha) {
     var value by mutableStateOf(TextFieldValue())
     Column {
-        Text("Mirai PicCaptcha(${botSolvePicCaptcha.bot.id})")
-        Image(botSolvePicCaptcha.imageBitmap, null)
+        Text("Mirai PicCaptcha(${solvePicCaptcha.bot.id})")
+        Image(solvePicCaptcha.imageBitmap, null)
         TextField(value = value, onValueChange = { value = it })
         Row {
-            Button(onClick = { botSolvePicCaptcha.result(null, ReturnException()) }) {
+            Button(onClick = { solvePicCaptcha.result(null, ReturnException()) }) {
                 Text("Exit")
             }
-            Button(onClick = { botSolvePicCaptcha.result(value.text, null) }) {
+            Button(onClick = { solvePicCaptcha.result(value.text, null) }) {
                 Text("Sure")
             }
         }
     }
 }
 
-class BotSolveSliderCaptcha(
+class SolveSliderCaptcha(
     context: ComponentContext,
     val bot: Bot,
     val url: String,
@@ -75,14 +75,14 @@ class BotSolveSliderCaptcha(
 ) : ComponentContext by context
 
 @Composable
-fun BotSolveSliderCaptchaUi(botSolveSliderCaptcha: BotSolveSliderCaptcha) {
+fun SolveSliderCaptchaUi(solveSliderCaptcha: SolveSliderCaptcha) {
     Column {
         Text("嵌入一下.jpg")
-        Text(botSolveSliderCaptcha.url)
+        Text(solveSliderCaptcha.url)
     }
 }
 
-class BotSolveUnsafeDeviceLoginVerify(
+class SolveUnsafeDeviceLoginVerify(
     context: ComponentContext,
     val bot: Bot,
     url: String,
@@ -138,16 +138,16 @@ class BotSolveUnsafeDeviceLoginVerify(
 }
 
 @Composable
-fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveUnsafeDeviceLoginVerify) = Box(
+fun SolveUnsafeDeviceLoginVerifyUi(solveUnsafeDeviceLoginVerify: SolveUnsafeDeviceLoginVerify) = Box(
     Modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {
     Column {
-        Text("Mirai UnsafeDeviceLoginVerify(${botSolveUnsafeDeviceLoginVerify.bot.id}")
-        if (botSolveUnsafeDeviceLoginVerify.string.isNotEmpty())
+        Text("Mirai UnsafeDeviceLoginVerify(${solveUnsafeDeviceLoginVerify.bot.id}")
+        if (solveUnsafeDeviceLoginVerify.string.isNotEmpty())
             Canvas(Modifier) {
                 val b: BitMatrix =
-                    MultiFormatWriter().encode(botSolveUnsafeDeviceLoginVerify.string, BarcodeFormat.QR_CODE, 200, 200)
+                    MultiFormatWriter().encode(solveUnsafeDeviceLoginVerify.string, BarcodeFormat.QR_CODE, 200, 200)
                 for (i in 0..200) {
                     for (j in 0..200) {
                         if (b.get(i, j))
@@ -166,16 +166,16 @@ fun BotSolveUnsafeDeviceLoginVerifyUi(botSolveUnsafeDeviceLoginVerify: BotSolveU
                 }
             }
         SelectionContainer {
-            Text(botSolveUnsafeDeviceLoginVerify.qrCodeUrl)
+            Text(solveUnsafeDeviceLoginVerify.qrCodeUrl)
         }
         Row {
             Button(onClick = {
-                botSolveUnsafeDeviceLoginVerify.result(null, null)
+                solveUnsafeDeviceLoginVerify.result(null, null)
             }) {
                 Text("Sure")
             }
             Button(onClick = {
-                botSolveUnsafeDeviceLoginVerify.result(null, ReturnException())
+                solveUnsafeDeviceLoginVerify.result(null, ReturnException())
             }) {
                 Text("Return")
             }

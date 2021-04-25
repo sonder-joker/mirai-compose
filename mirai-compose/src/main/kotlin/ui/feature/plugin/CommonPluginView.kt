@@ -10,15 +10,14 @@ import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.plugin.Plugin
 
+/**
+ * 普通插件 一般不应该出现
+ *
+ */
 class CommonPlugin(
     componentContext: ComponentContext,
     val plugin: Plugin,
 ) : ComponentContext by componentContext {
-
-    sealed class Setting : Parcelable {
-        object Description : Setting()
-    }
-
     private val router: Router<Setting, Component> = router(
         initialConfiguration = Setting.Description,
         handleBackButton = true,
@@ -33,6 +32,9 @@ class CommonPlugin(
 
     val state get() = router.state
 
+    sealed class Setting : Parcelable {
+        object Description : Setting()
+    }
 }
 
 @Composable

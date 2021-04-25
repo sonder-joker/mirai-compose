@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
-import com.youngerhousea.miraicompose.ui.feature.ComposeBot
-import com.youngerhousea.miraicompose.ui.feature.toComposeBot
+import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.model.toComposeBot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName

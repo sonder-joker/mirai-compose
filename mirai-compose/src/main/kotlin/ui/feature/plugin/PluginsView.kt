@@ -9,24 +9,21 @@ import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.MiraiComposeRepository
+import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.plugin.Plugin
+import org.koin.core.qualifier.named
 
-
+/**
+ * 插件菜单
+ *
+ * @see PluginList
+ * @see SpecificPlugin
+ */
 class Plugins(
     component: ComponentContext,
-    miraiComposeRepository: MiraiComposeRepository,
 ) : ComponentContext by component {
-
-    private val plugins = miraiComposeRepository.loadedPlugins
-
-    sealed class Configuration : Parcelable {
-        object List : Configuration()
-        class Specific(val plugin: Plugin) : Configuration()
-    }
-
     private val router: Router<Configuration, Component> = router(
         initialConfiguration = Configuration.List,
         key = "PluginRouter",
@@ -36,16 +33,14 @@ class Plugins(
                 is Configuration.List ->
                     PluginList(
                         componentContext,
-                        plugins = plugins,
-                        onPluginCardSelected = ::onPluginSelected,
+                        onPluginCardClick = ::routToSpecificPlugin
                     ).asComponent { PluginListUi(it) }
 
                 is Configuration.Specific -> {
                     SpecificPlugin(
                         componentContext,
                         plugin = configuration.plugin,
-                        onExitButtonClicked = ::popToPluginList,
-                        accessibleHolder = miraiComposeRepository
+                        onExitButtonClicked = ::popToPluginList
                     ).asComponent { SpecificPluginUi(it) }
                 }
             }
@@ -53,12 +48,17 @@ class Plugins(
 
     val state get() = router.state
 
-    private fun onPluginSelected(plugin: Plugin) {
+    private fun routToSpecificPlugin(plugin: Plugin) {
         router.push(Configuration.Specific(plugin))
     }
 
     private fun popToPluginList() {
         router.pop()
+    }
+
+    sealed class Configuration : Parcelable {
+        object List : Configuration()
+        class Specific(val plugin: Plugin) : Configuration()
     }
 }
 

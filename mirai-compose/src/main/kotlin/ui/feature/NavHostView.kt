@@ -8,7 +8,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -18,147 +17,130 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.cros
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.future.inject
-import com.youngerhousea.miraicompose.theme.ComposeSetting
+import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.model.toComposeBot
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
-import com.youngerhousea.miraicompose.ui.feature.bot.BotOnline
-import com.youngerhousea.miraicompose.ui.feature.bot.BotOnlineUi
 import com.youngerhousea.miraicompose.ui.feature.bot.Login
 import com.youngerhousea.miraicompose.ui.feature.bot.LoginUi
-import com.youngerhousea.miraicompose.ui.feature.log.MainLog
-import com.youngerhousea.miraicompose.ui.feature.log.MainLogUi
+import com.youngerhousea.miraicompose.ui.feature.bot.OnlineBot
+import com.youngerhousea.miraicompose.ui.feature.bot.OnlineBotUi
+import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLog
+import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
 import com.youngerhousea.miraicompose.ui.feature.plugin.PluginsUi
 import com.youngerhousea.miraicompose.ui.feature.setting.Setting
 import com.youngerhousea.miraicompose.ui.feature.setting.SettingUi
-import com.youngerhousea.miraicompose.utils.*
-import com.youngerhousea.miraicompose.utils.SkiaImageDecode
-import io.ktor.client.request.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import com.youngerhousea.miraicompose.utils.Component
+import com.youngerhousea.miraicompose.utils.asComponent
+import com.youngerhousea.miraicompose.utils.items
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.Mirai
-import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.event.events.BotEvent
+import org.koin.core.qualifier.named
 
-
+/**
+ * 主界面
+ *
+ * @property navigationIndex 目前导航所指向的TabView
+ * @property botList 目前的Console所登录的机器人List
+ * @property currentBot 目前的显示的机器人
+ *
+ * @see [Login]
+ * @see [OnlineBot]
+ * @see [Setting]
+ * @see [About]
+ * @see [ConsoleLog]
+ * @see [Plugins]
+ */
 class NavHost(
     component: ComponentContext,
 ) : ComponentContext by component {
-    private val miraiComposeRepository: MiraiComposeRepository by inject()
-
     private var _navigationIndex by mutableStateOf(0)
 
-    val navigationIndex get() = _navigationIndex
+    private val _botList: MutableList<ComposeBot> by inject(named("ComposeBot"))
 
-    val state get() = router.state
+    private var _currentBot by mutableStateOf(_botList.firstOrNull())
 
-    // 表示当前bot的list
-    private val _botList get() = miraiComposeRepository.botList
-
-    val botList: List<ComposeBot> get() = _botList
-
-    private val _currentBot by lazy { mutableStateOf(_botList.firstOrNull()) }
-
-    var currentBot by _currentBot
-
-    private val router = router<Config, Component>(
-        initialConfiguration = Config.Login,
+    private val router = router<Configuration, Component>(
+        initialConfiguration = Configuration.Login,
         handleBackButton = true,
         key = "NavHost",
         childFactory = { config, componentContext ->
             when (config) {
-                is Config.Login ->
-                    Login(
-                        componentContext,
-                        onLoginSuccess = { bot ->
-                            val composeBot = bot.toComposeBot()
-                            currentBot = composeBot
-                            _botList.add(composeBot)
-                            onMenuToSpecificBot(composeBot)
-                        }
-                    ).asComponent { LoginUi(it) }
-                is Config.OnlineBot ->
-                    BotOnline(
-                        componentContext,
-                        config.bot
-                    ).asComponent { BotOnlineUi(it) }
-                is Config.Setting ->
-                    Setting(
-                        componentContext,
-                        theme = ComposeSetting.AppTheme
-                    ).asComponent { SettingUi(it) }
-                is Config.About ->
-                    About(
-                        componentContext
-                    ).asComponent { AboutUi(it) }
-                is Config.Log ->
-                    MainLog(
-                        componentContext,
-                        loggerStorage = miraiComposeRepository.annotatedLogStorage,
-                        logger = MiraiConsole.mainLogger
-                    ).asComponent { MainLogUi(it) }
-                is Config.Plugin -> {
-                    Plugins(
-                        componentContext,
-                        miraiComposeRepository
-                    ).asComponent { PluginsUi(it) }
-                }
+                is Configuration.Login ->
+                    Login(componentContext, onLoginSuccess = ::onLoginSuccess).asComponent { LoginUi(it) }
+                is Configuration.OnlineBot ->
+                    OnlineBot(componentContext, config.bot).asComponent { OnlineBotUi(it) }
+                is Configuration.Plugin ->
+                    Plugins(componentContext).asComponent { PluginsUi(it) }
+                is Configuration.Setting ->
+                    Setting(componentContext).asComponent { SettingUi(it) }
+                is Configuration.ConsoleLog ->
+                    ConsoleLog(componentContext).asComponent { ConsoleLogUi(it) }
+                is Configuration.About ->
+                    About(componentContext).asComponent { AboutUi(it) }
             }
         }
     )
 
-    sealed class Config : Parcelable {
-        class OnlineBot(val bot: ComposeBot) : Config()
-        object Login : Config()
-        object Setting : Config()
-        object About : Config()
-        object Log : Config()
-        object Plugin : Config()
+    val navigationIndex get() = _navigationIndex
+
+    val botList: List<ComposeBot> get() = _botList
+
+    val currentBot get() = _currentBot
+
+    val state get() = router.state
+
+    // 当机器人登录成功
+    private fun onLoginSuccess(bot: Bot) {
+        val composeBot = bot.toComposeBot()
+        _currentBot = composeBot
+        _botList.add(composeBot)
+        onRouteToSpecificBot(composeBot)
     }
 
-    //menu action
-    fun onMenuAddNewBot() {
+    // 登录机器人
+    fun addNewBot() {
         _navigationIndex = 0
-        router.push(Config.Login)
+        router.push(Configuration.Login)
     }
 
-    fun onMenuToSpecificBot(bot: ComposeBot) {
-        router.push(Config.OnlineBot(bot))
+    fun onRouteToSpecificBot(bot: ComposeBot) {
+        router.push(Configuration.OnlineBot(bot))
     }
 
-    //  分别对于SideColumn的五个index
     fun onRouteBot() {
         _navigationIndex = 0
-        currentBot?.let { router.push(Config.OnlineBot(it)) } ?: router.push(Config.Login)
+        currentBot?.let { router.push(Configuration.OnlineBot(it)) } ?: router.push(Configuration.Login)
     }
 
     fun onRoutePlugin() {
         _navigationIndex = 1
-
-        router.push(Config.Plugin)
+        router.push(Configuration.Plugin)
     }
 
     fun onRouteSetting() {
         _navigationIndex = 2
-
-        router.push(Config.Setting)
+        router.push(Configuration.Setting)
     }
 
     fun onRouteLog() {
         _navigationIndex = 3
-
-        router.push(Config.Log)
+        router.push(Configuration.ConsoleLog)
     }
 
     fun onRouteAbout() {
         _navigationIndex = 4
+        router.push(Configuration.About)
+    }
 
-        router.push(Config.About)
+    sealed class Configuration : Parcelable {
+        class OnlineBot(val bot: ComposeBot) : Configuration()
+        object Login : Configuration()
+        object Setting : Configuration()
+        object About : Configuration()
+        object ConsoleLog : Configuration()
+        object Plugin : Configuration()
     }
 }
 
@@ -181,8 +163,8 @@ private fun SideRow(navHost: NavHost) {
     AvatarWithMenu(
         navHost.botList,
         navHost.currentBot,
-        onMenuItemSelected = navHost::onMenuToSpecificBot,
-        onNewItemButtonSelected = navHost::onMenuAddNewBot,
+        onMenuBotSelected = navHost::onRouteToSpecificBot,
+        onNewBotButtonSelected = navHost::addNewBot,
     )
     SelectEdgeText(
         "Robot",
@@ -215,8 +197,8 @@ private fun SideRow(navHost: NavHost) {
 private fun AvatarWithMenu(
     composeBotList: List<ComposeBot>,
     currentBot: ComposeBot?,
-    onMenuItemSelected: (bot: ComposeBot) -> Unit,
-    onNewItemButtonSelected: () -> Unit,
+    onMenuBotSelected: (bot: ComposeBot) -> Unit,
+    onNewBotButtonSelected: () -> Unit,
 ) {
     var isExpand by remember { mutableStateOf(false) }
 
@@ -238,7 +220,7 @@ private fun AvatarWithMenu(
             }
 
             DropdownMenuItem(onClick = {
-                onNewItemButtonSelected()
+                onNewBotButtonSelected()
                 isExpand = !isExpand
             }) {
                 Text("Add")
@@ -246,7 +228,7 @@ private fun AvatarWithMenu(
 
             items(composeBotList) { item ->
                 DropdownMenuItem(onClick = {
-                    onMenuItemSelected(item)
+                    onMenuBotSelected(item)
                     isExpand = !isExpand
                 }) {
                     BotItem(item)
@@ -308,38 +290,4 @@ private fun BotItem(
     }
 }
 
-interface ComposeBot : Bot {
-    val avatar: ImageBitmap
-
-    val eventList: List<BotEvent>
-}
-
-fun Bot.toComposeBot(): ComposeBot = ComposeBotImpl(this)
-
-@OptIn(ExperimentalCoroutinesApi::class)
-class ComposeBotImpl(bot: Bot) : Bot by bot, ComposeBot {
-    private var _avatar by mutableStateOf(ImageBitmap(200, 200))
-
-    private val _eventList = mutableStateListOf<BotEvent>()
-
-    override val eventList: List<BotEvent> get() = _eventList
-
-    init {
-        launch {
-            _avatar = SkiaImageDecode(
-                Mirai.Http.get(avatarUrl) {
-                    header("Connection", "close")
-                }
-            )
-        }
-        launch {
-            bot.eventChannel.asChannel().receiveAsFlow().collect {
-                _eventList.add(it)
-            }
-        }
-
-    }
-
-    override val avatar get() = _avatar
-}
 
