@@ -2,8 +2,10 @@ package com.youngerhousea.miraicompose.ui.feature.bot
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Snackbar
@@ -11,11 +13,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
@@ -49,19 +51,26 @@ class Login(
 
     @Composable
     fun verticalNotification(isExpand: MutableState<Boolean>, text: String, backgrouncolor: Color, textcolor: Color) {
-        BoxWithConstraints(
-            modifier = Modifier
-                .padding(start = 100000.dp, top = 100000.dp)
-                .clipToBounds()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
         ) {
-            DropdownMenu(
-                isExpand.value,
-                onDismissRequest = { isExpand.value = false },
-                modifier = Modifier
-                    .background(backgrouncolor)
+            BoxWithConstraints(
+//                modifier = Modifier
+//                    .clipToBounds()
             ) {
-                DropdownMenuItem(onClick = { isExpand.value = false }) {
-                    Text(text = text, color = textcolor)
+                DropdownMenu(
+                    isExpand.value,
+                    onDismissRequest = { isExpand.value = false },
+                    modifier = Modifier
+                        .background(backgrouncolor)
+                ) {
+                    DropdownMenuItem(onClick = { isExpand.value = false }) {
+                        Text(text = text, color = textcolor)
+                        // TODO better style
+                        Text(text = "X", color = Color.White)
+                    }
                 }
             }
         }
@@ -80,7 +89,7 @@ class Login(
                         Text(
                             modifier = bgcolor
                                 .clickable {
-                                    isExpand.value = !isExpand.value
+                                    isExpand.value = false
                                 },
                             text = "X",
                             color = textcolor
