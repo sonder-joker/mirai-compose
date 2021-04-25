@@ -1,6 +1,37 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
@@ -12,6 +43,7 @@ import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.asComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
@@ -26,6 +58,13 @@ class Login(
     onLoginSuccess: (bot: Bot) -> Unit,
 ) : LoginSolver(), ComponentContext by componentContext {
     private val scope = ComponentChildScope()
+    private var _isExpand by mutableStateOf(false)
+
+    val isExpand get() = _isExpand
+
+    private fun setIsExpand(isExpand: Boolean) {
+        _isExpand = isExpand
+    }
 
     private val onLoginSuccess: (bot: Bot) -> Unit = {
         router.push(BotStatus.NoLogin)
@@ -89,6 +128,7 @@ class Login(
     )
 
     private fun onExitHappened() {
+        _isExpand = true
         router.push(BotStatus.NoLogin)
     }
 
@@ -153,11 +193,62 @@ class Login(
 
 @Composable
 fun LoginUi(login: Login) {
+    HorizontalNotification(isExpand = login.isExpand, "Error", Color.Red, Color.White)
+    VerticalNotification(isExpand = login.isExpand, "Error", Color.Red, Color.White)
     Children(login.state) { child ->
         child.instance()
     }
 }
 
+@Composable
+fun VerticalNotification(isExpand: Boolean,setIsExpand:(Boolean) -> Unit, text: String, backgrouncolor: Color, textcolor: Color) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        BoxWithConstraints {
+            DropdownMenu(
+                isExpand,
+                onDismissRequest = { setIsExpand(false) },
+                modifier = Modifier
+                    .background(backgrouncolor)
+            ) {
+                DropdownMenuItem(onClick = { setIsExpand(false) }) {
+                    Text(text = text, color = textcolor)
+                    // TODO better style
+                    Text(text = "X", color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HorizontalNotification(isExpand: Boolean, setIsExpand:(Boolean) -> Unit,text: String, backgrouncolor: Color, textcolor: Color) {
+    val bgcolor = Modifier.background(color = backgrouncolor)
+    BoxWithConstraints(
+        modifier = Modifier
+            .clipToBounds()
+    ) {
+        if (isExpand) {
+            Snackbar(
+                action = {
+                    Text(
+                        modifier = bgcolor
+                            .clickable {
+                                setIsExpand(false)
+                            },
+                        text = "X",
+                        color = textcolor
+                    )
+                },
+                backgroundColor = backgrouncolor
+            ) { Text(text = text, modifier = bgcolor, color = textcolor) }
+        }
+
+    }
+}
 
 
 
