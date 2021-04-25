@@ -7,7 +7,14 @@ plugins {
     kotlin("plugin.serialization")
     id("org.jetbrains.compose")
 }
-
+configurations.all {
+//    this.resolutionStrategy.failOnVersionConflict()
+    this.resolutionStrategy {
+        this.setForcedModules(
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
+        )
+    }
+}
 
 dependencies {
     implementation(compose.desktop.currentOs)
@@ -22,13 +29,10 @@ dependencies {
     implementation(koin)
 
     //may remove in future
+    implementation("com.google.zxing:core:3.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
-        version {
-            strictly("1.4.2")
-        }
-    }
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
     testImplementation("io.insert-koin:koin-test:${Versions.koin}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")

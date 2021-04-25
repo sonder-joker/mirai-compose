@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
+import com.youngerhousea.miraicompose.ui.feature.ComposeBot
+import com.youngerhousea.miraicompose.ui.feature.toComposeBot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -72,9 +74,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         SwingSolver
 
-    private val _botList: MutableList<Bot?> = mutableStateListOf()
-
-    override val botList: List<Bot?> get() = _botList
+    override val botList: MutableList<ComposeBot> = mutableStateListOf()
 
     override var already by mutableStateOf(false)
 
@@ -83,15 +83,6 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     private val _annotatedLogStorage: MutableList<AnnotatedString> = mutableStateListOf()
 
     override val annotatedLogStorage: List<AnnotatedString> get() = _annotatedLogStorage
-
-    override fun addBot(bot: Bot?) {
-        _botList.add(bot)
-    }
-
-    override fun setNullToBot(index: Int, bot: Bot) {
-        require(_botList[index] == null) { "Error" }
-        _botList[index] = bot
-    }
 
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
@@ -105,7 +96,9 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override fun postPhase(phase: String) {
         if (phase == "auto-login bots") {
-            _botList.addAll(Bot.instances)
+            Bot.instances.map { it.toComposeBot() }.forEach {
+                botList.add(it)
+            }
         }
         if (phase == "load configurations") {
             ComposeDataScope.reloadAll()

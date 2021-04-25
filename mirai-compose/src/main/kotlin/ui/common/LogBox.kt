@@ -33,11 +33,11 @@ import net.mamoe.mirai.utils.warning
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-
 @Composable
 internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) {
-
-    BoxWithConstraints(modifier) {
+    BoxWithConstraints(
+        modifier
+    ) {
         val adaptiveLog = remember(logs) {
             logs.flatMap {
                 it.chunked(constraints.maxWidth / 9)
@@ -64,7 +64,6 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
                 }
             }
         }
-
         VerticalScrollbar(
             Modifier.align(Alignment.CenterEnd),
             state,
@@ -120,7 +119,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
                 .weight(2f),
             backgroundColor = MaterialTheme.colors.background,
         ) {
-            Text("发送")
+            Text("Send")
         }
     }
 
