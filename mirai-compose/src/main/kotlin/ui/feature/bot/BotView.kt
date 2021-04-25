@@ -10,23 +10,9 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +29,6 @@ import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.asComponent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
@@ -62,7 +47,7 @@ class Login(
 
     val isExpand get() = _isExpand
 
-    private fun setIsExpand(isExpand: Boolean) {
+    fun setIsExpand(isExpand: Boolean) {
         _isExpand = isExpand
     }
 
@@ -193,15 +178,21 @@ class Login(
 
 @Composable
 fun LoginUi(login: Login) {
-    HorizontalNotification(isExpand = login.isExpand, "Error", Color.Red, Color.White)
-    VerticalNotification(isExpand = login.isExpand, "Error", Color.Red, Color.White)
+    HorizontalNotification(isExpand = login.isExpand, login::setIsExpand, "Error", Color.Red, Color.White)
+    VerticalNotification(isExpand = login.isExpand, login::setIsExpand, "Error", Color.Red, Color.White)
     Children(login.state) { child ->
         child.instance()
     }
 }
 
 @Composable
-fun VerticalNotification(isExpand: Boolean,setIsExpand:(Boolean) -> Unit, text: String, backgrouncolor: Color, textcolor: Color) {
+fun VerticalNotification(
+    isExpand: Boolean,
+    setIsExpand: (Boolean) -> Unit,
+    text: String,
+    backgrouncolor: Color,
+    textcolor: Color
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.End,
@@ -225,8 +216,13 @@ fun VerticalNotification(isExpand: Boolean,setIsExpand:(Boolean) -> Unit, text: 
 }
 
 @Composable
-fun HorizontalNotification(isExpand: Boolean, setIsExpand:(Boolean) -> Unit,text: String, backgrouncolor: Color, textcolor: Color) {
-    val bgcolor = Modifier.background(color = backgrouncolor)
+fun HorizontalNotification(
+    isExpand: Boolean,
+    setIsExpand: (Boolean) -> Unit,
+    text: String,
+    backgrouncolor: Color,
+    textcolor: Color
+) {
     BoxWithConstraints(
         modifier = Modifier
             .clipToBounds()
@@ -235,7 +231,7 @@ fun HorizontalNotification(isExpand: Boolean, setIsExpand:(Boolean) -> Unit,text
             Snackbar(
                 action = {
                     Text(
-                        modifier = bgcolor
+                        modifier = Modifier.background(color = backgrouncolor)
                             .clickable {
                                 setIsExpand(false)
                             },
@@ -244,7 +240,9 @@ fun HorizontalNotification(isExpand: Boolean, setIsExpand:(Boolean) -> Unit,text
                     )
                 },
                 backgroundColor = backgrouncolor
-            ) { Text(text = text, modifier = bgcolor, color = textcolor) }
+            ) {
+                Text(text = text, modifier = Modifier.background(color = backgrouncolor), color = textcolor)
+            }
         }
 
     }
