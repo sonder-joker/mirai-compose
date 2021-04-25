@@ -1,6 +1,22 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
@@ -9,14 +25,11 @@ import com.youngerhousea.miraicompose.console.MiraiComposeSolver
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import com.youngerhousea.miraicompose.utils.asComponent
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
-import net.mamoe.mirai.network.LoginFailedException
 import kotlin.coroutines.resumeWithException
 
 class Login(
@@ -24,6 +37,7 @@ class Login(
     val onLoginSuccess: (bot: Bot) -> Unit,
 ) : ComponentContext by componentContext {
     private val scope = ComponentChildScope()
+    private var isExpand: MutableState<Boolean> = mutableStateOf(false)
 
     sealed class BotStatus : Parcelable {
         object NoLogin : BotStatus()
@@ -35,6 +49,59 @@ class Login(
             BotStatus()
     }
 
+    @Composable
+    fun verticalNotification(isExpand: MutableState<Boolean>, text: String, backgrouncolor: Color, textcolor: Color) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            BoxWithConstraints(
+//                modifier = Modifier
+//                    .clipToBounds()
+            ) {
+                DropdownMenu(
+                    isExpand.value,
+                    onDismissRequest = { isExpand.value = false },
+                    modifier = Modifier
+                        .background(backgrouncolor)
+                ) {
+                    DropdownMenuItem(onClick = { isExpand.value = false }) {
+                        Text(text = text, color = textcolor)
+                        // TODO better style
+                        Text(text = "X", color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun horizontalNotification(isExpand: MutableState<Boolean>, text: String, backgrouncolor: Color, textcolor: Color) {
+        val bgcolor = Modifier.background(color = backgrouncolor)
+        BoxWithConstraints(
+            modifier = Modifier
+                .clipToBounds()
+        ) {
+            if (isExpand.value) {
+                Snackbar(
+                    action = {
+                        Text(
+                            modifier = bgcolor
+                                .clickable {
+                                    isExpand.value = false
+                                },
+                            text = "X",
+                            color = textcolor
+                        )
+                    },
+                    backgroundColor = backgrouncolor
+                ) { Text(text = text, modifier = bgcolor, color = textcolor) }
+            }
+
+        }
+    }
+
     private val router: Router<BotStatus, Component> = router(
         initialConfiguration = BotStatus.NoLogin,
         key = "EmptyBot",
@@ -43,7 +110,11 @@ class Login(
             return@router when (configuration) {
                 is BotStatus.NoLogin ->
                     BotNoLogin(componentContext, onClick = ::onClick)
-                        .asComponent { BotNoLoginUi(it) }
+                        .asComponent {
+                            horizontalNotification(isExpand = isExpand, "Error", Color.Red, Color.White)
+                            verticalNotification(isExpand = isExpand, "Error", Color.Red, Color.White)
+                            BotNoLoginUi(it)
+                        }
                 is BotStatus.SolvePicCaptcha ->
                     BotSolvePicCaptcha(
                         componentContext,
@@ -70,6 +141,7 @@ class Login(
     )
 
     private fun onExitHappened() {
+        isExpand.value = true
         router.popWhile { it is BotStatus.NoLogin }
     }
 

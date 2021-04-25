@@ -15,15 +15,30 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
+import java.awt.event.MouseEvent
 
-private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
-    var event: PointerEvent
-    do {
-        event = awaitPointerEvent()
-    } while (
-        !event.changes.all { it.changedToDown() }
-    )
-    return event
+suspend fun PointerInputScope.onRightClick(run: (MouseEvent) -> Unit) {
+    suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
+        var event: PointerEvent
+        do {
+            event = awaitPointerEvent()
+        } while (
+            !event.changes.all { it.changedToDown() }
+        )
+        return event
+    }
+
+    forEachGesture {
+        awaitPointerEventScope {
+            awaitEventFirstDown().also { it1 ->
+                it1.changes.forEach { it.consumeDownChange() }
+            }.mouseEvent?.run {
+                if (this.button == MouseEvent.BUTTON3) {
+                    run(this)
+                }
+            }
+        }
+    }
 }
 
 class MainLog(
@@ -34,13 +49,12 @@ class MainLog(
 
 @Composable
 fun MainLogUi(mainLog: MainLog) {
-    var offset by remember { mutableStateOf(DpOffset.Zero) }
+    var offset by remember { mutableStateOf(DpOffset(100.dp, 100.dp)) }
     var isExpand by remember { mutableStateOf(false) }
-    // 160.dp is the width of nav
     Box(
         modifier = Modifier
-            .padding(top = offset.y)
-            .offset(x = offset.x - 160.dp)
+            .padding(top = offset.y - 80.dp)
+            .offset(x = offset.x)
     ) {
         DropdownMenu(
             isExpand,
@@ -63,17 +77,10 @@ fun MainLogUi(mainLog: MainLog) {
                 .weight(8f)
                 .padding(horizontal = 40.dp, vertical = 20.dp)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            awaitEventFirstDown().also { it1 ->
-                                it1.changes.forEach { it.consumeDownChange() }
-                            }.mouseEvent?.run {
-                                if (this.button == java.awt.event.MouseEvent.BUTTON3) {
-                                    isExpand = true
-                                    offset = DpOffset(this.xOnScreen.dp, this.yOnScreen.dp)
-                                }
-                            }
-                        }
+                    onRightClick {
+                        isExpand = true
+                        offset = DpOffset(it.x.dp, it.y.dp)
+                        println(offset)
                     }
                 },
             mainLog.loggerStorage
