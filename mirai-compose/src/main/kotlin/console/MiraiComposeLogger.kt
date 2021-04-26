@@ -16,9 +16,12 @@ import java.util.*
 
 private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
 
+/**
+ * [MiraiCompose] 默认Logger实现
+ */
 class MiraiComposeLogger(
     override val identity: String?,
-    private val logStorage: MutableList<AnnotatedString>
+    private val logStorage: MutableList<AnnotatedString> = mutableListOf()
 ) : MiraiLoggerPlatformBase() {
 
     private inline val currentDate: String get() = logTimeFormat.format(Date())
@@ -75,6 +78,7 @@ class MiraiComposeLogger(
         else debug(message.toString())
     }
 }
+
 
 internal class BufferedOutputStream constructor(
     private val size: Int = 1024 * 1024,

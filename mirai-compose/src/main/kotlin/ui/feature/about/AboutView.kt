@@ -13,7 +13,7 @@ import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.Component
 
 /**
- * 关于Compose的信息
+ * 关于MiraiCompose的信息
  *
  */
 class About(

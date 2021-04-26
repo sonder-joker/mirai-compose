@@ -57,7 +57,7 @@ fun MiraiComposeView() {
                 compose.cancel()
             }
         }
-        if (compose.already)
+        if (compose.alreadyLoaded)
             Ready()
         else
             Loading()
@@ -108,6 +108,7 @@ private fun SetDefaultExceptionHandler() {
 // 是否输出日志到 Console
 const val DEBUG = true
 
+// 异常窗口
 private fun ExceptionWithWindows(exception: Throwable) {
     if (DEBUG)
         systemOut.println(exception.stackTraceToString())

@@ -7,6 +7,11 @@ import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import java.nio.file.Path
 
+/**
+ * 可读的数据存储,由[MultiFilePluginDataStorage]代理实现
+ *
+ * @see ReadablePluginConfigStorage
+ */
 interface ReadablePluginDataStorage : MultiFilePluginDataStorage {
     val dataMap: MutableMap<PluginDataHolder, MutableList<PluginData>>
 
@@ -15,7 +20,7 @@ interface ReadablePluginDataStorage : MultiFilePluginDataStorage {
 
     companion object {
         /**
-         * 创建一个 [ReadablePluginDataStorage] 实例，实现为[MultiFilePluginDataStorage].
+         * 创建一个 [ReadablePluginDataStorage] 实例.
          */
         operator fun invoke(directory: Path): ReadablePluginDataStorage =
             ReadablePluginDataStorageImpl(MultiFilePluginDataStorage(directory))
@@ -38,6 +43,12 @@ private class ReadablePluginDataStorageImpl(
     }
 }
 
+
+/**
+ * 可读的配置存储，由[MultiFilePluginDataStorage]代理实现
+ *
+ * @see ReadablePluginDataStorage
+ */
 interface ReadablePluginConfigStorage : MultiFilePluginDataStorage {
     val dataMap: MutableMap<PluginDataHolder, MutableList<PluginConfig>>
 
@@ -68,28 +79,32 @@ private class ReadablePluginConfigStorageImpl(
     }
 }
 
-
-val ConfigStorageForCompose = ReadablePluginDataStorage(MiraiConsole.rootPath.resolve("config"))
-
-
+/**
+ * [MiraiCompose]的DataScope，用于存储配置
+ */
 internal object ComposeDataScope : CoroutineScope by MiraiConsole.childScope("ComposeDataScope") {
+    private val configStorageForCompose = ReadablePluginDataStorage(MiraiConsole.rootPath.resolve("config"))
+
     private val configs: MutableList<PluginConfig> = mutableListOf(ComposeSetting)
 
     fun addAndReloadConfig(config: PluginConfig) {
         configs.add(config)
-        ConfigStorageForCompose.load(ComposeBuiltInConfigHolder, config)
+        configStorageForCompose.load(ComposeBuiltInConfigHolder, config)
     }
 
     fun reloadAll() {
         configs.forEach { config ->
-            ConfigStorageForCompose.load(ComposeBuiltInConfigHolder, config)
+            configStorageForCompose.load(ComposeBuiltInConfigHolder, config)
         }
     }
 }
 
-internal object ComposeBuiltInConfigHolder : AutoSavePluginDataHolder,
+/**
+ * [MiraiCompose]的内置ConfigHolder，用于存储配置
+ */
+private object ComposeBuiltInConfigHolder : AutoSavePluginDataHolder,
     CoroutineScope by ComposeDataScope.childScope("ComposeBuiltInPluginDataHolder") {
-    override val autoSaveIntervalMillis: LongRange = 1 * (60 * 1000L)..10 * (60 * 1000L)
+    override val autoSaveIntervalMillis: LongRange = 1 * (60_1000L)..10 * (60_1000L)
     override val dataHolderName: String = "Compose"
 }
 
