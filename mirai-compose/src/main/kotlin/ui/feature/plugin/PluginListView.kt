@@ -10,14 +10,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
+import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.ui.common.PluginDescription
 import net.mamoe.mirai.console.plugin.Plugin
+import org.koin.core.qualifier.named
 
+/**
+ * 插件列表
+ *
+ */
 class PluginList(
     componentContext: ComponentContext,
-    val plugins: List<Plugin>,
-    val onPluginCardSelected: (plugin: Plugin) -> Unit
-) : ComponentContext by componentContext
+    val onPluginCardClick: (plugin: Plugin) -> Unit
+) : ComponentContext by componentContext {
+    val plugins: List<Plugin> by inject(named("Plugin"))
+}
 
 @Composable
 fun PluginListUi(pluginList: PluginList) {
@@ -30,7 +37,7 @@ fun PluginListUi(pluginList: PluginList) {
             Card(
                 Modifier
                     .padding(10.dp)
-                    .clickable(onClick = { pluginList.onPluginCardSelected(plugin) })
+                    .clickable(onClick = { pluginList.onPluginCardClick(plugin) })
                     .requiredHeight(150.dp)
                     .fillMaxWidth()
             ) {

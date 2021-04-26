@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
-import com.youngerhousea.miraicompose.ui.feature.ComposeBot
-import com.youngerhousea.miraicompose.ui.feature.toComposeBot
+import com.youngerhousea.miraicompose.model.ComposeBot
+import com.youngerhousea.miraicompose.model.toComposeBot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -34,7 +34,10 @@ import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
 
-
+/**
+ * MiraiCompose 的实现
+ *
+ */
 @ConsoleFrontEndImplementation
 class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, CoroutineScope by CoroutineScope(
     NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -45,14 +48,11 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
         MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
     }
 ) {
-    override val rootPath: Path =
-        Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
+    override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
 
-    override val builtInPluginLoaders =
-        listOf(lazy { JvmPluginLoader })
+    override val builtInPluginLoaders = listOf(lazy { JvmPluginLoader })
 
-    override val frontEndDescription =
-        MiraiComposeDescription
+    override val frontEndDescription = MiraiComposeDescription
 
     override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath.resolve("data"))
 
@@ -62,21 +62,18 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override val configStorageForBuiltIns = MultiFilePluginDataStorage(rootPath.resolve("config"))
 
-    override val consoleInput: ConsoleInput =
-        MiraiComposeInput
+    override val consoleInput: ConsoleInput = MiraiComposeInput
 
-    override val consoleCommandSender: MiraiComposeSender =
-        MiraiComposeSender
+    override val consoleCommandSender: MiraiComposeSender = MiraiComposeSender
 
-    override fun createLogger(identity: String?): MiraiLogger =
-        MiraiComposeLogger(identity, _annotatedLogStorage)
+    override fun createLogger(identity: String?): MiraiLogger = MiraiComposeLogger(identity, _annotatedLogStorage)
 
-    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
-        SwingSolver
+    // 一般不应该被使用
+    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) = SwingSolver
 
     override val botList: MutableList<ComposeBot> = mutableStateListOf()
 
-    override var already by mutableStateOf(false)
+    override var alreadyLoaded by mutableStateOf(false)
 
     override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
 
@@ -95,18 +92,18 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     }
 
     override fun postPhase(phase: String) {
-        if (phase == "auto-login bots") {
-            Bot.instances.map { it.toComposeBot() }.forEach {
-                botList.add(it)
-            }
-        }
-        if (phase == "load configurations") {
-            ComposeDataScope.reloadAll()
+        when (phase) {
+            "auto-login bots" ->
+                Bot.instances.map { it.toComposeBot() }.forEach {
+                    botList.add(it)
+                }
+            "load configurations" ->
+                ComposeDataScope.reloadAll()
         }
     }
 
     override fun postStart() {
-        already = true
+        alreadyLoaded = true
     }
 
 }

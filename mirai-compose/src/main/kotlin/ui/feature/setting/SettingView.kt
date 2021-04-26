@@ -15,17 +15,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
+import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.ui.common.ColorPicker
 
+/**
+ * Compose各项参数的设置
+ *
+ * TODO:提供注释
+ */
 class Setting(
     componentContext: ComponentContext,
-    val theme: AppTheme,
 ) : ComponentContext by componentContext {
     private inline val logColors get() = theme.logColors
 
+    val theme: AppTheme by inject()
+
     var material = theme.materialLight
-        set(value){
+        set(value) {
             theme.materialLight = value
             field = value
         }
@@ -186,7 +193,7 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
             Button({
                 isExpand = !isExpand
             }) {
-                Text("#" + value.value.toString(16).substring(0,8))
+                Text("#" + value.value.toString(16).substring(0, 8))
             }
         }
         AnimatedVisibility(isExpand) {

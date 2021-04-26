@@ -1,10 +1,6 @@
 package com.youngerhousea.miraicompose.ui.feature.plugin
 
-import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
@@ -12,43 +8,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.*
-import com.arkivanov.decompose.extensions.compose.jetbrains.ChildAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.page.PageArrangement
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.AccessibleHolder
-import com.youngerhousea.miraicompose.ui.common.EditView
-import com.youngerhousea.miraicompose.ui.common.annotatedDescription
-import com.youngerhousea.miraicompose.ui.common.annotatedExplain
-import com.youngerhousea.miraicompose.ui.common.simpleDescription
+import com.youngerhousea.miraicompose.future.getGlobal
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
-import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
-import net.mamoe.mirai.console.data.PluginData
-import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 
+/**
+ * Jvm插件的页面
+ *
+ * @see DetailedDescription
+ * @see DetailedData
+ * @see DetailedCommand
+ */
 class CJvmPlugin(
     componentContext: ComponentContext,
     val plugin: JvmPlugin,
-    accessibleHolder: AccessibleHolder
-) : ComponentContext by componentContext, AccessibleHolder by accessibleHolder {
-
-    sealed class Setting : Parcelable {
-        object Description : Setting()
-        object Command : Setting()
-        object Data : Setting()
-    }
+) : ComponentContext by componentContext, AccessibleHolder by getGlobal() {
+    private var _index by mutableStateOf(0)
 
     private val router: Router<Setting, Component> = router(
         initialConfiguration = Setting.Description,
@@ -71,8 +55,6 @@ class CJvmPlugin(
 
     val state get() = router.state
 
-    private var _index by mutableStateOf(0)
-
     val index get() = _index
 
     fun onDescriptionClick() {
@@ -88,6 +70,12 @@ class CJvmPlugin(
     fun onCommandClick() {
         _index = 2
         router.push(Setting.Command)
+    }
+
+    sealed class Setting : Parcelable {
+        object Description : Setting()
+        object Command : Setting()
+        object Data : Setting()
     }
 }
 
@@ -114,71 +102,7 @@ fun CJvmPluginUi(CJvmPlugin: CJvmPlugin) = Column {
             onClick = CJvmPlugin::onCommandClick
         )
     }
-    Children(CJvmPlugin.state, com.youngerhousea.miraicompose.ui.feature.plugin.slide()) { child ->
+    Children(CJvmPlugin.state, slide()) { child ->
         child.instance()
     }
 }
-
-@ExperimentalDecomposeApi
-fun <C : Any, T : Any> slide(
-    animationSpec: FiniteAnimationSpec<Float> = tween(),
-): ChildAnimation<C, T> =
-    childAnimation(animationSpec = animationSpec) { _, factor, arrangement, _, content ->
-        content(
-            Modifier.offset(
-                x = when (arrangement) {
-                    PageArrangement.PREVIOUS -> maxWidth * (factor - 1F)
-                    PageArrangement.FOLLOWING -> maxWidth * (1F - factor)
-                }
-            ).graphicsLayer()
-        )
-    }
-
-class DetailedDescription(
-    componentContext: ComponentContext,
-    val plugin: Plugin
-) : ComponentContext by componentContext
-
-@Composable
-fun DetailedDescriptionUi(detailedDescription: DetailedDescription) {
-    Column(
-        Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(detailedDescription.plugin.annotatedDescription)
-    }
-}
-
-
-class DetailedData(
-    componentContext: ComponentContext,
-    val data: List<PluginData>,
-) : ComponentContext by componentContext
-
-@Composable
-fun DetailedDataUi(detailedData: DetailedData) =
-    LazyColumn(
-        verticalArrangement = Arrangement.SpaceAround,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(detailedData.data) { pluginData ->
-            Text(pluginData.annotatedExplain, Modifier.padding(bottom = 40.dp))
-            EditView(pluginData)
-        }
-    }
-
-
-class DetailedCommand(
-    componentContext: ComponentContext,
-    internal val command: List<Command>,
-) : ComponentContext by componentContext
-
-@Composable
-fun DetailedCommandUi(detailedCommand: DetailedCommand) =
-    LazyColumn {
-        items(detailedCommand.command) { registeredCommand ->
-            Text(registeredCommand.simpleDescription)
-            Spacer(Modifier.height(20.dp))
-        }
-    }

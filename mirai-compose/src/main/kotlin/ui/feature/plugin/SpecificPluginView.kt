@@ -16,7 +16,6 @@ import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.MiraiComposeRepository
 import com.youngerhousea.miraicompose.ui.common.annotatedName
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
@@ -24,43 +23,42 @@ import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 
+/**
+ * 选择的插件的页面
+ *
+ * @see CommonPlugin
+ * @see CJvmPlugin
+ */
 class SpecificPlugin(
     component: ComponentContext,
     val plugin: Plugin,
     val onExitButtonClicked: () -> Unit,
-    accessibleHolder: MiraiComposeRepository,
 ) : ComponentContext by component {
-
-    sealed class Setting : Parcelable {
-        class Common(val plugin: Plugin) : Setting()
-        class Java(val javaPlugin: JavaPlugin) : Setting()
-        class Kotlin(val kotlinPlugin: KotlinPlugin) : Setting()
-    }
-
-    private val router: Router<Setting, Component> = router(
+    private val router: Router<Configuration, Component> = router(
         initialConfiguration = when (plugin) {
-            is JavaPlugin -> Setting.Java(plugin)
-            is KotlinPlugin -> Setting.Kotlin(plugin)
-            else -> Setting.Common(plugin)
+            is JavaPlugin -> Configuration.Java(plugin)
+            is KotlinPlugin -> Configuration.Kotlin(plugin)
+            else -> Configuration.Common(plugin)
         },
         handleBackButton = true,
         key = "SpecificPluginRouter",
         childFactory = { configuration, componentContext ->
             when (configuration) {
-                is Setting.Common -> CommonPlugin(componentContext, configuration.plugin).asComponent {
+                is Configuration.Common -> CommonPlugin(
+                    componentContext,
+                    configuration.plugin
+                ).asComponent {
                     CommonPluginUi(it)
                 }
-                is Setting.Java -> CJvmPlugin(
+                is Configuration.Java -> CJvmPlugin(
                     componentContext,
                     plugin = configuration.javaPlugin,
-                    accessibleHolder = accessibleHolder
                 ).asComponent {
                     CJvmPluginUi(it)
                 }
-                is Setting.Kotlin -> CJvmPlugin(
+                is Configuration.Kotlin -> CJvmPlugin(
                     componentContext,
                     plugin = configuration.kotlinPlugin,
-                    accessibleHolder = accessibleHolder
                 ).asComponent {
                     CJvmPluginUi(it)
                 }
@@ -69,6 +67,13 @@ class SpecificPlugin(
     )
 
     val state get() = router.state
+
+    sealed class Configuration : Parcelable {
+        class Common(val plugin: Plugin) : Configuration()
+        class Java(val javaPlugin: JavaPlugin) : Configuration()
+        class Kotlin(val kotlinPlugin: KotlinPlugin) : Configuration()
+    }
+
 }
 
 @Composable

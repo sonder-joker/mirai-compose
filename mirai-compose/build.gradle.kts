@@ -73,4 +73,3 @@ compose.desktop {
         }
     }
 }
-

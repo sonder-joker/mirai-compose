@@ -19,14 +19,14 @@ inline fun <reified T : Any> ComponentContext.inject(
     qualifier: Qualifier? = null,
     noinline parameters: ParametersDefinition? = null
 ) =
-    lazy { get<T>(qualifier, parameters) }
+    lazy { getGlobal<T>(qualifier, parameters) }
 
 /**
  * Retrieve given dependency for ComponentContext
  * @param qualifier - bean name / optional
  * @param parameters
  */
-inline fun <reified T : Any> ComponentContext.get(
+inline fun <reified T : Any> ComponentContext.getGlobal(
     qualifier: Qualifier? = null,
     noinline parameters: ParametersDefinition? = null
 ) =
@@ -54,3 +54,11 @@ fun ComponentContext.getProperty(key: String, defaultValue: String) =
  * Help work on ModuleDefinition
  */
 fun ComponentContext.getKoin() = GlobalContext.get()
+
+
+// Simple instead
+inline fun <reified T : Any> getGlobal(
+    qualifier: Qualifier? = null,
+    noinline parameters: ParametersDefinition? = null
+) =
+    GlobalContext.get().get<T>(qualifier, parameters)

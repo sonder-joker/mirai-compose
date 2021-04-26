@@ -6,7 +6,7 @@ import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import org.junit.jupiter.api.Test
 import java.util.*
 
-internal class BotNoLoginTest {
+internal class BotInitLoginTest {
 
 //    @get:Rule
 //    val rule = createComposeRule()
