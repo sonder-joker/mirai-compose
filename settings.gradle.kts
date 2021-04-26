@@ -12,4 +12,4 @@ rootProject.name = "mirai-compose"
 
 include (":mirai-compose")
 
-enableFeaturePreview("VERSION_CATALOGS")
+//enableFeaturePreview("VERSION_CATALOGS")

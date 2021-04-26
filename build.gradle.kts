@@ -14,9 +14,10 @@ allprojects {
     group = "com.youngerhousea"
 
     repositories {
-        jcenter()
+        google()
         mavenLocal()
         mavenCentral()
+        jcenter()
         maven(url = "https://jitpack.io/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://packages.jetbrains.team/maven/p/ui/dev")

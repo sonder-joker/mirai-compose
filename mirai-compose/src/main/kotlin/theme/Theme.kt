@@ -14,6 +14,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.console.data.AutoSavePluginConfig
 import net.mamoe.mirai.console.data.value
+import kotlin.math.log
 
 
 @Serializable
@@ -47,6 +48,31 @@ class LogColor {
     var warning: Color by _warning
 
     var error: Color by _error
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LogColor
+
+        if (debug != other.debug) return false
+        if (verbose != other.verbose) return false
+        if (info != other.info) return false
+        if (warning != other.warning) return false
+        if (error != other.error) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = debug.hashCode()
+        result = 31 * result + verbose.hashCode()
+        result = 31 * result + info.hashCode()
+        result = 31 * result + warning.hashCode()
+        result = 31 * result + error.hashCode()
+        return result
+    }
+
 }
 
 @Serializable
