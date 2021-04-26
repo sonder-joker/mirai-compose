@@ -11,5 +11,8 @@ buildSrc/.gradle/
 # build
 /mirai-compose/build/
 /mirai-compose/run/
+/mirai-compose/out/
 buildSrc/build/
 build/
+
+cef/
