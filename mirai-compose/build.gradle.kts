@@ -1,3 +1,4 @@
+import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 version = Versions.mirai_compose
@@ -34,17 +35,15 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
-    testImplementation("io.insert-koin:koin-test:${Versions.koin}")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("junit:junit:4.13")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:${Versions.kotlin}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
-    testImplementation("org.jetbrains.compose.ui:ui-test-desktop:${Versions.compose}")
-    testImplementation("org.jetbrains.compose.ui:ui-test:${Versions.compose}")
+
+    testImplementation("io.insert-koin:koin-test:${Versions.koin}")
+
+    testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-}
 
 compose.desktop {
     application {

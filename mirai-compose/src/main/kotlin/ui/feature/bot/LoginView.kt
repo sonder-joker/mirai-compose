@@ -150,7 +150,9 @@ class Login(
                 ) {
                     loginSolver = this@Login
                 }
-            }.onSuccess(onLoginSuccess).onFailure {
+            }.onSuccess {
+                onLoginSuccess(it)
+            }.onFailure {
                 if (it is LoginFailedException)
                 //TODO: 异常提示
                     onExitHappened()
