@@ -38,6 +38,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+interface LoginI {
+
+}
+
 /**
  * 登录界面
  *

@@ -11,19 +11,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VpnKey
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -60,12 +55,6 @@ class InitLogin(
     val hasPasswordError get() = _hasPasswordError
 
     var errorTip by mutableStateOf("")
-
-    private var _passwordVisualTransformation by mutableStateOf<VisualTransformation>(
-        PasswordVisualTransformation()
-    )
-
-    val passwordVisualTransformation get() = _passwordVisualTransformation
 
     private var _loading by mutableStateOf(false)
 
@@ -131,29 +120,6 @@ class InitLogin(
         _password = textFieldValue
     }
 
-    val accountLabel =
-        if (_hasAccountError)
-            errorTip
-        else
-            "Account"
-
-
-    @Composable
-    fun passwordLabel() {
-        if (_hasPasswordError)
-            Text(errorTip)
-        else
-            Text("Password")
-    }
-
-    fun passwordTrailingIconChange() {
-        _passwordVisualTransformation =
-            if (_passwordVisualTransformation != VisualTransformation.None)
-                VisualTransformation.None
-            else
-                PasswordVisualTransformation()
-    }
-
 }
 
 // TODO:简化UI
@@ -170,26 +136,50 @@ fun InitLoginUi(initLogin: InitLogin) {
             modifier = Modifier
                 .padding(5.dp)
         )
-        AccountTextField(initLogin)
-        PasswordTextField(initLogin)
-        LoginButton(initLogin)
+        AccountTextField(
+            account = initLogin.account,
+            onAccountTextChange = initLogin::onAccountTextChange,
+            isError = initLogin.hasAccountError,
+            errorLabel = initLogin.errorTip,
+            onKeyEnter = initLogin::onLogin
+        )
+        PasswordTextField(
+            password = initLogin.password,
+            onPasswordTextChange = initLogin::onPasswordTextChange,
+            isError = initLogin.hasPasswordError,
+            errorLabel = initLogin.errorTip,
+            onKeyEnter = initLogin::onLogin
+        )
+        LoginButton(
+            onClick = initLogin::onLogin,
+            isLoading = initLogin.loading
+        )
     }
 }
 
 @Composable
 private fun AccountTextField(
-    loginWindowState: InitLogin,
+    account: TextFieldValue,
+    onAccountTextChange: (TextFieldValue) -> Unit,
+    isError: Boolean,
+    errorLabel: String,
+    onKeyEnter: () -> Unit
 ) {
     TextField(
-        value = loginWindowState.account,
-        onValueChange = loginWindowState::onAccountTextChange,
+        value = account,
+        onValueChange = onAccountTextChange,
         modifier = Modifier
             .padding(40.dp)
             .shortcuts {
-                on(Key.Enter, callback = loginWindowState::onLogin)
+                on(Key.Enter, callback = onKeyEnter)
             },
         label = {
-            Text(loginWindowState.accountLabel)
+            Text(
+                if (isError)
+                    errorLabel
+                else
+                    "Account"
+            )
         },
         leadingIcon = {
             Icon(
@@ -197,7 +187,7 @@ private fun AccountTextField(
                 null
             )
         },
-        isError = loginWindowState.hasAccountError,
+        isError = isError,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next
@@ -207,16 +197,35 @@ private fun AccountTextField(
 }
 
 @Composable
-private fun PasswordTextField(loginWindowState: InitLogin) {
+private fun PasswordTextField(
+    password: TextFieldValue,
+    onPasswordTextChange: (TextFieldValue) -> Unit,
+    isError: Boolean,
+    errorLabel: String,
+    onKeyEnter: () -> Unit
+) {
+    var passwordVisualTransformation: VisualTransformation by remember(password, onPasswordTextChange) {
+        mutableStateOf(
+            PasswordVisualTransformation()
+        )
+    }
+
     TextField(
-        value = loginWindowState.password,
-        onValueChange = loginWindowState::onPasswordTextChange,
+        value = password,
+        onValueChange = onPasswordTextChange,
         modifier = Modifier
             .padding(40.dp)
             .shortcuts {
-                on(Key.Enter, callback = loginWindowState::onLogin)
+                on(Key.Enter, callback = onKeyEnter)
             },
-        label = { loginWindowState.passwordLabel() },
+        label = {
+            Text(
+                if (isError)
+                    errorLabel
+                else
+                    "Password"
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.VpnKey,
@@ -227,11 +236,17 @@ private fun PasswordTextField(loginWindowState: InitLogin) {
             Icon(
                 imageVector = Icons.Default.RemoveRedEye,
                 contentDescription = null,
-                modifier = Modifier.clickable(onClick = loginWindowState::passwordTrailingIconChange)
+                modifier = Modifier.clickable {
+                    passwordVisualTransformation =
+                        if (passwordVisualTransformation != VisualTransformation.None)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation()
+                }
             )
         },
-        isError = loginWindowState.hasPasswordError,
-        visualTransformation = loginWindowState.passwordVisualTransformation,
+        isError = isError,
+        visualTransformation = passwordVisualTransformation,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
@@ -253,15 +268,16 @@ private fun PasswordTextField(loginWindowState: InitLogin) {
 
 @Composable
 private fun LoginButton(
-    loginWindowState: InitLogin,
+    onClick: () -> Unit,
+    isLoading: Boolean
 ) = Button(
-    onClick = loginWindowState::onLogin,
+    onClick = onClick,
     modifier = Modifier
         .requiredHeight(100.dp)
         .aspectRatio(2f)
         .padding(24.dp),
 ) {
-    if (loginWindowState.loading)
+    if (isLoading)
         HorizontalDottedProgressBar()
     else
         Text("Login")

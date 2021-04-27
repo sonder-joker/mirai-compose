@@ -26,6 +26,7 @@ import java.net.URL
 import java.net.URLDecoder
 import java.util.*
 import kotlin.collections.set
+import kotlin.coroutines.EmptyCoroutineContext
 
 //https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
 fun getARGB(rgb: String): IntArray {
@@ -177,7 +178,8 @@ private fun checkWindowSizeStep(size: Int, step: Int) {
     }
 }
 
-class ComponentChildScope(private val scope: CoroutineScope = MiraiConsole.childScope()) : InstanceKeeper.Instance,
+class ComponentChildScope(private val scope: CoroutineScope = CoroutineScope(EmptyCoroutineContext)) :
+    InstanceKeeper.Instance,
     CoroutineScope by scope {
     override fun onDestroy() {
         scope.cancel()
