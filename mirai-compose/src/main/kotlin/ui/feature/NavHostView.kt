@@ -17,6 +17,7 @@ import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
+import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
 import com.youngerhousea.miraicompose.ui.feature.bot.Login
@@ -164,27 +165,27 @@ private fun SideRow(navHost: NavHost) {
         onNewBotButtonSelected = navHost::addNewBot,
     )
     SelectEdgeText(
-        "Robot",
+        R.String.sideRowFirst,
         isWishWindow = navHost.navigationIndex == 0,
         onClick = navHost::onRouteBot
     )
     SelectEdgeText(
-        "Plugin",
+        R.String.sideRowSecond,
         isWishWindow = navHost.navigationIndex == 1,
         onClick = navHost::onRoutePlugin
     )
     SelectEdgeText(
-        "Setting",
+        R.String.sideRowThird,
         isWishWindow = navHost.navigationIndex == 2,
         onClick = navHost::onRouteSetting
     )
     SelectEdgeText(
-        "Log",
+        R.String.sideRowFour,
         isWishWindow = navHost.navigationIndex == 3,
         onClick = navHost::onRouteLog
     )
     SelectEdgeText(
-        "About",
+        R.String.sideRowFive,
         isWishWindow = navHost.navigationIndex == 4,
         onClick = navHost::onRouteAbout
     )
@@ -208,19 +209,19 @@ private fun AvatarWithMenu(
         ) {
             currentBot?.let {
                 BotItem(currentBot)
-            } ?: Text("No item")
+            } ?: Text(R.String.botMenuEmpty)
         }
 
         DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }) {
             DropdownMenuItem(onClick = { isExpand = !isExpand }) {
-                Text("Logout")
+                Text(R.String.botMenuExit)
             }
 
             DropdownMenuItem(onClick = {
                 onNewBotButtonSelected()
                 isExpand = !isExpand
             }) {
-                Text("Add")
+                Text(R.String.botMenuAdd)
             }
 
             items(composeBotList) { item ->
