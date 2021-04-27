@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.instancekeeper.getOrCreate
+import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import kotlinx.coroutines.delay
@@ -70,26 +71,26 @@ class InitLogin(
                 // 应当在
                 is WrongPasswordException -> {
                     _hasPasswordError = true
-                    "密码错误！"
+                    R.String.wrongPassword
                 }
                 is NumberFormatException -> {
                     _hasAccountError = true
-                    "格式错误"
+                    R.String.numberFormat
                 }
                 is RetryLaterException -> {
-                    "请稍后再试"
+                    R.String.retryLater
                 }
                 is UnsupportedSliderCaptchaException -> {
-                    "Should not happened!"
+                    R.String.unsupportedSliderCaptcha
                 }
                 is UnsupportedSMSLoginException -> {
-                    "Mirai暂未提供"
+                    R.String.unsupportedSMSLogin
                 }
                 is NoStandardInputForCaptchaException -> {
-                    "无标准输入"
+                    R.String.noStandardInputForCaptcha
                 }
                 is NoServerAvailableException -> {
-                    "无可用服务器"
+                    R.String.noServerAvailable
                 }
                 else -> throw e
             }
