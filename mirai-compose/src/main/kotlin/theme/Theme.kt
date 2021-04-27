@@ -14,7 +14,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.console.data.AutoSavePluginConfig
 import net.mamoe.mirai.console.data.value
-import kotlin.math.log
 
 
 @Serializable
@@ -84,7 +83,8 @@ class AppTheme {
             surface = Color(0xff979595),
             onSurface = Color(0xFFFFFFFF),
             primary = Color(0xf5f5f5f5),
-            onPrimary = Color(0xFF000000)
+            onPrimary = Color(0xFF000000),
+            error = Color.Red
         )
     )
 
