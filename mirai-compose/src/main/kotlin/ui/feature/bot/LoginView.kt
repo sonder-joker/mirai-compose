@@ -2,23 +2,23 @@ package com.youngerhousea.miraicompose.ui.feature.bot
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
@@ -31,6 +31,7 @@ import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.asComponent
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.LoginSolver
@@ -153,7 +154,7 @@ class Login(
                     password = password
                 ) {
                     loginSolver = this@Login
-                }
+                }.alsoLogin()
             }.onSuccess {
                 onLoginSuccess(it)
             }.onFailure {
@@ -195,7 +196,7 @@ class Login(
 @Composable
 fun LoginUi(login: Login) {
     HorizontalNotification(isExpand = login.isExpand, login::setIsExpand, "Error", Color.Red, Color.White)
-    VerticalNotification(isExpand = login.isExpand, login::setIsExpand, "Error", Color.Red, Color.White)
+    VerticalNotification(isExpand = login.isExpand, login::setIsExpand, "Login Failure")
     Children(login.state) { child ->
         child.instance()
     }
@@ -207,25 +208,64 @@ fun VerticalNotification(
     isExpand: Boolean,
     setIsExpand: (Boolean) -> Unit,
     text: String,
-    backgroundColor: Color,
-    textColor: Color
+    backgroundColor: Color = Color.White,
+    textColor: Color = MaterialTheme.colors.error
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.Bottom
     ) {
-        BoxWithConstraints {
+        BoxWithConstraints(modifier = Modifier.padding(end = 10.dp)) {
             DropdownMenu(
                 isExpand,
-                onDismissRequest = { setIsExpand(false) },
-                modifier = Modifier
-                    .background(backgroundColor)
+                onDismissRequest = { /*setIsExpand(false)*/ },
+                modifier = Modifier.background(backgroundColor).drawBehind {
+                    drawLine(
+                        color = textColor,
+                        start = Offset(18f, 0f),
+                        end = Offset(size.width, 0f),
+                        strokeWidth = 10F
+                    )
+                    drawLine(
+                        color = textColor,
+                        start = Offset(0f, 0f),
+                        end = Offset(0f, size.height),
+                        strokeWidth = 17F
+                    )
+                }
             ) {
                 DropdownMenuItem(onClick = { setIsExpand(false) }) {
-                    Text(text = text, color = textColor)
                     // TODO better style
-                    Text(text = "X", color = Color.White)
+                    Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
+                        Row(modifier = Modifier.padding(top = 5.dp)) {
+                            Text(
+                                text = "Error",
+                                color = textColor,
+                                modifier = Modifier.padding(10.dp),
+                                style = TextStyle.Default.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Left
+                                )
+                            )
+                            Text(
+                                text = "X",
+                                color = textColor.copy(alpha = 0.7F),
+                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                                style = TextStyle.Default.copy(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    textAlign = TextAlign.Right
+                                )
+                            )
+                        }
+                        Row {
+                            Text(
+                                text = text,
+                                color = textColor,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -238,8 +278,8 @@ fun HorizontalNotification(
     isExpand: Boolean,
     setIsExpand: (Boolean) -> Unit,
     text: String,
-    backgroundColor: Color,
-    textColor: Color
+    backgroundColor: Color = MaterialTheme.colors.error,
+    textColor: Color = Color.White
 ) {
     BoxWithConstraints(
         modifier = Modifier
