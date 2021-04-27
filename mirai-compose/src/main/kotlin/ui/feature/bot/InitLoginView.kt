@@ -29,6 +29,7 @@ import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.network.*
+import java.lang.IllegalArgumentException
 
 /**
  * bot的登录的界面
@@ -91,6 +92,10 @@ class InitLogin(
                 }
                 is NoServerAvailableException -> {
                     R.String.noServerAvailable
+                }
+                is IllegalArgumentException -> {
+                    R.String.passwordLengthMuch
+
                 }
                 else -> throw e
             }

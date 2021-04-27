@@ -158,11 +158,9 @@ class Login(
             }.onSuccess {
                 onLoginSuccess(it)
             }.onFailure {
-                if (it is LoginFailedException)
                 //TODO: 异常提示
-                    onExitHappened()
-                else
-                    throw it
+                onExitHappened()
+                throw it
             }
         }
     }

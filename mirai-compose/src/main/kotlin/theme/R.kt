@@ -19,5 +19,6 @@ object R {
         const val unsupportedSMSLogin = "Mirai暂未提供"
         const val noStandardInputForCaptcha = "无标准输入"
         const val noServerAvailable = "无可用服务器"
+        const val passwordLengthMuch = "Password length must be at most 16"
     }
 }

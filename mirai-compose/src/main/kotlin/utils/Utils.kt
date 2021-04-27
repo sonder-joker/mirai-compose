@@ -19,8 +19,6 @@ import com.arkivanov.decompose.Navigator
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import org.jetbrains.skija.Image
 import java.net.URL
 import java.net.URLDecoder

@@ -7,7 +7,7 @@ object Versions {
 
     const val mirai = "2.7-M1-dev-1"
 
-    const val compose = "0.4.0-build184"
+    const val compose = "0.4.0-build185"
     const val decompose = "0.2.3"
 
     const val yamlkt = "0.9.0"

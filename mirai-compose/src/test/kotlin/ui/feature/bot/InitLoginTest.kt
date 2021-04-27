@@ -2,25 +2,28 @@ package com.youngerhousea.miraicompose.ui.feature.bot
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.text.input.TextFieldValue
+import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.utils.fakeContext
 import net.mamoe.mirai.network.WrongPasswordException
 import net.mamoe.mirai.utils.MiraiInternalApi
 import org.junit.Rule
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 @OptIn(MiraiInternalApi::class)
 internal class InitLoginTest {
+    private fun getInitLogin(onClick: () -> Unit) =
+        InitLogin(fakeContext(), onClick = { _, _ ->
+            onClick()
+        }).apply { onAccountTextChange(TextFieldValue("123456")) }
+
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val fakeContext = fakeContext()
-
-
     @Test
-    fun ensureHaveText() {
-        val initLogin = InitLogin(fakeContext, onClick = { _: Long, _: String -> })
+    fun `ensure has necessary text field`() {
+        val initLogin = getInitLogin {}
         composeTestRule.setContent {
             InitLoginUi(initLogin)
         }
@@ -30,11 +33,26 @@ internal class InitLoginTest {
     }
 
     @Test
-    fun t() {
-        val initLogin = InitLogin(fakeContext, onClick = { _, _ ->
-            throw WrongPasswordException("")
-        })
+    fun `test number format exception`() {
+        val initLogin = getInitLogin { throw NumberFormatException() }
+        composeTestRule.setContent {
+            InitLoginUi(initLogin)
+        }
         initLogin.onLogin()
-        assertEquals(initLogin.errorTip, "格式错误")
+        assertEquals(initLogin.errorTip, R.String.numberFormat)
+//        TODO: more useful test after support
+//        composeTestRule.onNodeWithText(R.String.numberFormat).assertExists()
+    }
+
+
+    @Test
+    fun `test wrong password exception`() {
+        val initLogin = getInitLogin { throw WrongPasswordException("") }
+        composeTestRule.setContent {
+            InitLoginUi(initLogin)
+        }
+        initLogin.onLogin()
+        assertEquals(initLogin.errorTip, R.String.wrongPassword)
+//        composeTestRule.onNodeWithText(R.String.wrongPassword).assertExists()
     }
 }

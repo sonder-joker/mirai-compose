@@ -33,6 +33,7 @@ import net.mamoe.mirai.utils.SwingSolver
 import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.div
 
 /**
  * MiraiCompose 的实现
@@ -54,9 +55,9 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override val frontEndDescription = MiraiComposeDescription
 
-    override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath.resolve("data"))
+    override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath / "data")
 
-    override val dataStorageForBuiltIns = MultiFilePluginDataStorage(rootPath.resolve("data"))
+    override val dataStorageForBuiltIns = MultiFilePluginDataStorage(rootPath /"data")
 
     override val configStorageForJvmPluginLoader = ReadablePluginConfigStorage(rootPath.resolve("config"))
 
