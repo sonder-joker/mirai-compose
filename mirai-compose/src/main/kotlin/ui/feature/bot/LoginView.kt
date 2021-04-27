@@ -3,10 +3,7 @@ package com.youngerhousea.miraicompose.ui.feature.bot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +25,6 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.ComponentChildScope
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
@@ -209,7 +205,7 @@ fun VerticalNotification(
     setIsExpand: (Boolean) -> Unit,
     text: String,
     backgroundColor: Color = Color.White,
-    textColor: Color = ComposeSetting.AppTheme.materialLight.error
+    textColor: Color = MaterialTheme.colors.error
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -278,8 +274,8 @@ fun HorizontalNotification(
     isExpand: Boolean,
     setIsExpand: (Boolean) -> Unit,
     text: String,
-    backgroundColor: Color,
-    textColor: Color
+    backgroundColor: Color = MaterialTheme.colors.error,
+    textColor: Color = Color.White
 ) {
     BoxWithConstraints(
         modifier = Modifier
