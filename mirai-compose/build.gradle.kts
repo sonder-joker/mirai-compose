@@ -41,7 +41,7 @@ dependencies {
 
     testImplementation("io.insert-koin:koin-test:${Versions.koin}")
 
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3-native-mt")
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
 }
 
