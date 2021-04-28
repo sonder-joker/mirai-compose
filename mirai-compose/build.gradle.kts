@@ -35,7 +35,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
-    testImplementation("junit:junit:4.13")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test:${Versions.kotlin}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
 
