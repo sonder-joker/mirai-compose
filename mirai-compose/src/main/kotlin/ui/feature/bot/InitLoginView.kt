@@ -25,7 +25,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.theme.ResourceImage
-import com.youngerhousea.miraicompose.utils.ComponentChildScope
+import com.youngerhousea.miraicompose.utils.ComponentScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.network.*
@@ -38,7 +38,7 @@ class InitLogin(
     componentContext: ComponentContext,
     private val onClick: (account: Long, password: String) -> Unit,
 ) : ComponentContext by componentContext {
-    private val scope = instanceKeeper.getOrCreate(::ComponentChildScope)
+    private val scope = instanceKeeper.getOrCreate(::ComponentScope)
 
     private var _account by mutableStateOf(TextFieldValue())
 
@@ -171,7 +171,7 @@ private fun AccountTextField(
     errorLabel: String,
     onKeyEnter: () -> Unit
 ) {
-    TextField(
+    OutlinedTextField(
         value = account,
         onValueChange = onAccountTextChange,
         modifier = Modifier
@@ -216,7 +216,7 @@ private fun PasswordTextField(
         )
     }
 
-    TextField(
+    OutlinedTextField(
         value = password,
         onValueChange = onPasswordTextChange,
         modifier = Modifier
@@ -260,17 +260,6 @@ private fun PasswordTextField(
         singleLine = true
     )
 }
-
-//fun SpecificPasswordField(value:String, onValueChange:(Str) -> Unit) {
-//    TextField(
-//        value = ,
-//        onValueChange = {},
-//        keyboardOptions = KeyboardOptions(
-//            keyboardType = KeyboardType.Password,
-//            imeAction = ImeAction.Done
-//        ),
-//    )
-//}
 
 @Composable
 private fun LoginButton(

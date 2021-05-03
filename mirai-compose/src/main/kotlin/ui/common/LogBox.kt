@@ -38,7 +38,7 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
     BoxWithConstraints(
         modifier
     ) {
-        val adaptiveLog = remember(logs) {
+        val adaptiveLogs = remember(logs) {
             logs.flatMap {
                 it.chunked(constraints.maxWidth / 9)
             }
@@ -52,28 +52,24 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
             state = state
         ) {
             items(
-                adaptiveLog
-            ) {
+                adaptiveLogs
+            ) { adaptiveLog ->
                 //TODO:HapticFeedback.performHapticFeedback not implemented yet
                 SelectionContainer {
-                    Text(
-                        it,
-                        modifier = Modifier
-                            .height(adaptiveLogHeight)
-                    )
+                    Text(adaptiveLog, modifier = Modifier.height(adaptiveLogHeight))
                 }
             }
         }
         VerticalScrollbar(
             Modifier.align(Alignment.CenterEnd),
             state,
-            adaptiveLog.size,
+            adaptiveLogs.size,
             adaptiveLogHeight
         )
 
-        LaunchedEffect(adaptiveLog) {
-            if (adaptiveLog.isNotEmpty())
-                state.scrollToItem(adaptiveLog.size - 1, 0)
+        LaunchedEffect(adaptiveLogs) {
+            if (adaptiveLogs.isNotEmpty())
+                state.scrollToItem(adaptiveLogs.size - 1, 0)
         }
     }
 }

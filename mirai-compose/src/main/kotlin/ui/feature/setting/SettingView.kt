@@ -187,7 +187,7 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.width(200.dp)) {
-                Text(text, color = value)
+                Text(text)
             }
 
             Button({

@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,7 +28,7 @@ import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.yamlkt.Yaml
 
 internal inline val Plugin.annotatedName: AnnotatedString
-    get() = with(AnnotatedString.Builder()) {
+    get() = buildAnnotatedString {
         pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 20.sp))
         append(name.ifEmpty { "Unknown" })
         pop()
@@ -35,7 +36,7 @@ internal inline val Plugin.annotatedName: AnnotatedString
     }
 
 private inline val Plugin.annotatedAuthor: AnnotatedString
-    get() = with(AnnotatedString.Builder()) {
+    get() = buildAnnotatedString {
         pushStyle(SpanStyle(fontSize = 13.sp))
         append("Author:")
         append(author.ifEmpty { "Unknown" })
@@ -43,7 +44,7 @@ private inline val Plugin.annotatedAuthor: AnnotatedString
     }
 
 private inline val Plugin.annotatedInfo: AnnotatedString
-    get() = with(AnnotatedString.Builder()) {
+    get() = buildAnnotatedString {
         pushStyle(SpanStyle(fontSize = 13.sp))
         append("Info:")
         append(info.ifEmpty { "Unknown" })
@@ -51,7 +52,7 @@ private inline val Plugin.annotatedInfo: AnnotatedString
     }
 
 private inline val Plugin.annotatedKind: AnnotatedString
-    get() = with(AnnotatedString.Builder()) {
+    get() = buildAnnotatedString {
         pushStyle(SpanStyle(fontSize = 13.sp))
         append(
             when (this@annotatedKind) {
@@ -84,7 +85,7 @@ private val Plugin.languageIcon: ImageVector
         }
 
 val Plugin.annotatedDescription: AnnotatedString
-    get() = with(AnnotatedString.Builder()) {
+    get() = buildAnnotatedString {
         pushStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.Black, fontSize = 20.sp))
         append("Name:${this@annotatedDescription.name.ifEmpty { "Unknown" }}\n")
         append("ID:${this@annotatedDescription.id}\n")
@@ -114,7 +115,7 @@ internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
 
 
 internal inline val PluginData.annotatedExplain: AnnotatedString
-    get() = with(AnnotatedString.Builder()) {
+    get() = buildAnnotatedString {
         pushStyle(SpanStyle(fontSize = 20.sp))
         append(
             when (this@annotatedExplain) {
@@ -130,48 +131,11 @@ internal inline val PluginData.annotatedExplain: AnnotatedString
         toAnnotatedString()
     }
 
-@Composable
-internal fun EditView(pluginData: PluginData) {
-    var value by remember(pluginData) {
-        mutableStateOf(
-            Yaml.encodeToString(
-                pluginData.updaterSerializer,
-                Unit
-            )
-        )
-    }
-
-
-    var textField by remember(pluginData) { mutableStateOf(TextFieldValue(value)) }
-
-    Row(
-        Modifier.fillMaxWidth().padding(bottom = 40.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-    ) {
-        TextField(textField, {
-            textField = it
-        })
-        Button(
-            {
-                runCatching {
-                    Yaml.decodeFromString(pluginData.updaterSerializer, textField.text)
-                }.onSuccess {
-                    value = textField.text
-                }
-            },
-            Modifier
-                .requiredWidth(100.dp)
-                .background(MaterialTheme.colors.background)
-        ) {
-            Text("修改")
-        }
-    }
-}
 
 
 internal inline val Command.simpleDescription: AnnotatedString
     get() =
-        with(AnnotatedString.Builder()) {
+        buildAnnotatedString {
             append(allNames.joinToString { " " })
             append('\n')
             append(usage)

@@ -1,8 +1,10 @@
 package com.youngerhousea.miraicompose.console
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.ui.feature.DEBUG
 import com.youngerhousea.miraicompose.ui.feature.systemOut
@@ -16,12 +18,13 @@ import java.util.*
 
 private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
 
+internal val annotatedLogStorage: MutableList<AnnotatedString> = mutableStateListOf()
+
 /**
  * [MiraiCompose] 默认Logger实现
  */
 class MiraiComposeLogger(
-    override val identity: String?,
-    private val logStorage: MutableList<AnnotatedString> = mutableListOf()
+    override val identity: String?
 ) : MiraiLoggerPlatformBase() {
 
     private inline val currentDate: String get() = logTimeFormat.format(Date())
@@ -38,13 +41,14 @@ class MiraiComposeLogger(
     private fun printLog(message: String?, priority: SimpleLogger.LogPriority) {
         if (message != null) {
             val annotatedLog =
-                AnnotatedString(
-                    "$currentDate ${priority.simpleName}/$identity: $message",
-                    SpanStyle(priority.color)
-                )
+                buildAnnotatedString {
+                pushStyle(SpanStyle(priority.color))
+                append("$currentDate ${priority.simpleName}/$identity: $message")
+            }
+
             if (DEBUG)
                 systemOut.println(message)
-            logStorage.add(annotatedLog)
+            annotatedLogStorage.add(annotatedLog)
         }
     }
 
