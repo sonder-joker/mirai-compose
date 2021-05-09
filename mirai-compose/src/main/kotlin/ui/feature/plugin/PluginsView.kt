@@ -12,12 +12,9 @@ import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.MiraiComposeRepository
-import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.plugin.Plugin
-import org.koin.core.qualifier.named
 
 /**
  * 插件菜单
@@ -28,7 +25,7 @@ import org.koin.core.qualifier.named
 class Plugins(
     component: ComponentContext,
 ) : ComponentContext by component {
-    val repository by inject<MiraiComposeRepository>()
+//    val repository by inject<MiraiComposeRepository>()
     private val router: Router<Configuration, Component> = router(
         initialConfiguration = Configuration.List,
         key = "PluginRouter",
@@ -77,7 +74,7 @@ fun PluginsUi(plugins: Plugins) {
         Button(
             modifier = Modifier.align(Alignment.BottomEnd),
             onClick = {
-                plugins.repository.reload()
+//                plugins.repository.reload()
             }) {
             Text("Reload")
         }

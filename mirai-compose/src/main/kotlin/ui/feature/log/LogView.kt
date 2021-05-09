@@ -24,11 +24,9 @@ import java.awt.event.MouseEvent
  */
 class ConsoleLog(
     componentContext: ComponentContext,
-) : ComponentContext by componentContext {
-    val loggerStorage: MutableList<AnnotatedString> by inject()
-
-    val logger: MiraiLogger by inject()
-}
+    val loggerStorage: List<AnnotatedString>,
+    val logger: MiraiLogger
+) : ComponentContext by componentContext
 
 @Composable
 fun ConsoleLogUi(consoleLog: ConsoleLog) {

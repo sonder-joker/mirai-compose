@@ -80,10 +80,10 @@ class AppTheme {
     @Serializable(MutableStateSerializer::class)
     private val _materialLight: MutableState<@Serializable(ColorsSerializer::class) Colors> = mutableStateOf(
         lightColors(
-//            background = Color(0xfffafafa),
-            primary = Color(0xff00ff00)
-//            surface = Color(0xff979595),
-//            onSurface = Color(0xFFFFFFFF),
+            background = Color(0xffffffff),
+//            primary = Color(0xff00ff00)
+            surface = Color(0xff979595),
+            onSurface = Color(0xFFFFFFFF),
 //            primary = Color(0xf5f5f5f5),
 //            onPrimary = Color(0xFF000000),
 //            error = Color.Red

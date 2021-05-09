@@ -39,7 +39,7 @@ import kotlin.io.path.div
  *
  */
 @ConsoleFrontEndImplementation
-class MiraiCompose : MiraiConsoleImplementation, InstanceKeeper.Instance, MiraiComposeRepository,
+class MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
     CoroutineScope by CoroutineScope(
         NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
             if (throwable is CancellationException) {
@@ -78,21 +78,11 @@ class MiraiCompose : MiraiConsoleImplementation, InstanceKeeper.Instance, MiraiC
 
     override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
 
-
-    override fun reload() {
-        cancel("reload")
-        start()
-    }
-
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
-
-    override fun preStart() {
-        setSystemOut(MiraiConsole.mainLogger)
-    }
 
     override fun postPhase(phase: String) {
         when (phase) {
@@ -108,15 +98,6 @@ class MiraiCompose : MiraiConsoleImplementation, InstanceKeeper.Instance, MiraiC
     override fun postStart() {
         alreadyLoaded = true
     }
-
-    init {
-        start()
-    }
-
-    override fun onDestroy() {
-        cancel("Exit")
-    }
-
 }
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val name: String = "MiraiCompose"

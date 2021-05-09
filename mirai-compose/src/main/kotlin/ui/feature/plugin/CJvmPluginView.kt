@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.AccessibleHolder
@@ -102,7 +103,7 @@ fun CJvmPluginUi(CJvmPlugin: CJvmPlugin) = Column {
             onClick = CJvmPlugin::onCommandClick
         )
     }
-    Children(CJvmPlugin.state, slide()) { child ->
+    Children(CJvmPlugin.state, crossfade()) { child ->
         child.instance()
     }
 }

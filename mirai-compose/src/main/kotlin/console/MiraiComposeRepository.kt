@@ -18,9 +18,6 @@ interface MiraiComposeRepository : AccessibleHolder {
 
     // 已加载的插件
     val loadedPlugins: List<Plugin>
-
-
-    fun reload()
 }
 
 // 提供访问loadedJvmPlugin的data和config
