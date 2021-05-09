@@ -26,14 +26,13 @@ import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.utils.Component
-import com.youngerhousea.miraicompose.utils.ComponentChildScope
+import com.youngerhousea.miraicompose.utils.ComponentScope
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.asComponent
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.network.LoginFailedException
 import net.mamoe.mirai.utils.LoginSolver
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -57,7 +56,7 @@ class Login(
     componentContext: ComponentContext,
     onLoginSuccess: (bot: Bot) -> Unit,
 ) : LoginSolver(), ComponentContext by componentContext {
-    private val scope = ComponentChildScope()
+    private val scope = ComponentScope()
 
     private val onLoginSuccess: (bot: Bot) -> Unit = {
         router.push(Configuration.InitLogin)

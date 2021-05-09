@@ -176,7 +176,7 @@ private fun checkWindowSizeStep(size: Int, step: Int) {
     }
 }
 
-class ComponentChildScope(private val scope: CoroutineScope = CoroutineScope(EmptyCoroutineContext)) :
+class ComponentScope(private val scope: CoroutineScope = CoroutineScope(EmptyCoroutineContext)) :
     InstanceKeeper.Instance,
     CoroutineScope by scope {
     override fun onDestroy() {

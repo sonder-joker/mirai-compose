@@ -1,22 +1,34 @@
 package com.youngerhousea.miraicompose.ui.feature
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.*
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
+import com.arkivanov.decompose.push
+import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
+import com.youngerhousea.miraicompose.console.annotatedLogStorage
+import com.youngerhousea.miraicompose.future.getGlobal
 import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
+import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
@@ -34,6 +46,7 @@ import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import com.youngerhousea.miraicompose.utils.items
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.MiraiConsole
 import org.koin.core.qualifier.named
 
 /**
@@ -72,9 +85,16 @@ class NavHost(
                 is Configuration.Plugin ->
                     Plugins(componentContext).asComponent { PluginsUi(it) }
                 is Configuration.Setting ->
-                    Setting(componentContext).asComponent { SettingUi(it) }
+                    Setting(
+                        componentContext,
+                        ComposeSetting.AppTheme
+                    ).asComponent { SettingUi(it) }
                 is Configuration.ConsoleLog ->
-                    ConsoleLog(componentContext).asComponent { ConsoleLogUi(it) }
+                    ConsoleLog(
+                        componentContext,
+                        annotatedLogStorage,
+                        MiraiConsole.mainLogger
+                    ).asComponent { ConsoleLogUi(it) }
                 is Configuration.About ->
                     About(componentContext).asComponent { AboutUi(it) }
             }
@@ -145,51 +165,71 @@ class NavHost(
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
-    Column(Modifier.fillMaxSize()) {
-        TopAppBar(Modifier.height(80.dp)) { SideRow(navHost) }
-        Children(
-            navHost.state, crossfade()
-        ) { child ->
-            child.instance()
+    Row(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .width(200.dp)
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+//            elevation = 0.dp,
+//            backgroundColor = Color(0xffffffff)
+        ) {
+
+            AvatarWithMenu(
+                composeBotList = navHost.botList,
+                currentBot = navHost.currentBot,
+                onMenuBotSelected = navHost::onRouteToSpecificBot,
+                onNewBotButtonSelected = navHost::addNewBot,
+                modifier = Modifier.weight(1f)
+            )
+            SelectEdgeText(
+                icon = Icons.Default.Message,
+                text = R.String.sideRowFirst,
+                isWishWindow = navHost.navigationIndex == 0,
+                onClick = navHost::onRouteBot,
+                modifier = Modifier.weight(1f),
+            )
+            SelectEdgeText(
+                icon = Icons.Default.Extension,
+                text = R.String.sideRowSecond,
+                isWishWindow = navHost.navigationIndex == 1,
+                onClick = navHost::onRoutePlugin,
+                modifier = Modifier.weight(1f)
+            )
+            SelectEdgeText(
+                icon = Icons.Default.Settings,
+                text = R.String.sideRowThird,
+                isWishWindow = navHost.navigationIndex == 2,
+                onClick = navHost::onRouteSetting,
+                modifier = Modifier.weight(1f)
+            )
+            SelectEdgeText(
+                icon = Icons.Default.Notes,
+                text = R.String.sideRowFour,
+                isWishWindow = navHost.navigationIndex == 3,
+                onClick = navHost::onRouteLog,
+                modifier = Modifier.weight(1f)
+            )
+            SelectEdgeText(
+                icon = Icons.Default.Forum,
+                text = R.String.sideRowFive,
+                isWishWindow = navHost.navigationIndex == 4,
+                onClick = navHost::onRouteAbout,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.fillMaxHeight().weight(3f))
+        }
+        Surface(color = Color(0xfffafafa)) {
+            Children(
+                navHost.state, crossfade()
+            ) { child ->
+                child.instance()
+            }
         }
     }
 }
 
-
-@Composable
-private fun SideRow(navHost: NavHost) {
-    AvatarWithMenu(
-        navHost.botList,
-        navHost.currentBot,
-        onMenuBotSelected = navHost::onRouteToSpecificBot,
-        onNewBotButtonSelected = navHost::addNewBot,
-    )
-    SelectEdgeText(
-        R.String.sideRowFirst,
-        isWishWindow = navHost.navigationIndex == 0,
-        onClick = navHost::onRouteBot
-    )
-    SelectEdgeText(
-        R.String.sideRowSecond,
-        isWishWindow = navHost.navigationIndex == 1,
-        onClick = navHost::onRoutePlugin
-    )
-    SelectEdgeText(
-        R.String.sideRowThird,
-        isWishWindow = navHost.navigationIndex == 2,
-        onClick = navHost::onRouteSetting
-    )
-    SelectEdgeText(
-        R.String.sideRowFour,
-        isWishWindow = navHost.navigationIndex == 3,
-        onClick = navHost::onRouteLog
-    )
-    SelectEdgeText(
-        R.String.sideRowFive,
-        isWishWindow = navHost.navigationIndex == 4,
-        onClick = navHost::onRouteAbout
-    )
-}
 
 @Composable
 private fun AvatarWithMenu(
@@ -197,19 +237,19 @@ private fun AvatarWithMenu(
     currentBot: ComposeBot?,
     onMenuBotSelected: (bot: ComposeBot) -> Unit,
     onNewBotButtonSelected: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var isExpand by remember { mutableStateOf(false) }
 
-    Box {
+    Box(modifier) {
         Row(
             modifier = Modifier
+                .fillMaxSize()
                 .clickable {
                     isExpand = !isExpand
                 }
         ) {
-            currentBot?.let {
-                BotItem(currentBot)
-            } ?: Text(R.String.botMenuEmpty)
+            BotItem(currentBot)
         }
 
         DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }) {
@@ -238,24 +278,34 @@ private fun AvatarWithMenu(
 
 
 @Composable
-private fun SelectEdgeText(text: String, isWishWindow: Boolean, onClick: () -> Unit) {
+private fun SelectEdgeText(
+    icon: ImageVector,
+    text: String,
+    isWishWindow: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
-        Modifier
-            .clickable(onClick = onClick),
+        modifier,
         contentAlignment = Alignment.Center
     ) {
-        if (isWishWindow)
-            Text(text, style = MaterialTheme.typography.subtitle1)
-        else
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text, style = MaterialTheme.typography.subtitle1)
+        OutlinedButton(
+            onClick = onClick,
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = MaterialTheme.colors.background),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Row(Modifier.animateContentSize()) {
+                Image(icon, null)
+                if (isWishWindow)
+                    Text(text, maxLines = 1)
             }
+        }
     }
 }
 
 @Composable
 private fun BotItem(
-    bot: ComposeBot,
+    bot: ComposeBot?,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -271,7 +321,7 @@ private fun BotItem(
             shape = CircleShape,
             color = MaterialTheme.colors.surface.copy(alpha = 0.12f)
         ) {
-            Image(bot.avatar, null)
+            Image(bot?.avatar ?: ImageBitmap(200, 200), null)
         }
 
         Column(
@@ -279,9 +329,9 @@ private fun BotItem(
                 .weight(6f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(bot.nick, fontWeight = FontWeight.Bold, maxLines = 1)
+            Text(bot?.nick ?: "Login", fontWeight = FontWeight.Bold, maxLines = 1)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text("${bot.id}", style = MaterialTheme.typography.body2)
+                Text("${bot?.id?:"Unknown"}", style = MaterialTheme.typography.body2)
             }
         }
         Spacer(Modifier.weight(1f))

@@ -71,6 +71,7 @@ fun ColorPicker(
         }
         IntSlider(trueAlpha, {
             trueAlpha = it
+            result(trueRed, trueGreen, trueBlue, trueAlpha)
         }, valueRange = 0..0xff, modifier = Modifier.width(100.dp))
         Row {
             Text("Pointer color")

@@ -25,15 +25,12 @@ import com.arkivanov.decompose.ComponentContext
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
-import com.youngerhousea.miraicompose.utils.ComponentChildScope
+import com.youngerhousea.miraicompose.utils.ComponentScope
 import com.youngerhousea.miraicompose.utils.splitQuery
 import io.ktor.client.*
 import io.ktor.client.features.cookies.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -101,12 +98,12 @@ class SolveUnsafeDeviceLoginVerify(
                 body = "{\"str_dev_auth_token\":\"${sig}\",\"uint32_flag\":1}"
             }
         val res = Json { ignoreUnknownKeys = true }.decodeFromString<Res>(s)
-        if (res.errorCode != 0)
-            error(res.errorInfo)
+//        if (res.errorCode != 0)
+//            error(res.errorInfo)
         return res.strUrl
     }
 
-    private val scope = ComponentChildScope()
+    private val scope = ComponentScope()
 
     private val qrCodeParameter = URL(url).splitQuery()
 
@@ -118,20 +115,20 @@ class SolveUnsafeDeviceLoginVerify(
 
     init {
         println(url)
-        val value = scope.async { firstRequest(sig) }
-        scope.launch {
-            string = value.await()
-            while (true) {
-                val s =
-                    client.post<String>("https://ti.qq.com/proxy/domain/oidb.tim.qq.com/v3/oidbinterface/oidb_0xc9e_4?sdkappid=39998&actype=2&bkn=") {
-                        accept(ContentType.Application.Json)
-                        body = "{\"str_dev_auth_token\":\"${string}\",\"uint32_flag\":0}"
-                    }
-                val res = Json { ignoreUnknownKeys = true }.decodeFromString<Res>(s)
-                string = res.strUrl
-                delay(1_000)
-            }
-        }
+//        val value = scope.async { firstRequest(sig) }
+//        scope.launch {
+//            string = value.await()
+//            while (true) {
+//                val s =
+//                    client.post<String>("https://ti.qq.com/proxy/domain/oidb.tim.qq.com/v3/oidbinterface/oidb_0xc9e_4?sdkappid=39998&actype=2&bkn=") {
+//                        accept(ContentType.Application.Json)
+//                        body = "{\"str_dev_auth_token\":\"${string}\",\"uint32_flag\":0}"
+//                    }
+//                val res = Json { ignoreUnknownKeys = true }.decodeFromString<Res>(s)
+//                string = res.strUrl
+//                delay(1_000)
+//            }
+//        }
 
     }
 

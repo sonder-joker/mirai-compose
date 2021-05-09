@@ -5,10 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,13 +35,13 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
     BoxWithConstraints(
         modifier
     ) {
-        val adaptiveLog = remember(logs) {
+        val adaptiveLogs = remember(logs.size) {
             logs.flatMap {
                 it.chunked(constraints.maxWidth / 9)
             }
         }
         val adaptiveLogHeight = 40.dp
-        val state = remember(logs) { LazyListState() }
+        val state = remember(logs.size) { LazyListState() }
 
         LazyColumn(
             Modifier
@@ -52,28 +49,24 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
             state = state
         ) {
             items(
-                adaptiveLog
-            ) {
+                adaptiveLogs
+            ) { adaptiveLog ->
                 //TODO:HapticFeedback.performHapticFeedback not implemented yet
                 SelectionContainer {
-                    Text(
-                        it,
-                        modifier = Modifier
-                            .height(adaptiveLogHeight)
-                    )
+                    Text(adaptiveLog, modifier = Modifier.height(adaptiveLogHeight))
                 }
             }
         }
         VerticalScrollbar(
             Modifier.align(Alignment.CenterEnd),
             state,
-            adaptiveLog.size,
+            adaptiveLogs.size,
             adaptiveLogHeight
         )
 
-        LaunchedEffect(adaptiveLog) {
-            if (adaptiveLog.isNotEmpty())
-                state.scrollToItem(adaptiveLog.size - 1, 0)
+        LaunchedEffect(adaptiveLogs) {
+            if (adaptiveLogs.isNotEmpty())
+                state.scrollToItem(adaptiveLogs.size - 1, 0)
         }
     }
 }
@@ -96,7 +89,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
         }
     }
     Row(modifier) {
-        TextField(
+            OutlinedTextField(
             currentCommand,
             onValueChange = {
                 currentCommand = it

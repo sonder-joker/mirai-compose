@@ -5,17 +5,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
+import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
@@ -40,15 +39,16 @@ import kotlin.io.path.div
  *
  */
 @ConsoleFrontEndImplementation
-class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, CoroutineScope by CoroutineScope(
-    NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
-        if (throwable is CancellationException) {
-            return@CoroutineExceptionHandler
+class MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
+    CoroutineScope by CoroutineScope(
+        NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
+            if (throwable is CancellationException) {
+                return@CoroutineExceptionHandler
+            }
+            val coroutineName = coroutineContext[CoroutineName]?.name ?: "<unnamed>"
+            MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
         }
-        val coroutineName = coroutineContext[CoroutineName]?.name ?: "<unnamed>"
-        MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
-    }
-) {
+    ) {
     override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
 
     override val builtInPluginLoaders = listOf(lazy { JvmPluginLoader })
@@ -57,17 +57,17 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath / "data")
 
-    override val dataStorageForBuiltIns = MultiFilePluginDataStorage(rootPath /"data")
+    override val dataStorageForBuiltIns = MultiFilePluginDataStorage(rootPath / "data")
 
-    override val configStorageForJvmPluginLoader = ReadablePluginConfigStorage(rootPath.resolve("config"))
+    override val configStorageForJvmPluginLoader = ReadablePluginConfigStorage(rootPath / "config")
 
-    override val configStorageForBuiltIns = MultiFilePluginDataStorage(rootPath.resolve("config"))
+    override val configStorageForBuiltIns = MultiFilePluginDataStorage(rootPath / "config")
 
     override val consoleInput: ConsoleInput = MiraiComposeInput
 
     override val consoleCommandSender: MiraiComposeSender = MiraiComposeSender
 
-    override fun createLogger(identity: String?): MiraiLogger = MiraiComposeLogger(identity, _annotatedLogStorage)
+    override fun createLogger(identity: String?): MiraiLogger = MiraiComposeLogger(identity)
 
     // 一般不应该被使用
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) = SwingSolver
@@ -78,19 +78,11 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
 
     override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
 
-    private val _annotatedLogStorage: MutableList<AnnotatedString> = mutableStateListOf()
-
-    override val annotatedLogStorage: List<AnnotatedString> get() = _annotatedLogStorage
-
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
-
-    override fun preStart() {
-        setSystemOut(MiraiConsole.mainLogger)
-    }
 
     override fun postPhase(phase: String) {
         when (phase) {
@@ -106,9 +98,7 @@ class MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository, Corouti
     override fun postStart() {
         alreadyLoaded = true
     }
-
 }
-
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val name: String = "MiraiCompose"
     override val vendor: String = "Noire"

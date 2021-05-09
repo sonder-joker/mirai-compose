@@ -6,7 +6,7 @@ object R {
         const val botMenuExit = "Logout"
         const val botMenuAdd = "Add"
 
-        const val sideRowFirst = "Robot"
+        const val sideRowFirst = "Message"
         const val sideRowSecond = "Plugin"
         const val sideRowThird = "Setting"
         const val sideRowFour = "Log"

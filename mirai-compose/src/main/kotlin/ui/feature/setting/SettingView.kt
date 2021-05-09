@@ -26,10 +26,9 @@ import com.youngerhousea.miraicompose.ui.common.ColorPicker
  */
 class Setting(
     componentContext: ComponentContext,
+    val theme: AppTheme
 ) : ComponentContext by componentContext {
     private inline val logColors get() = theme.logColors
-
-    val theme: AppTheme by inject()
 
     var material = theme.materialLight
         set(value) {
@@ -139,29 +138,30 @@ fun SettingUi(setting: Setting) {
             ColorSetSlider("Info", setting.info, onValueChange = setting::onInfoColorSet)
             ColorSetSlider("Warning", setting.warning, onValueChange = setting::onWarningColorSet)
             ColorSetSlider("Error", setting.error, onValueChange = setting::onErrorColorSet)
-            Row(Modifier.fillMaxWidth()) {
-                Text("自定义主题配色")
-            }
-            ColorSetSlider("Primary", setting.material.primary, onValueChange = setting::setPrimary)
-            ColorSetSlider(
-                "PrimaryVariant",
-                setting.material.primaryVariant,
-                onValueChange = setting::setPrimaryVariant
-            )
-            ColorSetSlider("Secondary", setting.material.secondary, onValueChange = setting::setSecondary)
-            ColorSetSlider(
-                "SecondaryVariant",
-                setting.material.secondaryVariant,
-                onValueChange = setting::setSecondaryVariant
-            )
-            ColorSetSlider("Background", setting.material.background, onValueChange = setting::setBackground)
-            ColorSetSlider("Surface", setting.material.surface, onValueChange = setting::setSurface)
-            ColorSetSlider("Error", setting.material.error, onValueChange = setting::setError)
-            ColorSetSlider("OnPrimary", setting.material.onPrimary, onValueChange = setting::setOnPrimary)
-            ColorSetSlider("OnSecondary", setting.material.onSecondary, onValueChange = setting::setOnSecondary)
-            ColorSetSlider("OnBackground", setting.material.onBackground, onValueChange = setting::setOnBackground)
-            ColorSetSlider("OnSurface", setting.material.onSurface, onValueChange = setting::setOnSurface)
-            ColorSetSlider("OnError", setting.material.onError, onValueChange = setting::setOnError)
+//            TODO:With a more good way
+//            Row(Modifier.fillMaxWidth()) {
+//                Text("自定义主题配色")
+//            }
+//            ColorSetSlider("Primary", setting.material.primary, onValueChange = setting::setPrimary)
+//            ColorSetSlider(
+//                "PrimaryVariant",
+//                setting.material.primaryVariant,
+//                onValueChange = setting::setPrimaryVariant
+//            )
+//            ColorSetSlider("Secondary", setting.material.secondary, onValueChange = setting::setSecondary)
+//            ColorSetSlider(
+//                "SecondaryVariant",
+//                setting.material.secondaryVariant,
+//                onValueChange = setting::setSecondaryVariant
+//            )
+//            ColorSetSlider("Background", setting.material.background, onValueChange = setting::setBackground)
+//            ColorSetSlider("Surface", setting.material.surface, onValueChange = setting::setSurface)
+//            ColorSetSlider("Error", setting.material.error, onValueChange = setting::setError)
+//            ColorSetSlider("OnPrimary", setting.material.onPrimary, onValueChange = setting::setOnPrimary)
+//            ColorSetSlider("OnSecondary", setting.material.onSecondary, onValueChange = setting::setOnSecondary)
+//            ColorSetSlider("OnBackground", setting.material.onBackground, onValueChange = setting::setOnBackground)
+//            ColorSetSlider("OnSurface", setting.material.onSurface, onValueChange = setting::setOnSurface)
+//            ColorSetSlider("OnError", setting.material.onError, onValueChange = setting::setOnError)
         }
         VerticalScrollbar(
             modifier = Modifier
@@ -187,7 +187,7 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.width(200.dp)) {
-                Text(text, color = value)
+                Text(text)
             }
 
             Button({
