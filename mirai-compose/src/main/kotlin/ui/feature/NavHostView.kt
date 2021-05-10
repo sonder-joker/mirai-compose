@@ -2,7 +2,7 @@ package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -24,7 +24,6 @@ import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.annotatedLogStorage
-import com.youngerhousea.miraicompose.future.getGlobal
 import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
@@ -34,8 +33,8 @@ import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
 import com.youngerhousea.miraicompose.ui.feature.bot.Login
 import com.youngerhousea.miraicompose.ui.feature.bot.LoginUi
-import com.youngerhousea.miraicompose.ui.feature.bot.OnlineBot
-import com.youngerhousea.miraicompose.ui.feature.bot.OnlineBotUi
+import com.youngerhousea.miraicompose.ui.feature.bot.Message
+import com.youngerhousea.miraicompose.ui.feature.bot.MessageUi
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLog
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
@@ -57,7 +56,7 @@ import org.koin.core.qualifier.named
  * @property currentBot 目前的显示的机器人
  *
  * @see [Login]
- * @see [OnlineBot]
+ * @see [MessageUi]
  * @see [Setting]
  * @see [About]
  * @see [ConsoleLog]
@@ -80,8 +79,8 @@ class NavHost(
             when (config) {
                 is Configuration.Login ->
                     Login(componentContext, onLoginSuccess = ::onLoginSuccess).asComponent { LoginUi(it) }
-                is Configuration.OnlineBot ->
-                    OnlineBot(componentContext, config.bot).asComponent { OnlineBotUi(it) }
+                is Configuration.Message ->
+                    Message(componentContext, botList).asComponent { MessageUi(it) }
                 is Configuration.Plugin ->
                     Plugins(componentContext).asComponent { PluginsUi(it) }
                 is Configuration.Setting ->
@@ -114,22 +113,22 @@ class NavHost(
         val composeBot = bot.toComposeBot()
         _currentBot = composeBot
         _botList.add(composeBot)
-        onRouteToSpecificBot(composeBot)
+        router.push(Configuration.Message)
     }
 
     // 登录机器人
     fun addNewBot() {
-        _navigationIndex = 0
         router.push(Configuration.Login)
     }
 
     fun onRouteToSpecificBot(bot: ComposeBot) {
-        router.push(Configuration.OnlineBot(bot))
+        _currentBot = bot
+        onRouteMessage()
     }
 
-    fun onRouteBot() {
+    fun onRouteMessage() {
         _navigationIndex = 0
-        currentBot?.let { router.push(Configuration.OnlineBot(it)) } ?: router.push(Configuration.Login)
+        router.push(Configuration.Message)
     }
 
     fun onRoutePlugin() {
@@ -153,7 +152,7 @@ class NavHost(
     }
 
     sealed class Configuration : Parcelable {
-        class OnlineBot(val bot: ComposeBot) : Configuration()
+        object Message : Configuration()
         object Login : Configuration()
         object Setting : Configuration()
         object About : Configuration()
@@ -168,57 +167,53 @@ fun NavHostUi(navHost: NavHost) {
     Row(Modifier.fillMaxSize()) {
         Column(
             Modifier
-                .width(200.dp)
+                .width(160.dp)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-//            elevation = 0.dp,
-//            backgroundColor = Color(0xffffffff)
+            verticalArrangement = Arrangement.Top
         ) {
-
             AvatarWithMenu(
                 composeBotList = navHost.botList,
                 currentBot = navHost.currentBot,
                 onMenuBotSelected = navHost::onRouteToSpecificBot,
                 onNewBotButtonSelected = navHost::addNewBot,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.height(80.dp)
             )
             SelectEdgeText(
                 icon = Icons.Default.Message,
                 text = R.String.sideRowFirst,
                 isWishWindow = navHost.navigationIndex == 0,
-                onClick = navHost::onRouteBot,
-                modifier = Modifier.weight(1f),
+                onClick = navHost::onRouteMessage,
+                modifier = Modifier.height(80.dp),
             )
             SelectEdgeText(
                 icon = Icons.Default.Extension,
                 text = R.String.sideRowSecond,
                 isWishWindow = navHost.navigationIndex == 1,
                 onClick = navHost::onRoutePlugin,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.height(80.dp)
             )
             SelectEdgeText(
                 icon = Icons.Default.Settings,
                 text = R.String.sideRowThird,
                 isWishWindow = navHost.navigationIndex == 2,
                 onClick = navHost::onRouteSetting,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.height(80.dp)
             )
             SelectEdgeText(
                 icon = Icons.Default.Notes,
                 text = R.String.sideRowFour,
                 isWishWindow = navHost.navigationIndex == 3,
                 onClick = navHost::onRouteLog,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.height(80.dp)
             )
             SelectEdgeText(
                 icon = Icons.Default.Forum,
                 text = R.String.sideRowFive,
                 isWishWindow = navHost.navigationIndex == 4,
                 onClick = navHost::onRouteAbout,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.height(80.dp)
             )
-            Spacer(Modifier.fillMaxHeight().weight(3f))
         }
         Surface(color = Color(0xfffafafa)) {
             Children(
@@ -245,9 +240,16 @@ private fun AvatarWithMenu(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable {
-                    isExpand = !isExpand
-                }
+                .combinedClickable(
+                    onLongClick = { isExpand = !isExpand },
+                    onClick = {
+                        if (currentBot == null) {
+                            onNewBotButtonSelected()
+                        } else {
+                            onMenuBotSelected(currentBot)
+                        }
+                    }
+                )
         ) {
             BotItem(currentBot)
         }
@@ -292,7 +294,8 @@ private fun SelectEdgeText(
         OutlinedButton(
             onClick = onClick,
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = MaterialTheme.colors.background),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            border = null
         ) {
             Row(Modifier.animateContentSize()) {
                 Image(icon, null)
@@ -319,7 +322,7 @@ private fun BotItem(
             modifier = Modifier
                 .weight(3f, fill = false),
             shape = CircleShape,
-            color = MaterialTheme.colors.surface.copy(alpha = 0.12f)
+            color = Color(0xff979595),
         ) {
             Image(bot?.avatar ?: ImageBitmap(200, 200), null)
         }
@@ -331,7 +334,7 @@ private fun BotItem(
         ) {
             Text(bot?.nick ?: "Login", fontWeight = FontWeight.Bold, maxLines = 1)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text("${bot?.id?:"Unknown"}", style = MaterialTheme.typography.body2)
+                Text("${bot?.id ?: "Unknown"}", style = MaterialTheme.typography.body2)
             }
         }
         Spacer(Modifier.weight(1f))

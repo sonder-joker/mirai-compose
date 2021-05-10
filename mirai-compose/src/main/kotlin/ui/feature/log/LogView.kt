@@ -12,7 +12,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
@@ -61,7 +60,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                     onRightClick {
                         isExpand = true
                         offset = DpOffset(it.x.dp, it.y.dp)
-                        println(offset)
+//                        println(offset)
                     }
                 },
             consoleLog.loggerStorage

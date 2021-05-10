@@ -5,9 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -26,10 +23,8 @@ import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.utils.Component
-import com.youngerhousea.miraicompose.utils.ComponentScope
 import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.utils.asComponent
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
@@ -37,10 +32,6 @@ import net.mamoe.mirai.utils.LoginSolver
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-
-interface LoginI {
-
-}
 
 /**
  * 登录界面
@@ -54,16 +45,9 @@ interface LoginI {
  */
 class Login(
     componentContext: ComponentContext,
-    onLoginSuccess: (bot: Bot) -> Unit,
+    private val onLoginSuccess: (bot: Bot) -> Unit,
 ) : LoginSolver(), ComponentContext by componentContext {
-    private val scope = ComponentScope()
 
-    private val onLoginSuccess: (bot: Bot) -> Unit = {
-        router.push(Configuration.InitLogin)
-        onLoginSuccess(it)
-    }
-
-    private var _isExpand by mutableStateOf(false)
 
     private val router: Router<Configuration, Component> = router(
         initialConfiguration = Configuration.InitLogin,
@@ -72,7 +56,10 @@ class Login(
         childFactory = { configuration: Configuration, componentContext ->
             when (configuration) {
                 is Configuration.InitLogin ->
-                    InitLogin(componentContext, onClick = ::startLogin).asComponent { InitLoginUi(it) }
+                    InitLogin(
+                        componentContext,
+                        onClick = ::startLogin
+                    ).asComponent { InitLoginUi(it) }
                 is Configuration.SolvePicCaptcha ->
                     //TODO:简化参数
                     SolvePicCaptcha(
@@ -99,12 +86,10 @@ class Login(
         }
     )
 
-    val isExpand get() = _isExpand
 
     val state get() = router.state
 
     private fun onExitHappened() {
-        _isExpand = true
         router.push(Configuration.InitLogin)
     }
 
@@ -145,27 +130,21 @@ class Login(
             })
         }
 
-    private fun startLogin(account: Long, password: String) {
-        scope.launch {
-            runCatching {
-                MiraiConsole.addBot(
-                    id = account,
-                    password = password
-                ) {
-                    loginSolver = this@Login
-                }.alsoLogin()
-            }.onSuccess {
-                onLoginSuccess(it)
-            }.onFailure {
-                //TODO: 异常提示
-                onExitHappened()
-                throw it
-            }
+    private suspend fun startLogin(account: Long, password: String) {
+        runCatching {
+            MiraiConsole.addBot(
+                id = account,
+                password = password
+            ) {
+                loginSolver = this@Login
+            }.alsoLogin()
+        }.onSuccess {
+            onLoginSuccess(it)
+        }.onFailure {
+            //TODO: 异常提示
+            onExitHappened()
+            throw it
         }
-    }
-
-    fun setIsExpand(isExpand: Boolean) {
-        _isExpand = isExpand
     }
 
     sealed class Configuration : Parcelable {
@@ -192,21 +171,20 @@ class Login(
 
 @Composable
 fun LoginUi(login: Login) {
-    HorizontalNotification(isExpand = login.isExpand, login::setIsExpand, "Error", Color.Red, Color.White)
-    VerticalNotification(isExpand = login.isExpand, login::setIsExpand, "Login Failure")
+//    HorizontalNotification(isExpand = login.isExpand, login::setIsExpand, "Login Failure")
     Children(login.state) { child ->
         child.instance()
     }
 }
 
-//TODO: 简化函数
+
 @Composable
 fun VerticalNotification(
     isExpand: Boolean,
     setIsExpand: (Boolean) -> Unit,
     text: String,
-    backgroundColor: Color = Color.White,
-    textColor: Color = MaterialTheme.colors.error
+    backgroundColor: Color = MaterialTheme.colors.error,
+    textColor: Color = MaterialTheme.colors.onError
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -269,19 +247,15 @@ fun VerticalNotification(
     }
 }
 
-//TODO: 简化函数
 @Composable
 fun HorizontalNotification(
     isExpand: Boolean,
     setIsExpand: (Boolean) -> Unit,
     text: String,
     backgroundColor: Color = MaterialTheme.colors.error,
-    textColor: Color = Color.White
+    textColor: Color = MaterialTheme.colors.onError
 ) {
-    BoxWithConstraints(
-        modifier = Modifier
-            .clipToBounds()
-    ) {
+    Box(modifier = Modifier.clipToBounds()) {
         if (isExpand) {
             Snackbar(
                 action = {
