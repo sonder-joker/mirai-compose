@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.ui.feature.log
 
+import androidx.compose.desktop.AppManager
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu
@@ -15,7 +16,9 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
+import java.awt.FileDialog
 import java.awt.event.MouseEvent
+import java.io.File
 
 /**
  * Compose的所有日志
@@ -34,19 +37,42 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     Box(
         modifier = Modifier
             .padding(top = offset.y)
-            .offset(x = offset.x - 200.dp)
+            .offset(x = offset.x - 160.dp)
     ) {
         DropdownMenu(
             isExpand,
             onDismissRequest = { isExpand = false }
         ) {
-            DropdownMenuItem(onClick = { isExpand = false }) {
-                Text("OpenLog")
-                //TODO open log file in editor such as notepad
+            DropdownMenuItem(onClick = {
+                isExpand = false
+                val fd = FileDialog(AppManager.focusedWindow!!.window, "保存日志文件", FileDialog.LOAD)
+                // TODO: fix file name filter
+                fd.setFilenameFilter { _, name ->
+                    (name.endsWith(".txt") || name.endsWith(".log"))
+                }
+                fd.mode = FileDialog.SAVE
+                fd.file = "${java.time.LocalDate.now()}.log"
+                fd.isVisible = true
+                val re = fd.file
+                if (re != null) {
+                    val f = File(fd.directory, re)
+                    consoleLog.logger.info("储存当前日志到文件: ${f.absolutePath}")
+                    if (f.exists()) {
+                        consoleLog.logger.error("储存失败,文件已存在")
+                    } else {
+                        f.createNewFile()
+                        f.writeText(consoleLog.loggerStorage.joinToString("\n"))
+                        consoleLog.logger.info("写入完成")
+                    }
+                }
+            }) {
+                Text("Save log")
             }
-            DropdownMenuItem(onClick = { isExpand = false }) {
-                Text("Report")
+            DropdownMenuItem(onClick = {
                 //TODO report error or do else
+                isExpand = false
+            }) {
+                Text("Report")
             }
         }
     }
@@ -60,7 +86,6 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                     onRightClick {
                         isExpand = true
                         offset = DpOffset(it.x.dp, it.y.dp)
-//                        println(offset)
                     }
                 },
             consoleLog.loggerStorage

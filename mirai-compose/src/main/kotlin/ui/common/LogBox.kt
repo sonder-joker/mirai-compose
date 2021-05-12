@@ -83,7 +83,6 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
     fun onClick() {
         if (currentCommand == "") {
             // TODO:提示输入框为空，如输入框边框变红，抖动等
-            logger.error("test")
             return
         }
         scope.launch {
