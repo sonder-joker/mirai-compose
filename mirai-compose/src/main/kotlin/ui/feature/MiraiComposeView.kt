@@ -18,6 +18,7 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import java.awt.datatransfer.UnsupportedFlavorException
 
 // 应用起点
 fun MiraiComposeView() {
@@ -60,6 +61,9 @@ fun MiraiComposeView() {
 // 取代默认的异常处理
 private fun SetDefaultExceptionHandler() {
     Thread.setDefaultUncaughtExceptionHandler { _, exception ->
+        if(exception is UnsupportedFlavorException) {
+            return@setDefaultUncaughtExceptionHandler
+        }
         println(exception.stackTraceToString())
         Window {
             SelectionContainer {

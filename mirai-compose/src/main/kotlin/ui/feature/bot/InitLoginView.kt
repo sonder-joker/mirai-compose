@@ -1,5 +1,7 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -15,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
@@ -26,85 +27,107 @@ import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.ComponentScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.network.*
-import java.lang.IllegalArgumentException
 
 /**
  * bot的登录的界面
  */
 class InitLogin(
     componentContext: ComponentContext,
-    private val onClick: (account: Long, password: String) -> Unit,
+    private val onClick: suspend (account: Long, password: String) -> Unit,
 ) : ComponentContext by componentContext {
-    private val scope = instanceKeeper.getOrCreate(::ComponentScope)
+    private val scope = instanceKeeper.getOrCreate{
+        ComponentScope(MiraiConsole.childScope("InitLogin"))
+    }
 
     private var _account by mutableStateOf(TextFieldValue())
 
-    val account get() = _account
+    private var _hasPasswordError by mutableStateOf(false)
 
     private var _password by mutableStateOf(TextFieldValue())
 
-    val password get() = _password
-
     private var _hasAccountError by mutableStateOf(false)
 
-    val hasAccountError get() = _hasAccountError
+    private var _loading by mutableStateOf(false)
 
-    private var _hasPasswordError by mutableStateOf(false)
+    val account get() = _account
+
+    val password get() = _password
+
+    val hasAccountError get() = _hasAccountError
 
     val hasPasswordError get() = _hasPasswordError
 
     var errorTip by mutableStateOf("")
 
-    private var _loading by mutableStateOf(false)
-
     val loading get() = _loading
 
-    // 应当在InitLogin处理部分异常
+    private lateinit var job: Job
+
+    fun cancelLogin() {
+        job.cancel("Exit")
+    }
+
     fun onLogin() {
         _loading = true
-        try {
-            onClick(_account.text.toLong(), _password.text)
-        } catch (e: Exception) {
-            errorTip = when (e) {
-                // 应当在
-                is WrongPasswordException -> {
-                    _hasPasswordError = true
-                    R.String.wrongPassword
+        job = scope.launch {
+            runCatching {
+                withTimeout(20_000) {
+                    onClick(_account.text.toLong(), _password.text)
                 }
-                is NumberFormatException -> {
-                    _hasAccountError = true
-                    R.String.numberFormat
+            }.onFailure {
+                errorTip = when (it) {
+                    is WrongPasswordException -> {
+                        _hasPasswordError = true
+                        R.String.wrongPassword
+                    }
+                    is NumberFormatException -> {
+                        _hasAccountError = true
+                        R.String.numberFormat
+                    }
+                    is RetryLaterException -> {
+                        _hasPasswordError = true
+                        R.String.retryLater
+                    }
+                    is UnsupportedSliderCaptchaException -> {
+                        _hasPasswordError = true
+                        R.String.unsupportedSliderCaptcha
+                    }
+                    is UnsupportedSMSLoginException -> {
+                        _hasPasswordError = true
+                        R.String.unsupportedSMSLogin
+                    }
+                    is NoStandardInputForCaptchaException -> {
+                        _hasPasswordError = true
+                        R.String.noStandardInputForCaptcha
+                    }
+                    is NoServerAvailableException -> {
+                        _hasPasswordError = true
+                        R.String.noServerAvailable
+                    }
+                    is IllegalArgumentException -> {
+                        _hasPasswordError = true
+                        R.String.passwordLengthMuch
+                    }
+                    is TimeoutCancellationException -> {
+                        _hasPasswordError = true
+                        R.String.loginTimeOut
+                    }
+                    is CancellationException -> {
+                        _hasPasswordError = true
+                        R.String.loginDismiss
+                    }
+                    else -> throw it
                 }
-                is RetryLaterException -> {
-                    R.String.retryLater
+                scope.launch {
+                    delay(1_000)
+                    _hasAccountError = false
+                    _hasPasswordError = false
                 }
-                is UnsupportedSliderCaptchaException -> {
-                    R.String.unsupportedSliderCaptcha
-                }
-                is UnsupportedSMSLoginException -> {
-                    R.String.unsupportedSMSLogin
-                }
-                is NoStandardInputForCaptchaException -> {
-                    R.String.noStandardInputForCaptcha
-                }
-                is NoServerAvailableException -> {
-                    R.String.noServerAvailable
-                }
-                is IllegalArgumentException -> {
-                    R.String.passwordLengthMuch
-
-                }
-                else -> throw e
             }
-            scope.launch {
-                delay(1000)
-                _hasAccountError = false
-                _hasPasswordError = false
-            }
-        } finally {
             _loading = false
         }
     }
@@ -116,7 +139,7 @@ class InitLogin(
         } else {
             _hasAccountError = true
             scope.launch {
-                delay(1000)
+                delay(1_000)
                 _hasAccountError = false
             }
         }
@@ -128,7 +151,7 @@ class InitLogin(
 
 }
 
-// TODO:简化UI
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InitLoginUi(initLogin: InitLogin) {
     Column(
@@ -160,6 +183,17 @@ fun InitLoginUi(initLogin: InitLogin) {
             onClick = initLogin::onLogin,
             isLoading = initLogin.loading
         )
+        AnimatedVisibility(initLogin.loading) {
+            Snackbar(action = {
+                TextButton(onClick = {
+                    initLogin.cancelLogin()
+                }) {
+                    Text("Cancel")
+                }
+            }) {
+                Text("Loading")
+            }
+        }
     }
 }
 
@@ -188,10 +222,7 @@ private fun AccountTextField(
             )
         },
         leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                null
-            )
+            Icon(imageVector = Icons.Default.AccountCircle, null)
         },
         isError = isError,
         keyboardOptions = KeyboardOptions(
@@ -210,7 +241,7 @@ private fun PasswordTextField(
     errorLabel: String,
     onKeyEnter: () -> Unit
 ) {
-    var passwordVisualTransformation: VisualTransformation by remember(password, onPasswordTextChange) {
+    var passwordVisualTransformation: VisualTransformation by remember {
         mutableStateOf(
             PasswordVisualTransformation()
         )
@@ -294,15 +325,6 @@ private fun HorizontalDottedProgressBar() {
         )
     )
 
-    DrawCanvas(state = state, color = color)
-}
-
-
-@Composable
-private fun DrawCanvas(
-    state: Float,
-    color: Color,
-) {
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
@@ -316,22 +338,24 @@ private fun DrawCanvas(
             if (i - 1 == state.toInt()) {
                 drawCircle(
                     radius = radius * 2,
-                    brush = SolidColor(color),
+                    brush = SolidColor(value = color),
                     center = Offset(
-                        x = this.center.x + radius * 2 * (i - 3) + padding * (i - 3),
-                        y = this.center.y
+                        x = center.x + radius * 2 * (i - 3) + padding * (i - 3),
+                        y = center.y
                     )
                 )
             } else {
                 drawCircle(
                     radius = radius,
-                    brush = SolidColor(color),
+                    brush = SolidColor(value = color),
                     center = Offset(
-                        x = this.center.x + radius * 2 * (i - 3) + padding * (i - 3),
-                        y = this.center.y
+                        x = center.x + radius * 2 * (i - 3) + padding * (i - 3),
+                        y = center.y
                     )
                 )
             }
         }
     }
 }
+
+

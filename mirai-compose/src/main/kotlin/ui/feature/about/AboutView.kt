@@ -10,7 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.theme.ResourceImage
-import com.youngerhousea.miraicompose.utils.Component
+import java.lang.management.ManagementFactory
+import java.lang.management.MemoryMXBean
+import java.lang.management.MemoryUsage
 
 /**
  * 关于MiraiCompose的信息
@@ -18,7 +20,9 @@ import com.youngerhousea.miraicompose.utils.Component
  */
 class About(
     componentContext: ComponentContext
-) : ComponentContext by componentContext
+) : ComponentContext by componentContext {
+
+}
 
 @Composable
 fun AboutUi(about: About) {
@@ -31,4 +35,5 @@ fun AboutUi(about: About) {
         Text("Mirai Compose 2021!")
         Text("https://github.com/sonder-joker/mirai-compose")
     }
+
 }

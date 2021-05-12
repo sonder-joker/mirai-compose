@@ -7,7 +7,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
-import net.mamoe.mirai.utils.SimpleLogger
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.text.DateFormat
@@ -26,58 +25,92 @@ class MiraiComposeLogger(
 ) : MiraiLoggerPlatformBase() {
     private inline val currentDate: String get() = logTimeFormat.format(Date())
 
-    private val SimpleLogger.LogPriority.color: Color
+    private val LogPriority.color: Color
         get() = when (this) {
-            SimpleLogger.LogPriority.VERBOSE -> ComposeSetting.AppTheme.logColors.verbose
-            SimpleLogger.LogPriority.INFO -> ComposeSetting.AppTheme.logColors.info
-            SimpleLogger.LogPriority.WARNING -> ComposeSetting.AppTheme.logColors.warning
-            SimpleLogger.LogPriority.ERROR -> ComposeSetting.AppTheme.logColors.error
-            SimpleLogger.LogPriority.DEBUG -> ComposeSetting.AppTheme.logColors.debug
+            LogPriority.VERBOSE -> ComposeSetting.AppTheme.logColors.verbose
+            LogPriority.INFO -> ComposeSetting.AppTheme.logColors.info
+            LogPriority.WARNING -> ComposeSetting.AppTheme.logColors.warning
+            LogPriority.ERROR -> ComposeSetting.AppTheme.logColors.error
+            LogPriority.DEBUG -> ComposeSetting.AppTheme.logColors.debug
         }
 
-    private fun printLog(message: String?, priority: SimpleLogger.LogPriority) {
+    private fun printLog(message: String?, priority: LogPriority) {
         if (message != null) {
             val annotatedLog =
-                buildAnnotatedString {
-                    pushStyle(SpanStyle(priority.color))
-                    append("$currentDate ${priority.simpleName}/$identity: $message")
-                }
-            println(message)
+                annotatedString(priority, message)
+            println(priority.parseInConsole(annotatedLog.text))
             annotatedLogStorage.add(annotatedLog)
         }
     }
 
-    public override fun verbose0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.VERBOSE)
+    private fun annotatedString(
+        priority: LogPriority,
+        message: String?
+    ) = buildAnnotatedString {
+        pushStyle(SpanStyle(priority.color))
+        append("$currentDate ${priority.simpleName}/$identity: $message")
+    }
+
+    public override fun verbose0(message: String?): Unit = printLog(message, LogPriority.VERBOSE)
     public override fun verbose0(message: String?, e: Throwable?) {
         if (e != null) verbose((message ?: e.toString()) + "\n${e.stackTraceString}")
         else verbose(message.toString())
     }
 
-    public override fun info0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.INFO)
+    public override fun info0(message: String?): Unit = printLog(message, LogPriority.INFO)
     public override fun info0(message: String?, e: Throwable?) {
         if (e != null) info((message ?: e.toString()) + "\n${e.stackTraceString}")
         else info(message.toString())
     }
 
-    public override fun warning0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.WARNING)
+    public override fun warning0(message: String?): Unit = printLog(message, LogPriority.WARNING)
     public override fun warning0(message: String?, e: Throwable?) {
         if (e != null) warning((message ?: e.toString()) + "\n${e.stackTraceString}")
         else warning(message.toString())
     }
 
-    public override fun error0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.ERROR)
+    public override fun error0(message: String?): Unit = printLog(message, LogPriority.ERROR)
     public override fun error0(message: String?, e: Throwable?) {
         if (e != null) error((message ?: e.toString()) + "\n${e.stackTraceString}")
         else error(message.toString())
     }
 
-    public override fun debug0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.DEBUG)
+    public override fun debug0(message: String?): Unit = printLog(message, LogPriority.DEBUG)
     public override fun debug0(message: String?, e: Throwable?) {
         if (e != null) debug((message ?: e.toString()) + "\n${e.stackTraceString}")
         else debug(message.toString())
     }
+
+    enum class LogPriority(
+        val simpleName: String
+    ) {
+        VERBOSE("V"),
+        INFO("I"),
+        WARNING("W"),
+        ERROR("E"),
+        DEBUG("D")
+    }
+
+    private fun LogPriority.parseInConsole(text: String): String =
+        when (this) {
+            LogPriority.VERBOSE -> text
+            LogPriority.DEBUG -> text
+            LogPriority.INFO -> ANSI_GREEN + text + ANSI_RESET
+            LogPriority.WARNING -> ANSI_YELLOW + text + ANSI_RESET
+            LogPriority.ERROR -> ANSI_RED + text + ANSI_RESET
+        }
 }
 
+
+const val ANSI_RESET = "\u001B[0m"
+const val ANSI_BLACK = "\u001B[30m"
+const val ANSI_RED = "\u001B[31m"
+const val ANSI_GREEN = "\u001B[32m"
+const val ANSI_YELLOW = "\u001B[33m"
+const val ANSI_BLUE = "\u001B[34m"
+const val ANSI_PURPLE = "\u001B[35m"
+const val ANSI_CYAN = "\u001B[36m"
+const val ANSI_WHITE = "\u001B[37m"
 
 internal class BufferedOutputStream constructor(
     private val size: Int = 1024 * 1024,

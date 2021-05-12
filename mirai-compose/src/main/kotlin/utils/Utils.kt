@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.Navigator
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import org.jetbrains.skija.Image
 import java.net.URL
@@ -176,7 +177,7 @@ private fun checkWindowSizeStep(size: Int, step: Int) {
     }
 }
 
-class ComponentScope(private val scope: CoroutineScope = CoroutineScope(EmptyCoroutineContext)) :
+class ComponentScope(private val scope: CoroutineScope = MainScope()) :
     InstanceKeeper.Instance,
     CoroutineScope by scope {
     override fun onDestroy() {

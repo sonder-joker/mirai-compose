@@ -60,7 +60,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                     onRightClick {
                         isExpand = true
                         offset = DpOffset(it.x.dp, it.y.dp)
-                        println(offset)
+//                        println(offset)
                     }
                 },
             consoleLog.loggerStorage

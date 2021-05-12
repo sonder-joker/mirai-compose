@@ -14,11 +14,13 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.event.events.BotEvent
+import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.event.subscribe
 
 interface ComposeBot : Bot {
     val avatar: ImageBitmap
 
-    val eventList: List<BotEvent>
+    val messageSpeed: Int
 }
 
 fun Bot.toComposeBot(): ComposeBot = ComposeBotImpl(this)
@@ -27,9 +29,7 @@ fun Bot.toComposeBot(): ComposeBot = ComposeBotImpl(this)
 internal class ComposeBotImpl(bot: Bot) : Bot by bot, ComposeBot {
     private var _avatar by mutableStateOf(ImageBitmap(200, 200))
 
-    private val _eventList = mutableStateListOf<BotEvent>()
-
-    override val eventList: List<BotEvent> get() = _eventList
+    private var _messageSpeed by mutableStateOf(0)
 
     init {
         launch {
@@ -40,12 +40,14 @@ internal class ComposeBotImpl(bot: Bot) : Bot by bot, ComposeBot {
             )
         }
         launch {
-            bot.eventChannel.asChannel().receiveAsFlow().collect {
-                _eventList.add(it)
+            bot.eventChannel.subscribeAlways<MessageEvent> {
+                _messageSpeed++
             }
         }
 
     }
 
     override val avatar get() = _avatar
+
+    override val messageSpeed: Int get() = _messageSpeed
 }

@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 class FakeComposeBot : ComposeBot {
     override val avatar: ImageBitmap
         get() = TODO("Not yet implemented")
-    override val eventList: List<BotEvent>
+    override val messageSpeed: Int
         get() = TODO("Not yet implemented")
     override val asFriend: Friend
         get() = TODO("Not yet implemented")
@@ -52,6 +52,6 @@ class FakeComposeBot : ComposeBot {
 }
 
 class OnlineBotTest {
-    val onlineBot = OnlineBot(fakeContext(), FakeComposeBot())
+//    val onlineBot = Message(fakeContext(), FakeComposeBot())
 
 }

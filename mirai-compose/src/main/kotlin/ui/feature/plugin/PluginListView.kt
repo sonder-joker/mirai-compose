@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.future.inject
@@ -39,7 +40,9 @@ fun PluginListUi(pluginList: PluginList) {
                     .padding(10.dp)
                     .clickable(onClick = { pluginList.onPluginCardClick(plugin) })
                     .requiredHeight(150.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                backgroundColor = Color(0xff979595),
+                contentColor = Color(0xffffffff)
             ) {
                 PluginDescription(plugin, Modifier.padding(10.dp))
             }
