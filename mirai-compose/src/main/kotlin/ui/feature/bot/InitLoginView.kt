@@ -1,5 +1,7 @@
 package com.youngerhousea.miraicompose.ui.feature.bot
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -26,9 +28,9 @@ import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.ComponentScope
 import kotlinx.coroutines.*
-import kotlinx.coroutines.time.withTimeout
+import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.network.*
-import java.lang.IllegalArgumentException
 
 /**
  * bot的登录的界面
@@ -37,7 +39,9 @@ class InitLogin(
     componentContext: ComponentContext,
     private val onClick: suspend (account: Long, password: String) -> Unit,
 ) : ComponentContext by componentContext {
-    private val scope = instanceKeeper.getOrCreate(::ComponentScope)
+    private val scope = instanceKeeper.getOrCreate{
+        ComponentScope(MiraiConsole.childScope("InitLogin"))
+    }
 
     private var _account by mutableStateOf(TextFieldValue())
 
@@ -63,6 +67,10 @@ class InitLogin(
 
     private lateinit var job: Job
 
+    fun cancelLogin() {
+        job.cancel("Exit")
+    }
+
     fun onLogin() {
         _loading = true
         job = scope.launch {
@@ -81,25 +89,36 @@ class InitLogin(
                         R.String.numberFormat
                     }
                     is RetryLaterException -> {
+                        _hasPasswordError = true
                         R.String.retryLater
                     }
                     is UnsupportedSliderCaptchaException -> {
+                        _hasPasswordError = true
                         R.String.unsupportedSliderCaptcha
                     }
                     is UnsupportedSMSLoginException -> {
+                        _hasPasswordError = true
                         R.String.unsupportedSMSLogin
                     }
                     is NoStandardInputForCaptchaException -> {
+                        _hasPasswordError = true
                         R.String.noStandardInputForCaptcha
                     }
                     is NoServerAvailableException -> {
+                        _hasPasswordError = true
                         R.String.noServerAvailable
                     }
                     is IllegalArgumentException -> {
+                        _hasPasswordError = true
                         R.String.passwordLengthMuch
                     }
                     is TimeoutCancellationException -> {
+                        _hasPasswordError = true
                         R.String.loginTimeOut
+                    }
+                    is CancellationException -> {
+                        _hasPasswordError = true
+                        R.String.loginDismiss
                     }
                     else -> throw it
                 }
@@ -108,7 +127,6 @@ class InitLogin(
                     _hasAccountError = false
                     _hasPasswordError = false
                 }
-            }.onSuccess {
             }
             _loading = false
         }
@@ -133,6 +151,7 @@ class InitLogin(
 
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InitLoginUi(initLogin: InitLogin) {
     Column(
@@ -164,11 +183,18 @@ fun InitLoginUi(initLogin: InitLogin) {
             onClick = initLogin::onLogin,
             isLoading = initLogin.loading
         )
+        AnimatedVisibility(initLogin.loading) {
+            Snackbar(action = {
+                TextButton(onClick = {
+                    initLogin.cancelLogin()
+                }) {
+                    Text("Cancel")
+                }
+            }) {
+                Text("Loading")
+            }
+        }
     }
-    LaunchedEffect(Unit) {
-        SnackbarHostState().showSnackbar("??")
-    }
-
 }
 
 @Composable

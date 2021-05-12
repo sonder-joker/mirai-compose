@@ -2,6 +2,7 @@ package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -31,10 +32,7 @@ import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
-import com.youngerhousea.miraicompose.ui.feature.bot.Login
-import com.youngerhousea.miraicompose.ui.feature.bot.LoginUi
-import com.youngerhousea.miraicompose.ui.feature.bot.Message
-import com.youngerhousea.miraicompose.ui.feature.bot.MessageUi
+import com.youngerhousea.miraicompose.ui.feature.bot.*
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLog
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
@@ -164,6 +162,7 @@ class NavHost(
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
+
     Row(Modifier.fillMaxSize()) {
         Column(
             Modifier

@@ -43,6 +43,7 @@ class Message(
         val used: Long,
         val max: Long,
     )
+
     internal interface MemoryUsageGet {
         val heapMemoryUsage: MUsage
         val nonHeapMemoryUsage: MUsage
@@ -66,6 +67,7 @@ class Message(
         override val objectPendingFinalizationCount: Int
             get() = memoryMXBean.objectPendingFinalizationCount
     }
+
     internal object ByRuntime : MemoryUsageGet {
         override val heapMemoryUsage: MUsage
             get() {
@@ -94,7 +96,7 @@ fun MessageUi(message: Message) {
 }
 
 @Composable
-private fun TopView(modifier: Modifier) =
+fun TopView(modifier: Modifier) =
     Row(
         modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -106,30 +108,3 @@ private fun TopView(modifier: Modifier) =
             modifier = Modifier.padding(horizontal = 4.dp)
         )
     }
-
-@OptIn(InternalCoroutinesApi::class)
-@Composable
-private fun EventListView(event: List<BotEvent>) {
-    LazyColumn {
-        items(event) { botEvent ->
-            Card(backgroundColor = MaterialTheme.colors.background) {
-                Text(ParseEventString(botEvent))
-            }
-        }
-    }
-}
-
-@Composable
-private fun ParseEventString(botEvent: BotEvent): String {
-    return when (botEvent) {
-        is BotInvitedJoinGroupRequestEvent -> "BotInvitedJoinGroupRequestEvent"
-        is BotLeaveEvent -> "BotLeaveEvent"
-        is MessageEvent -> "MessageEvent"
-        else -> "Unknown Event"
-    }
-}
-
-
-inline val Bot.stringId get() = this.id.toString()
-
-

@@ -48,7 +48,6 @@ class Login(
     private val onLoginSuccess: (bot: Bot) -> Unit,
 ) : LoginSolver(), ComponentContext by componentContext {
 
-
     private val router: Router<Configuration, Component> = router(
         initialConfiguration = Configuration.InitLogin,
         key = "EmptyBot",
@@ -138,10 +137,9 @@ class Login(
             ) {
                 loginSolver = this@Login
             }.alsoLogin()
-        }.onSuccess {
-            onLoginSuccess(it)
-        }.onFailure {
-            //TODO: 异常提示
+        }.onSuccess(
+            onLoginSuccess
+        ).onFailure {
             onExitHappened()
             throw it
         }

@@ -21,5 +21,6 @@ object R {
         const val noServerAvailable = "无可用服务器"
         const val passwordLengthMuch = "Password length must be at most 16"
         const val loginTimeOut = "超时"
+        const val loginDismiss = "取消"
     }
 }
