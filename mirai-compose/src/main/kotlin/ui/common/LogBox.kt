@@ -5,7 +5,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,6 +81,11 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
     val scope = rememberCoroutineScope()
 
     fun onClick() {
+        if (currentCommand == "") {
+            // TODO:提示输入框为空，如输入框边框变红，抖动等
+            logger.error("test")
+            return
+        }
         scope.launch {
             try {
                 SolveCommandResult(currentCommand, logger)
@@ -137,7 +145,7 @@ private suspend fun SolveCommandResult(
             logger.error(result.exception)
         }
         is CommandExecuteResult.UnresolvedCommand -> {
-            logger.warning { "未知指令: ${currentCommand}, 输入 ? 获取帮助" }
+            logger.warning { "未知指令: ${currentCommand}, 输入 /help 获取帮助" }
         }
         is CommandExecuteResult.PermissionDenied -> {
             logger.warning { "权限不足." }

@@ -12,7 +12,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
@@ -34,8 +33,8 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     var isExpand by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
-            .padding(top = offset.y - 80.dp)
-            .offset(x = offset.x)
+            .padding(top = offset.y)
+            .offset(x = offset.x - 200.dp)
     ) {
         DropdownMenu(
             isExpand,
