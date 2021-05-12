@@ -35,11 +35,8 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) 
     BoxWithConstraints(
         modifier
     ) {
-        val adaptiveLogs = remember(logs.size) {
-            logs.flatMap {
-                it.chunked(constraints.maxWidth / 9)
-            }
-        }
+        val adaptiveLogs = logs.flatMap { it.chunked(constraints.maxWidth / 9) }
+
         val adaptiveLogHeight = 40.dp
         val state = remember(logs.size) { LazyListState() }
 
@@ -89,7 +86,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
         }
     }
     Row(modifier) {
-            OutlinedTextField(
+        OutlinedTextField(
             currentCommand,
             onValueChange = {
                 currentCommand = it

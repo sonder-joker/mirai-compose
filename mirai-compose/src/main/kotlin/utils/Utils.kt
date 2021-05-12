@@ -25,7 +25,6 @@ import java.net.URL
 import java.net.URLDecoder
 import java.util.*
 import kotlin.collections.set
-import kotlin.coroutines.EmptyCoroutineContext
 
 //https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
 fun getARGB(rgb: String): IntArray {
