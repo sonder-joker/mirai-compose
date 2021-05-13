@@ -16,9 +16,12 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
-import java.awt.FileDialog
 import java.awt.event.MouseEvent
 import java.io.File
+import javax.swing.JFileChooser
+import javax.swing.UIManager
+import javax.swing.filechooser.FileNameExtensionFilter
+
 
 /**
  * Compose的所有日志
@@ -45,17 +48,18 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
         ) {
             DropdownMenuItem(onClick = {
                 isExpand = false
-                val fd = FileDialog(AppManager.focusedWindow!!.window, "保存日志文件", FileDialog.LOAD)
-                // TODO: fix file name filter
-                fd.setFilenameFilter { _, name ->
-                    (name.endsWith(".txt") || name.endsWith(".log"))
-                }
-                fd.mode = FileDialog.SAVE
-                fd.file = "${java.time.LocalDate.now()}.log"
-                fd.isVisible = true
-                val re = fd.file
-                if (re != null) {
-                    val f = File(fd.directory, re)
+                // open maybe slow
+                val previousLF = UIManager.getLookAndFeel();
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                val fc = JFileChooser()
+                UIManager.setLookAndFeel(previousLF);
+                fc.selectedFile = File("${java.time.LocalDate.now()}.log")
+                fc.dialogTitle = "Save log"
+                fc.dragEnabled = true
+                fc.fileSelectionMode = JFileChooser.FILES_ONLY
+                fc.fileFilter = FileNameExtensionFilter("log(*.log, *.txt)", "log", "txt")
+                if (fc.showSaveDialog(AppManager.focusedWindow!!.window) == JFileChooser.APPROVE_OPTION) {
+                    val f = fc.selectedFile
                     consoleLog.logger.info("储存当前日志到文件: ${f.absolutePath}")
                     if (f.exists()) {
                         consoleLog.logger.error("储存失败,文件已存在")
