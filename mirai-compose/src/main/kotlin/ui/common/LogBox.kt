@@ -10,10 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -41,19 +38,6 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>) {
     val lazyListState = rememberLazyListState()
     var searchText by remember { mutableStateOf("") }
 
-    DisposableEffect(Unit) {
-        AppManager.windows.first().let {
-            (it as AppWindow).keyboard.setShortcut(Key.CtrlLeft + Key.F) {
-                isShowSearch = !isShowSearch
-            }
-        }
-        onDispose {
-            AppManager.windows.first().let {
-                (it as AppWindow).keyboard.removeShortcut(Key.CtrlLeft + Key.F)
-            }
-        }
-    }
-
     Box(modifier) {
         LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
             stickyHeader {
@@ -67,30 +51,43 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>) {
                 }
             }
         }
-        LaunchedEffect(logs.size) {
-            if (logs.isNotEmpty())
-                lazyListState.animateScrollToItem(logs.size - 1)
-        }
     }
-}
 
-@OptIn(ExperimentalCommandDescriptors::class)
-@Composable
-internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) {
-    var currentCommand by remember(logger) { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-
-    val onClick: () -> Unit = {
-        scope.launch {
-            try {
-                SolveCommandResult(currentCommand, logger)
-            } catch (e: Exception) {
-
-            } finally {
-                currentCommand = ""
+    DisposableEffect(Unit) {
+        AppManager.windows.first().let {
+            (it as AppWindow).keyboard.setShortcut(Key.CtrlLeft + Key.F) {
+                isShowSearch = !isShowSearch
+            }
+        }
+        onDispose {
+            AppManager.windows.first().let {
+                (it as AppWindow).keyboard.removeShortcut(Key.CtrlLeft + Key.F)
             }
         }
     }
+    LaunchedEffect(logs.size) {
+        if (logs.isNotEmpty())
+            lazyListState.animateScrollToItem(logs.size)
+    }
+}
+
+@Composable
+internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) {
+    var currentCommand by remember(logger) { mutableStateOf("") }
+    var re by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val onClick: () -> Unit = {
+        scope.launch {
+//            try {
+            SolveCommandResult(currentCommand, logger)
+//            } catch (e: Exception) {
+//
+//            } finally {
+            currentCommand = ""
+//            }
+        }
+    }
+
     Row(modifier) {
         OutlinedTextField(
             currentCommand,
@@ -109,16 +106,30 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
             Modifier.weight(1f)
         )
 
-        FloatingActionButton(
+        OutlinedButton(
             onClick = onClick,
             modifier = Modifier
                 .weight(2f),
-            backgroundColor = MaterialTheme.colors.background,
         ) {
             Text("Send")
         }
     }
+}
 
+/**
+ * TODO:用于自动补全
+ *
+ */
+@OptIn(ExperimentalCommandDescriptors::class)
+private suspend fun CommandPrompt(
+    currentCommand: String,
+): String {
+    return when (val result = ConsoleCommandSender.executeCommand(currentCommand)) {
+        is CommandExecuteResult.UnmatchedSignature -> {
+            result.failureReasons.render(result.command, result.call)
+        }
+        else -> ""
+    }
 }
 
 

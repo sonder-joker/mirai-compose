@@ -39,7 +39,7 @@ class InitLogin(
     componentContext: ComponentContext,
     private val onClick: suspend (account: Long, password: String) -> Unit,
 ) : ComponentContext by componentContext {
-    private val scope = instanceKeeper.getOrCreate{
+    private val scope = instanceKeeper.getOrCreate {
         ComponentScope(MiraiConsole.childScope("InitLogin"))
     }
 
@@ -154,35 +154,37 @@ class InitLogin(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InitLoginUi(initLogin: InitLogin) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Image(
-            ResourceImage.mirai,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(5.dp)
-        )
-        AccountTextField(
-            account = initLogin.account,
-            onAccountTextChange = initLogin::onAccountTextChange,
-            isError = initLogin.hasAccountError,
-            errorLabel = initLogin.errorTip,
-            onKeyEnter = initLogin::onLogin
-        )
-        PasswordTextField(
-            password = initLogin.password,
-            onPasswordTextChange = initLogin::onPasswordTextChange,
-            isError = initLogin.hasPasswordError,
-            errorLabel = initLogin.errorTip,
-            onKeyEnter = initLogin::onLogin
-        )
-        LoginButton(
-            onClick = initLogin::onLogin,
-            isLoading = initLogin.loading
-        )
+    Box {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Image(
+                ResourceImage.mirai,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(5.dp)
+            )
+            AccountTextField(
+                account = initLogin.account,
+                onAccountTextChange = initLogin::onAccountTextChange,
+                isError = initLogin.hasAccountError,
+                errorLabel = initLogin.errorTip,
+                onKeyEnter = initLogin::onLogin
+            )
+            PasswordTextField(
+                password = initLogin.password,
+                onPasswordTextChange = initLogin::onPasswordTextChange,
+                isError = initLogin.hasPasswordError,
+                errorLabel = initLogin.errorTip,
+                onKeyEnter = initLogin::onLogin
+            )
+            LoginButton(
+                onClick = initLogin::onLogin,
+                isLoading = initLogin.loading
+            )
+        }
         AnimatedVisibility(initLogin.loading) {
             Snackbar(action = {
                 TextButton(onClick = {
@@ -190,11 +192,12 @@ fun InitLoginUi(initLogin: InitLogin) {
                 }) {
                     Text("Cancel")
                 }
-            }) {
+            }, modifier = Modifier.align(Alignment.BottomEnd)) {
                 Text("Loading")
             }
         }
     }
+
 }
 
 @Composable

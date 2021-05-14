@@ -82,28 +82,30 @@ class CJvmPlugin(
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
-fun CJvmPluginUi(CJvmPlugin: CJvmPlugin) = Column {
-    TabRow(CJvmPlugin.index) {
-        Tab(
-            selectedContentColor = Color.Black,
-            text = { Text("Description") },
-            selected = CJvmPlugin.index == 0,
-            onClick = CJvmPlugin::onDescriptionClick
-        )
-        Tab(
-            selectedContentColor = Color.Black,
-            text = { Text("Data") },
-            selected = CJvmPlugin.index == 1,
-            onClick = CJvmPlugin::onDataClick
-        )
-        Tab(
-            selectedContentColor = Color.Black,
-            text = { Text("Command") },
-            selected = CJvmPlugin.index == 2,
-            onClick = CJvmPlugin::onCommandClick
-        )
-    }
-    Children(CJvmPlugin.state, crossfade()) { child ->
-        child.instance()
+fun CJvmPluginUi(CJvmPlugin: CJvmPlugin) {
+    Column {
+        TabRow(CJvmPlugin.index) {
+            Tab(
+                selectedContentColor = Color.Black,
+                text = { Text("Description") },
+                selected = CJvmPlugin.index == 0,
+                onClick = CJvmPlugin::onDescriptionClick
+            )
+            Tab(
+                selectedContentColor = Color.Black,
+                text = { Text("Data") },
+                selected = CJvmPlugin.index == 1,
+                onClick = CJvmPlugin::onDataClick
+            )
+            Tab(
+                selectedContentColor = Color.Black,
+                text = { Text("Command") },
+                selected = CJvmPlugin.index == 2,
+                onClick = CJvmPlugin::onCommandClick
+            )
+        }
+        Children(CJvmPlugin.state, crossfade()) { child ->
+            child.instance()
+        }
     }
 }

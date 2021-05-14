@@ -15,7 +15,7 @@ object R {
         const val wrongPassword = "密码错误"
         const val numberFormat = "格式错误"
         const val retryLater = "请稍后再试"
-        const val unsupportedSliderCaptcha = "不应该出现"
+        const val unsupportedSliderCaptcha = "不支持滑动输入框, 请安装solver"
         const val unsupportedSMSLogin = "Mirai暂未提供"
         const val noStandardInputForCaptcha = "无标准输入"
         const val noServerAvailable = "无可用服务器"

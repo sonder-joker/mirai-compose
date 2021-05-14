@@ -1,19 +1,24 @@
 package com.youngerhousea.miraicompose.ui.feature
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.outlined.Extension
+import androidx.compose.material.icons.outlined.Login
+import androidx.compose.material.icons.outlined.Message
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -31,7 +36,10 @@ import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
-import com.youngerhousea.miraicompose.ui.feature.bot.*
+import com.youngerhousea.miraicompose.ui.feature.bot.Login
+import com.youngerhousea.miraicompose.ui.feature.bot.LoginUi
+import com.youngerhousea.miraicompose.ui.feature.bot.Message
+import com.youngerhousea.miraicompose.ui.feature.bot.MessageUi
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLog
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
@@ -120,7 +128,6 @@ class NavHost(
 
     fun onRouteToSpecificBot(bot: ComposeBot) {
         _currentBot = bot
-        onRouteMessage()
     }
 
     fun onRouteMessage() {
@@ -161,6 +168,7 @@ class NavHost(
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
+    val height = 80.dp
 
     Row(Modifier.fillMaxSize()) {
         Column(
@@ -172,47 +180,55 @@ fun NavHostUi(navHost: NavHost) {
         ) {
             AvatarWithMenu(
                 composeBotList = navHost.botList,
-                currentBot = navHost.currentBot,
+                onBoxClick = {
+//                    if (navHost.currentBot != null)
+//                        navHost.onRouteMessage()
+//                    else
+                        navHost.addNewBot()
+                },
                 onMenuBotSelected = navHost::onRouteToSpecificBot,
                 onNewBotButtonSelected = navHost::addNewBot,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Message,
-                text = R.String.sideRowFirst,
-                isWishWindow = navHost.navigationIndex == 0,
-                onClick = navHost::onRouteMessage,
-                modifier = Modifier.height(80.dp),
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Extension,
-                text = R.String.sideRowSecond,
-                isWishWindow = navHost.navigationIndex == 1,
+                modifier = Modifier.height(height),
+            ) {
+                BotItem(navHost.currentBot)
+            }
+//            SideTab(
+//                onClick = navHost::onRouteMessage,
+//                modifier = Modifier.height(height),
+//            ) {
+//                Icon(Icons.Outlined.Message, null)
+//                Text(R.String.sideRowFirst, maxLines = 1)
+//            }
+            SideTab(
                 onClick = navHost::onRoutePlugin,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Settings,
-                text = R.String.sideRowThird,
-                isWishWindow = navHost.navigationIndex == 2,
+                modifier = Modifier.height(height)
+            ) {
+                Icon(Icons.Outlined.Extension, null)
+                Text(R.String.sideRowSecond)
+            }
+            SideTab(
                 onClick = navHost::onRouteSetting,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Notes,
-                text = R.String.sideRowFour,
-                isWishWindow = navHost.navigationIndex == 3,
+                modifier = Modifier.height(height)
+            ) {
+                Icon(Icons.Outlined.Settings, null, modifier = Modifier)
+                Text(R.String.sideRowThird)
+            }
+            SideTab(
                 onClick = navHost::onRouteLog,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Forum,
-                text = R.String.sideRowFive,
-                isWishWindow = navHost.navigationIndex == 4,
+                modifier = Modifier.height(height)
+            ) {
+                Icon(Icons.Default.Notes, null)
+                Text(R.String.sideRowFour, maxLines = 1)
+            }
+            SideTab(
                 onClick = navHost::onRouteAbout,
-                modifier = Modifier.height(80.dp)
-            )
+                modifier = Modifier.height(height)
+            ) {
+                Icon(Icons.Default.Forum, null)
+                Text(R.String.sideRowFive)
+            }
         }
+
         Surface(color = Color(0xfffafafa)) {
             Children(
                 navHost.state, crossfade()
@@ -227,39 +243,35 @@ fun NavHostUi(navHost: NavHost) {
 @Composable
 private fun AvatarWithMenu(
     composeBotList: List<ComposeBot>,
-    currentBot: ComposeBot?,
+    onBoxClick: () -> Unit,
     onMenuBotSelected: (bot: ComposeBot) -> Unit,
     onNewBotButtonSelected: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
 ) {
-    var isExpand by remember { mutableStateOf(false) }
+    var menuExpand by remember { mutableStateOf(false) }
 
     Box(modifier) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .combinedClickable(
-                    onLongClick = { isExpand = !isExpand },
-                    onClick = {
-                        if (currentBot == null) {
-                            onNewBotButtonSelected()
-                        } else {
-                            onMenuBotSelected(currentBot)
-                        }
-                    }
-                )
-        ) {
-            BotItem(currentBot)
-        }
+                    onLongClick = { menuExpand = !menuExpand },
+                    onClick = onBoxClick
+                ),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            content = content
+        )
 
-        DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }) {
-            DropdownMenuItem(onClick = { isExpand = !isExpand }) {
+        DropdownMenu(menuExpand, onDismissRequest = { menuExpand = !menuExpand }) {
+            DropdownMenuItem(onClick = { menuExpand = !menuExpand }) {
                 Text(R.String.botMenuExit)
             }
 
             DropdownMenuItem(onClick = {
                 onNewBotButtonSelected()
-                isExpand = !isExpand
+                menuExpand = !menuExpand
             }) {
                 Text(R.String.botMenuAdd)
             }
@@ -267,7 +279,7 @@ private fun AvatarWithMenu(
             items(composeBotList) { item ->
                 DropdownMenuItem(onClick = {
                     onMenuBotSelected(item)
-                    isExpand = !isExpand
+                    menuExpand = !menuExpand
                 }) {
                     BotItem(item)
                 }
@@ -278,30 +290,18 @@ private fun AvatarWithMenu(
 
 
 @Composable
-private fun SelectEdgeText(
-    icon: ImageVector,
-    text: String,
-    isWishWindow: Boolean,
+private fun SideTab(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    content: @Composable RowScope.() -> Unit
 ) {
-    Box(
-        modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        OutlinedButton(
-            onClick = onClick,
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = MaterialTheme.colors.background),
-            modifier = Modifier.fillMaxSize(),
-            border = null
-        ) {
-            Row(Modifier.animateContentSize()) {
-                Image(icon, null)
-                if (isWishWindow)
-                    Text(text, maxLines = 1)
-            }
-        }
-    }
+    OutlinedButton(
+        modifier = modifier.fillMaxSize(),
+        onClick = onClick,
+        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = MaterialTheme.colors.background),
+        border = null,
+        content = content
+    )
 }
 
 @Composable
@@ -311,11 +311,12 @@ private fun BotItem(
 ) {
     Row(
         modifier = modifier
-            .aspectRatio(2f),
-        horizontalArrangement = Arrangement.Center,
+            .aspectRatio(2f)
+            .clipToBounds(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.weight(1f).fillMaxHeight())
         Surface(
             modifier = Modifier
                 .weight(3f, fill = false),
@@ -324,7 +325,6 @@ private fun BotItem(
         ) {
             Image(bot?.avatar ?: ImageBitmap(200, 200), null)
         }
-
         Column(
             Modifier
                 .weight(6f),
@@ -335,6 +335,5 @@ private fun BotItem(
                 Text("${bot?.id ?: "Unknown"}", style = MaterialTheme.typography.body2)
             }
         }
-        Spacer(Modifier.weight(1f))
     }
 }
