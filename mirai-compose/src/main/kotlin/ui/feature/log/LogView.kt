@@ -12,6 +12,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
+import com.youngerhousea.miraicompose.console.ComposeLog
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
@@ -23,7 +24,7 @@ import java.awt.event.MouseEvent
  */
 class ConsoleLog(
     componentContext: ComponentContext,
-    val loggerStorage: List<AnnotatedString>,
+    val loggerStorage: List<ComposeLog>,
     val logger: MiraiLogger
 ) : ComponentContext by componentContext
 

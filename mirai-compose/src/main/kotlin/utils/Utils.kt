@@ -133,47 +133,8 @@ inline fun <T> ColumnScope.itemsWithIndexed(
     }
 }
 
-internal fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
-    return windowed(size, size, partialWindows = true)
-}
+fun AnnotatedString.replace() {
 
-internal fun AnnotatedString.windowed(
-    size: Int,
-    step: Int = 1,
-    partialWindows: Boolean = false
-): List<AnnotatedString> {
-    return windowed(size, step, partialWindows) { it }
-}
-
-internal fun <R> AnnotatedString.windowed(
-    size: Int,
-    step: Int = 1,
-    partialWindows: Boolean = false,
-    transform: (AnnotatedString) -> R
-): List<R> {
-    checkWindowSizeStep(size, step)
-    val thisSize = this.length
-    val resultCapacity = thisSize / step + if (thisSize % step == 0) 0 else 1
-    val result = ArrayList<R>(resultCapacity)
-    var index = 0
-    while (index in 0 until thisSize) {
-        val end = index + size
-        val coercedEnd = if (end < 0 || end > thisSize) {
-            if (partialWindows) thisSize else break
-        } else end
-        result.add(transform(subSequence(index, coercedEnd)))
-        index += step
-    }
-    return result
-}
-
-private fun checkWindowSizeStep(size: Int, step: Int) {
-    require(size > 0 && step > 0) {
-        if (size != step)
-            "Both size $size and step $step must be greater than zero."
-        else
-            "size $size must be greater than zero."
-    }
 }
 
 class ComponentScope(private val scope: CoroutineScope = MainScope()) :

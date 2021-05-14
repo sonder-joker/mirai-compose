@@ -13,9 +13,89 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
 
-internal val annotatedLogStorage: MutableList<AnnotatedString> = mutableStateListOf()
+/**
+ * Compose log
+ *
+ * 单个的日志
+ * @property priority
+ * @property identity
+ * @property message
+ * @constructor Create empty Compose log
+ */
+class ComposeLog(
+    val priority: MiraiComposeLogger.LogPriority,
+    identity: String?,
+    message: String
+) {
+    private inline val ANSI_RESET get() = "\u001B[0m"
+    private inline val ANSI_BLACK get() = "\u001B[30m"
+    private inline val ANSI_RED get() = "\u001B[31m"
+    private inline val ANSI_GREEN get() = "\u001B[32m"
+    private inline val ANSI_YELLOW get() = "\u001B[33m"
+    private inline val ANSI_BLUE get() = "\u001B[34m"
+    private inline val ANSI_PURPLE get() = "\u001B[35m"
+    private inline val ANSI_CYAN get() = "\u001B[36m"
+    private inline val ANSI_WHITE get() = "\u001B[37m"
+
+    private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
+
+    private inline val currentDate: String get() = logTimeFormat.format(Date())
+
+    val text = "$currentDate ${priority.simpleName}/$identity: $message"
+
+    val color: Color
+        get() = when (priority) {
+            MiraiComposeLogger.LogPriority.VERBOSE -> ComposeSetting.AppTheme.logColors.verbose
+            MiraiComposeLogger.LogPriority.INFO -> ComposeSetting.AppTheme.logColors.info
+            MiraiComposeLogger.LogPriority.WARNING -> ComposeSetting.AppTheme.logColors.warning
+            MiraiComposeLogger.LogPriority.ERROR -> ComposeSetting.AppTheme.logColors.error
+            MiraiComposeLogger.LogPriority.DEBUG -> ComposeSetting.AppTheme.logColors.debug
+        }
+
+    fun parseInConsole(): String = when (priority) {
+        MiraiComposeLogger.LogPriority.VERBOSE -> text
+        MiraiComposeLogger.LogPriority.DEBUG -> text
+        MiraiComposeLogger.LogPriority.INFO -> ANSI_GREEN + text + ANSI_RESET
+        MiraiComposeLogger.LogPriority.WARNING -> ANSI_YELLOW + text + ANSI_RESET
+        MiraiComposeLogger.LogPriority.ERROR -> ANSI_RED + text + ANSI_RESET
+    }
+
+
+    fun parseInCompose(): AnnotatedString {
+        return buildAnnotatedString {
+            pushStyle(SpanStyle(color))
+            append(text)
+        }
+    }
+
+    fun parseInSearch(searchText: String): AnnotatedString {
+        if(searchText.isEmpty()) return parseInCompose()
+        val builder = AnnotatedString.Builder()
+        text.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
+            if (it == searchText)
+                builder.append(
+                    AnnotatedString(
+                        it,
+                        spanStyle = SpanStyle(background = Color.Yellow),
+                    )
+                )
+            else
+                builder.append(
+                    AnnotatedString(
+                        it,
+                        spanStyle = SpanStyle(color),
+                    )
+                )
+
+        }
+        return builder.toAnnotatedString()
+    }
+
+    companion object {
+        internal val logStorage: MutableList<ComposeLog> = mutableStateListOf()
+    }
+}
 
 /**
  * [MiraiCompose] 默认Logger实现
@@ -23,32 +103,13 @@ internal val annotatedLogStorage: MutableList<AnnotatedString> = mutableStateLis
 class MiraiComposeLogger(
     override val identity: String?
 ) : MiraiLoggerPlatformBase() {
-    private inline val currentDate: String get() = logTimeFormat.format(Date())
-
-    private val LogPriority.color: Color
-        get() = when (this) {
-            LogPriority.VERBOSE -> ComposeSetting.AppTheme.logColors.verbose
-            LogPriority.INFO -> ComposeSetting.AppTheme.logColors.info
-            LogPriority.WARNING -> ComposeSetting.AppTheme.logColors.warning
-            LogPriority.ERROR -> ComposeSetting.AppTheme.logColors.error
-            LogPriority.DEBUG -> ComposeSetting.AppTheme.logColors.debug
-        }
 
     private fun printLog(message: String?, priority: LogPriority) {
         if (message != null) {
-            val annotatedLog =
-                annotatedString(priority, message)
-            println(priority.parseInConsole(annotatedLog.text))
-            annotatedLogStorage.add(annotatedLog)
+            val compose = ComposeLog(priority, identity, message)
+            println(compose.parseInConsole())
+            ComposeLog.logStorage.add(compose)
         }
-    }
-
-    private fun annotatedString(
-        priority: LogPriority,
-        message: String?
-    ) = buildAnnotatedString {
-        pushStyle(SpanStyle(priority.color))
-        append("$currentDate ${priority.simpleName}/$identity: $message")
     }
 
     public override fun verbose0(message: String?): Unit = printLog(message, LogPriority.VERBOSE)
@@ -90,27 +151,7 @@ class MiraiComposeLogger(
         ERROR("E"),
         DEBUG("D")
     }
-
-    private fun LogPriority.parseInConsole(text: String): String =
-        when (this) {
-            LogPriority.VERBOSE -> text
-            LogPriority.DEBUG -> text
-            LogPriority.INFO -> ANSI_GREEN + text + ANSI_RESET
-            LogPriority.WARNING -> ANSI_YELLOW + text + ANSI_RESET
-            LogPriority.ERROR -> ANSI_RED + text + ANSI_RESET
-        }
 }
-
-
-const val ANSI_RESET = "\u001B[0m"
-const val ANSI_BLACK = "\u001B[30m"
-const val ANSI_RED = "\u001B[31m"
-const val ANSI_GREEN = "\u001B[32m"
-const val ANSI_YELLOW = "\u001B[33m"
-const val ANSI_BLUE = "\u001B[34m"
-const val ANSI_PURPLE = "\u001B[35m"
-const val ANSI_CYAN = "\u001B[36m"
-const val ANSI_WHITE = "\u001B[37m"
 
 internal class BufferedOutputStream constructor(
     private val size: Int = 1024 * 1024,

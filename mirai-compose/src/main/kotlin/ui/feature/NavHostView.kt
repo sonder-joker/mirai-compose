@@ -2,7 +2,6 @@ package com.youngerhousea.miraicompose.ui.feature
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -24,7 +23,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.cros
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.annotatedLogStorage
+import com.youngerhousea.miraicompose.console.ComposeLog
 import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
@@ -89,7 +88,7 @@ class NavHost(
                 is Configuration.ConsoleLog ->
                     ConsoleLog(
                         componentContext,
-                        annotatedLogStorage,
+                        ComposeLog.logStorage,
                         MiraiConsole.mainLogger
                     ).asComponent { ConsoleLogUi(it) }
                 is Configuration.About ->

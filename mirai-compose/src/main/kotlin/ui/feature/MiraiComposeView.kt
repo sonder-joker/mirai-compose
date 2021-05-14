@@ -9,7 +9,6 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.youngerhousea.miraicompose.console.AccessibleHolder
 import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.console.MiraiComposeRepository
-import com.youngerhousea.miraicompose.future.Application
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.ResourceImage
 import com.youngerhousea.miraicompose.utils.asComponent
@@ -38,22 +37,20 @@ fun MiraiComposeView() {
         modules(module)
     }
 
-    Application {
-        ComposableWindow(
-            title = "Mirai compose",
-            size = IntSize(1280, 768),
-            icon = ResourceImage.icon,
-            onDismissRequest = {
-                compose.cancel("Normal Exit")
-            }
+    Window(
+        title = "Mirai compose",
+        size = IntSize(1280, 768),
+        icon = ResourceImage.icon,
+        onDismissRequest = {
+            compose.cancel("Normal Exit")
+        }
+    ) {
+        DesktopMaterialTheme(
+            colors = ComposeSetting.AppTheme.materialLight
         ) {
-            DesktopMaterialTheme(
-                colors = ComposeSetting.AppTheme.materialLight
-            ) {
-                rememberRootComponent { componentContext ->
-                    NavHost(componentContext)
-                }.asComponent { NavHostUi(it) }()
-            }
+            rememberRootComponent { componentContext ->
+                NavHost(componentContext)
+            }.asComponent { NavHostUi(it) }()
         }
     }
 }
@@ -61,7 +58,7 @@ fun MiraiComposeView() {
 // 取代默认的异常处理
 private fun SetDefaultExceptionHandler() {
     Thread.setDefaultUncaughtExceptionHandler { _, exception ->
-        if(exception is UnsupportedFlavorException) {
+        if (exception is UnsupportedFlavorException) {
             return@setDefaultUncaughtExceptionHandler
         }
         println(exception.stackTraceToString())

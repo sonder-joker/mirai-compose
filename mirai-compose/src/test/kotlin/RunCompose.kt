@@ -1,7 +1,5 @@
 package com.youngerhousea.miraicompose
 
-import com.youngerhousea.miraicompose.console.MiraiCompose
-import com.youngerhousea.miraicompose.ui.feature.MiraiComposeView
 import java.io.File
 
 fun main() {
