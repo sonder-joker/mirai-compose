@@ -28,7 +28,6 @@ dependencies {
     implementation(yamlkt)
     implementation(compose.materialIconsExtended)
     //may remove in future
-    implementation("com.google.zxing:core:3.4.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")

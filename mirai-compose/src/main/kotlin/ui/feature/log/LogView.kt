@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -21,6 +20,11 @@ import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
 import net.mamoe.mirai.utils.MiraiLogger
 import java.awt.event.MouseEvent
+import java.io.File
+import java.time.LocalDate
+import javax.swing.JFileChooser
+import javax.swing.UIManager
+import javax.swing.filechooser.FileNameExtensionFilter
 
 /**
  * Compose的所有日志
@@ -51,21 +55,45 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     }) {
         Box(
             modifier = Modifier
-                .padding(top = offset.y - 80.dp)
-                .offset(x = offset.x)
+                .padding(top = offset.y)
+                .offset(x = offset.x - 160.dp)
         ) {
             DropdownMenu(
                 isExpand,
                 onDismissRequest = { isExpand = false }
             ) {
-                DropdownMenuItem(onClick = { isExpand = false }) {
-                    Text("OpenLog")
-                    //TODO open log file in editor such as notepad
+                DropdownMenuItem(onClick = {
+                    isExpand = false
+                    // open maybe slow
+                    val previousLF = UIManager.getLookAndFeel();
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    val fc = JFileChooser()
+                    UIManager.setLookAndFeel(previousLF);
+                    fc.selectedFile = File("${LocalDate.now()}.log")
+                    fc.dialogTitle = "Save log"
+                    fc.dragEnabled = true
+                    fc.fileSelectionMode = JFileChooser.FILES_ONLY
+                    fc.fileFilter = FileNameExtensionFilter("log(*.log, *.txt)", "log", "txt")
+                    if (fc.showSaveDialog(AppManager.focusedWindow!!.window) == JFileChooser.APPROVE_OPTION) {
+                        val f = fc.selectedFile
+                        consoleLog.logger.info("储存当前日志到文件: ${f.absolutePath}")
+                        if (f.exists()) {
+                            consoleLog.logger.error("储存失败,文件已存在")
+                        } else {
+                            f.createNewFile()
+                            f.writeText(consoleLog.loggerStorage.joinToString("\n"))
+                            consoleLog.logger.info("写入完成")
+                        }
+                    }
+                }) {
+                    Text("Save log")
                 }
-                DropdownMenuItem(onClick = { isExpand = false }) {
-                    Text("Report")
-                    //TODO report error or do else
-                }
+//                DropdownMenuItem(onClick = {
+//                    //TODO report error or do else
+//                    isExpand = false
+//                }) {
+//                    Text("Report")
+//                }
             }
         }
         Column {

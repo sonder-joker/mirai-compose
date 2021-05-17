@@ -13,6 +13,9 @@ import com.youngerhousea.miraicompose.utils.asComponent
 import kotlinx.coroutines.cancel
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import java.awt.datatransfer.UnsupportedFlavorException
+import java.nio.file.Files
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.div
 
 // 应用起点
 fun MiraiComposeView() {

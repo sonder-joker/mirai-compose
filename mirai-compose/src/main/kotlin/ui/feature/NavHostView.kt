@@ -178,6 +178,7 @@ fun NavHostUi(navHost: NavHost) {
                 AvatarWithMenu(
                     composeBotList = navHost.botList,
                     onBoxClick = {
+                        navigationIndex = 5
                         if (navHost.currentBot != null)
                             navHost.onRouteMessage()
                         else

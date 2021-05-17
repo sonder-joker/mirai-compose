@@ -1,8 +1,6 @@
 package com.youngerhousea.miraicompose.ui.common
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,13 +8,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
 import com.youngerhousea.miraicompose.console.ComposeLog
 import kotlinx.coroutines.launch
@@ -46,10 +43,7 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>, searc
                 }
             }
         }
-
     }
-
-
 
     LaunchedEffect(logs.size) {
         if (logs.isNotEmpty())
@@ -86,7 +80,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
             Modifier.weight(1f)
         )
 
-        OutlinedButton(
+        Button(
             onClick = onClick,
             modifier = Modifier
                 .weight(2f),

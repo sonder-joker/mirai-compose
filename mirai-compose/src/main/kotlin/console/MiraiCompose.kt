@@ -102,27 +102,6 @@ object MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val name: String = "MiraiCompose"
     override val vendor: String = "Noire"
-    override val version: SemVersion = SemVersion("1.1.0")
-}
-
-internal fun setSystemOut(out: MiraiLogger) {
-    System.setOut(
-        PrintStream(
-            BufferedOutputStream(
-                logger = out.run { ({ line: String? -> info(line) }) }
-            ),
-            false,
-            "UTF-8"
-        )
-    )
-    System.setErr(
-        PrintStream(
-            BufferedOutputStream(
-                logger = out.run { ({ line: String? -> warning(line) }) }
-            ),
-            false,
-            "UTF-8"
-        )
-    )
+    override val version: SemVersion = SemVersion("0.1.0-dev1")
 }
 

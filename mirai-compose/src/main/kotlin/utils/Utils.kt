@@ -154,10 +154,6 @@ inline fun <T> ColumnScope.itemsWithIndexed(
     }
 }
 
-fun AnnotatedString.replace() {
-
-}
-
 class ComponentScope(private val scope: CoroutineScope = MainScope()) :
     InstanceKeeper.Instance,
     CoroutineScope by scope {
