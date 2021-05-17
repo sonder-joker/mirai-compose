@@ -10,7 +10,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -33,38 +35,22 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 @Composable
-internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>) {
-    var isShowSearch by remember { mutableStateOf(true) }
+internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>, searchText:String = "") {
     val lazyListState = rememberLazyListState()
-    var searchText by remember { mutableStateOf("") }
 
     Box(modifier) {
         LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
-            stickyHeader {
-                if (isShowSearch)
-                    OutlinedTextField(searchText, { searchText = it })
-            }
-
             items(logs) { adaptiveLog ->
                 SelectionContainer {
                     Text(adaptiveLog.parseInSearch(searchText))
                 }
             }
         }
+
     }
 
-    DisposableEffect(Unit) {
-        AppManager.windows.first().let {
-            (it as AppWindow).keyboard.setShortcut(Key.CtrlLeft + Key.F) {
-                isShowSearch = !isShowSearch
-            }
-        }
-        onDispose {
-            AppManager.windows.first().let {
-                (it as AppWindow).keyboard.removeShortcut(Key.CtrlLeft + Key.F)
-            }
-        }
-    }
+
+
     LaunchedEffect(logs.size) {
         if (logs.isNotEmpty())
             lazyListState.animateScrollToItem(logs.size)
@@ -74,17 +60,11 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>) {
 @Composable
 internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) {
     var currentCommand by remember(logger) { mutableStateOf("") }
-    var re by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val onClick: () -> Unit = {
         scope.launch {
-//            try {
             SolveCommandResult(currentCommand, logger)
-//            } catch (e: Exception) {
-//
-//            } finally {
             currentCommand = ""
-//            }
         }
     }
 

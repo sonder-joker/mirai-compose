@@ -12,6 +12,7 @@ import java.io.OutputStream
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.PatternSyntaxException
 
 
 /**
@@ -70,24 +71,29 @@ class ComposeLog(
     }
 
     fun parseInSearch(searchText: String): AnnotatedString {
-        if(searchText.isEmpty()) return parseInCompose()
+        if (searchText.isEmpty()) return parseInCompose()
         val builder = AnnotatedString.Builder()
-        text.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
-            if (it == searchText)
-                builder.append(
-                    AnnotatedString(
-                        it,
-                        spanStyle = SpanStyle(background = Color.Yellow),
+        try {
+            text.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
+                if (it == searchText)
+                    builder.append(
+                        AnnotatedString(
+                            it,
+                            spanStyle = SpanStyle(background = Color.Yellow),
+                        )
                     )
-                )
-            else
-                builder.append(
-                    AnnotatedString(
-                        it,
-                        spanStyle = SpanStyle(color),
+                else
+                    builder.append(
+                        AnnotatedString(
+                            it,
+                            spanStyle = SpanStyle(color),
+                        )
                     )
-                )
 
+            }
+        } catch (e: PatternSyntaxException) {
+            //TODO:
+            return parseInCompose()
         }
         return builder.toAnnotatedString()
     }

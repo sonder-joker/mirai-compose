@@ -39,7 +39,7 @@ import kotlin.io.path.div
  *
  */
 @ConsoleFrontEndImplementation
-class MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
+object MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
     CoroutineScope by CoroutineScope(
         NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
             if (throwable is CancellationException) {

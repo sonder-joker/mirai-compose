@@ -3,7 +3,9 @@ package com.youngerhousea.miraicompose.ui.feature.plugin
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.Composable
@@ -78,21 +80,21 @@ class SpecificPlugin(
 
 @Composable
 fun SpecificPluginUi(specificPlugin: SpecificPlugin) {
-    Column(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxWidth().requiredHeight(34.dp), contentAlignment = Alignment.CenterStart) {
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(
+                specificPlugin.plugin.annotatedName,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+            )
+        }, navigationIcon = {
             Icon(
                 Icons.Default.KeyboardArrowLeft,
                 null,
                 Modifier.clickable(onClick = specificPlugin.onExitButtonClicked)
             )
-            Text(
-                specificPlugin.plugin.annotatedName,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-
+        })
+    }) {
         Children(specificPlugin.state) { child ->
             child.instance()
         }

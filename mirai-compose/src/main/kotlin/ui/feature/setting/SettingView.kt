@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.future.inject
 import com.youngerhousea.miraicompose.theme.AppTheme
 import com.youngerhousea.miraicompose.ui.common.ColorPicker
 

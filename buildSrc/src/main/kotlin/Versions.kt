@@ -12,8 +12,6 @@ object Versions {
 
     const val yamlkt = "0.9.0"
 
-    const val koin = "3.0.1"
-
     const val download = "4.1.1"
 }
 
@@ -25,4 +23,3 @@ const val `mirai-console` = "net.mamoe:mirai-console:${Versions.mirai}"
 
 const val yamlkt = "net.mamoe.yamlkt:yamlkt:${Versions.yamlkt}"
 
-const val koin = "io.insert-koin:koin-core:${Versions.koin}"

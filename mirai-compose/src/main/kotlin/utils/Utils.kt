@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.utils
 
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -7,20 +8,24 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderColors
 import androidx.compose.material.SliderDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Navigator
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import org.jetbrains.skija.Image
+import java.awt.Cursor
 import java.net.URL
 import java.net.URLDecoder
 import java.util.*
@@ -102,6 +107,22 @@ internal fun Base64ImageDecode(data: String): ImageBitmap =
     SkiaImageDecode(Base64.getDecoder().decode(data.split(",").last()))
 
 
+fun Modifier.cursorForHorizontalResize(
+): Modifier = composed {
+    var isHover by remember { mutableStateOf(false) }
+
+    if (isHover) {
+        LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
+    } else {
+        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
+    }
+
+    pointerMoveFilter(
+        onEnter = { isHover = true; true },
+        onExit = { isHover = false; true }
+    )
+}
+
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))
     layout(constraints.maxWidth, placeable.height) {
@@ -144,3 +165,5 @@ class ComponentScope(private val scope: CoroutineScope = MainScope()) :
         scope.cancel()
     }
 }
+
+fun ComponentContext.componentScope() = instanceKeeper.getOrCreate(::ComponentScope)

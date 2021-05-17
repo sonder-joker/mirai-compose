@@ -1,24 +1,23 @@
 package com.youngerhousea.miraicompose.ui.feature
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.Notes
-import androidx.compose.material.icons.outlined.Extension
-import androidx.compose.material.icons.outlined.Login
-import androidx.compose.material.icons.outlined.Message
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -29,7 +28,10 @@ import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.console.ComposeLog
-import com.youngerhousea.miraicompose.future.inject
+import com.youngerhousea.miraicompose.console.MiraiCompose
+import com.youngerhousea.miraicompose.future.splitpane.ExperimentalSplitPaneApi
+import com.youngerhousea.miraicompose.future.splitpane.HorizontalSplitPane
+import com.youngerhousea.miraicompose.future.splitpane.rememberSplitPaneState
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
 import com.youngerhousea.miraicompose.theme.ComposeSetting
@@ -48,10 +50,10 @@ import com.youngerhousea.miraicompose.ui.feature.setting.Setting
 import com.youngerhousea.miraicompose.ui.feature.setting.SettingUi
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
+import com.youngerhousea.miraicompose.utils.cursorForHorizontalResize
 import com.youngerhousea.miraicompose.utils.items
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
-import org.koin.core.qualifier.named
 
 /**
  * 主界面
@@ -70,9 +72,8 @@ import org.koin.core.qualifier.named
 class NavHost(
     component: ComponentContext,
 ) : ComponentContext by component {
-    private var _navigationIndex by mutableStateOf(0)
 
-    private val _botList: MutableList<ComposeBot> by inject(named("ComposeBot"))
+    private val _botList: MutableList<ComposeBot> = MiraiCompose.botList
 
     private var _currentBot by mutableStateOf(_botList.firstOrNull())
 
@@ -105,7 +106,6 @@ class NavHost(
         }
     )
 
-    val navigationIndex get() = _navigationIndex
 
     val botList: List<ComposeBot> get() = _botList
 
@@ -131,27 +131,22 @@ class NavHost(
     }
 
     fun onRouteMessage() {
-        _navigationIndex = 0
         router.push(Configuration.Message)
     }
 
     fun onRoutePlugin() {
-        _navigationIndex = 1
         router.push(Configuration.Plugin)
     }
 
     fun onRouteSetting() {
-        _navigationIndex = 2
         router.push(Configuration.Setting)
     }
 
     fun onRouteLog() {
-        _navigationIndex = 3
         router.push(Configuration.ConsoleLog)
     }
 
     fun onRouteAbout() {
-        _navigationIndex = 4
         router.push(Configuration.About)
     }
 
@@ -165,80 +160,123 @@ class NavHost(
     }
 }
 
-@OptIn(ExperimentalDecomposeApi::class)
+@OptIn(ExperimentalDecomposeApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
     val height = 80.dp
 
-    Row(Modifier.fillMaxSize()) {
-        Column(
-            Modifier
-                .width(160.dp)
-                .fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            AvatarWithMenu(
-                composeBotList = navHost.botList,
-                onBoxClick = {
-//                    if (navHost.currentBot != null)
-//                        navHost.onRouteMessage()
-//                    else
-                        navHost.addNewBot()
-                },
-                onMenuBotSelected = navHost::onRouteToSpecificBot,
-                onNewBotButtonSelected = navHost::addNewBot,
-                modifier = Modifier.height(height),
+    val splitterState = rememberSplitPaneState()
+
+    var navigationIndex by remember { mutableStateOf(0) }
+
+    HorizontalSplitPane(splitPaneState = splitterState) {
+        first(160.dp) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
             ) {
-                BotItem(navHost.currentBot)
-            }
-//            SideTab(
-//                onClick = navHost::onRouteMessage,
-//                modifier = Modifier.height(height),
-//            ) {
-//                Icon(Icons.Outlined.Message, null)
-//                Text(R.String.sideRowFirst, maxLines = 1)
-//            }
-            SideTab(
-                onClick = navHost::onRoutePlugin,
-                modifier = Modifier.height(height)
-            ) {
-                Icon(Icons.Outlined.Extension, null)
-                Text(R.String.sideRowSecond)
-            }
-            SideTab(
-                onClick = navHost::onRouteSetting,
-                modifier = Modifier.height(height)
-            ) {
-                Icon(Icons.Outlined.Settings, null, modifier = Modifier)
-                Text(R.String.sideRowThird)
-            }
-            SideTab(
-                onClick = navHost::onRouteLog,
-                modifier = Modifier.height(height)
-            ) {
-                Icon(Icons.Default.Notes, null)
-                Text(R.String.sideRowFour, maxLines = 1)
-            }
-            SideTab(
-                onClick = navHost::onRouteAbout,
-                modifier = Modifier.height(height)
-            ) {
-                Icon(Icons.Default.Forum, null)
-                Text(R.String.sideRowFive)
+                AvatarWithMenu(
+                    composeBotList = navHost.botList,
+                    onBoxClick = {
+                        if (navHost.currentBot != null)
+                            navHost.onRouteMessage()
+                        else
+                            navHost.addNewBot()
+                    },
+                    onMenuBotSelected = navHost::onRouteToSpecificBot,
+                    onNewBotButtonSelected = navHost::addNewBot,
+                    modifier = Modifier.height(height),
+                ) {
+                    BotItem(navHost.currentBot)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRouteMessage()
+                        navigationIndex = 0
+                    },
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 0
+                ) {
+                    Icon(Icons.Outlined.Message, null)
+                    Text(R.String.sideRowFirst)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRoutePlugin()
+                        navigationIndex = 1
+                    },
+                    isWish = navigationIndex == 1,
+                    modifier = Modifier.height(height),
+                ) {
+                    Icon(Icons.Outlined.Extension, null)
+                    Text(R.String.sideRowSecond)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRouteSetting()
+                        navigationIndex = 2
+                    },
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 2
+                ) {
+                    Icon(Icons.Outlined.Settings, null)
+                    Text(R.String.sideRowThird)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRouteLog()
+                        navigationIndex = 3
+                    },
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 3
+                ) {
+                    Icon(Icons.Outlined.Notes, null)
+                    Text(R.String.sideRowFour, maxLines = 1)
+                }
+                SideTab(
+                    onClick = navHost::onRouteAbout,
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 4
+                ) {
+                    Icon(Icons.Outlined.Forum, null)
+                    Text(R.String.sideRowFive)
+                }
             }
         }
 
-        Surface(color = Color(0xfffafafa)) {
-            Children(
-                navHost.state, crossfade()
-            ) { child ->
-                child.instance()
+        splitter {
+            visiblePart {
+                Box(
+                    Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colors.background)
+                )
             }
+            handle {
+                Box(
+                    Modifier
+                        .markAsHandle()
+                        .cursorForHorizontalResize()
+                        .background(SolidColor(Color.Gray), alpha = 0.5f)
+                        .width(1.dp)
+                        .fillMaxHeight()
+                )
+            }
+        }
+
+        second(500.dp) {
+            Box(Modifier.fillMaxSize().clipToBounds()) {
+                Children(
+                    navHost.state, crossfade()
+                ) { child ->
+                    child.instance()
+                }
+            }
+
         }
     }
 }
-
 
 @Composable
 private fun AvatarWithMenu(
@@ -250,7 +288,6 @@ private fun AvatarWithMenu(
     content: @Composable RowScope.() -> Unit
 ) {
     var menuExpand by remember { mutableStateOf(false) }
-
     Box(modifier) {
         Row(
             modifier = Modifier
@@ -259,7 +296,7 @@ private fun AvatarWithMenu(
                     onLongClick = { menuExpand = !menuExpand },
                     onClick = onBoxClick
                 ),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
             content = content
         )
@@ -288,20 +325,23 @@ private fun AvatarWithMenu(
     }
 }
 
-
 @Composable
 private fun SideTab(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    content: @Composable RowScope.() -> Unit
+    isWish: Boolean,
+    content: @Composable RowScope.() -> Unit,
 ) {
-    OutlinedButton(
-        modifier = modifier.fillMaxSize(),
-        onClick = onClick,
-        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = MaterialTheme.colors.background),
-        border = null,
-        content = content
-    )
+    val color by animateColorAsState(if (isWish) Color.Green else MaterialTheme.colors.primary)
+
+    CompositionLocalProvider(LocalContentColor provides color) {
+        Row(
+            modifier = modifier.fillMaxSize().clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.aligned(Alignment.CenterHorizontally),
+            content = content
+        )
+    }
 }
 
 @Composable
