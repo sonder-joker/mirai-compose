@@ -36,7 +36,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:${Versions.kotlin}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
 
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0-native-mt")
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
 }
 
