@@ -12,7 +12,7 @@ configurations.all {
 //    this.resolutionStrategy.failOnVersionConflict()
     this.resolutionStrategy {
         this.setForcedModules(
-            "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt"
         )
     }
 }
