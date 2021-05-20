@@ -4,17 +4,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.AnnotatedString
-import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
-import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
@@ -29,7 +29,6 @@ import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.SwingSolver
-import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.div
@@ -68,6 +67,8 @@ object MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
     override val consoleCommandSender: MiraiComposeSender = MiraiComposeSender
 
     override fun createLogger(identity: String?): MiraiLogger = MiraiComposeLogger(identity)
+
+    val logger = createLogger("compose")
 
     // 一般不应该被使用
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) = SwingSolver

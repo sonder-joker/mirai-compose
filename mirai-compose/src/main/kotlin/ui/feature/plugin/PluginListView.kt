@@ -70,17 +70,27 @@ fun PluginListUi(pluginList: PluginList) {
                         false
                     ) ?: let { return@Button }
                     if (!fc.selectedFile.exists() || !fc.selectedFile.isFile) {
-                        //TODO: logger->error
+                        MiraiCompose.logger.error("选择的文件(${fc.selectedFile.absolutePath})不存在或不是文件")
                         return@Button
                     }
+                    if (!fc.selectedFile.name.endsWith(".mirai.jar")) {
+                        MiraiCompose.logger.error("选择的文件(${fc.selectedFile.absolutePath})不是mirai插件(.mirai.jar)")
+                        return@Button
+                    }
+                    val target = (MiraiCompose.rootPath / "plugins" / fc.selectedFile.name).toFile()
                     if (fc.selectedFile.canRead()) {
-                        fc.selectedFile.copyTo(
-                            (MiraiCompose.rootPath / "plugins" / fc.selectedFile.name).toFile(),
-                            true
-                        )
-                        //TODO: logger->Info(成功)
+                        if (target.exists()) {
+                            if (!target.canWrite()) {
+                                MiraiCompose.logger.error("导入失败, ${target.absolutePath}已存在并不可更改")
+                                return@Button
+                            }
+                            MiraiCompose.logger.warning("${fc.selectedFile.name}已存在，将会覆盖旧版本")
+                        }
+                        fc.selectedFile.copyTo(target, true)
+                        MiraiCompose.logger.info("成功导入${fc.selectedFile.name}插件")
+                        //TODO: do something to load plugin
                     } else {
-                        //TODO: 使用全局logger输出该文件不可修改
+                        MiraiCompose.logger.error("导入失败, ${fc.selectedFile.absolutePath}无法读取")
                     }
                 }) {
                 Text(R.String.addPlugin)
