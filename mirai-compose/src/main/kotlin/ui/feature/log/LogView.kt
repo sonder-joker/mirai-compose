@@ -55,8 +55,8 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     }) {
         Box(
             modifier = Modifier
-                .padding(top = offset.y)
-                .offset(x = offset.x - 160.dp)
+                .padding(top = offset.y - 55.dp)
+                .offset(x = offset.x - 110.dp)
         ) {
             DropdownMenu(
                 isExpand,
@@ -67,7 +67,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                     // open maybe slow
                     val previousLF = UIManager.getLookAndFeel();
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    val fc = JFileChooser()
+                    val fc = JFileChooser(".")
                     UIManager.setLookAndFeel(previousLF);
                     fc.selectedFile = File("${LocalDate.now()}.log")
                     fc.dialogTitle = "Save log"
