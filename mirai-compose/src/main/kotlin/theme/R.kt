@@ -3,7 +3,8 @@ package com.youngerhousea.miraicompose.theme
 object R {
     object String {
         const val editWithEditor = "Edit by default editor"
-        const val addPlugin = "Add plugin"
+        const val addPlugin = "添加插件"
+        const val openPluginFolder = "打开插件目录"
         const val botMenuEmpty = "No item"
         const val botMenuExit = "Logout"
         const val botMenuAdd = "Add"
@@ -24,5 +25,8 @@ object R {
         const val loginTimeOut = "超时"
         const val loginDismiss = "取消"
         const val loginLoading = "加载中"
+
+        const val saveLog = "保存日志"
+        const val reportError = "报告错误"
     }
 }

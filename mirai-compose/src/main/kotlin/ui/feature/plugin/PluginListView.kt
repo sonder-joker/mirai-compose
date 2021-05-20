@@ -18,9 +18,11 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.common.PluginDescription
-import net.mamoe.mirai.console.MiraiConsole
+import com.youngerhousea.miraicompose.utils.FileChooser
 import net.mamoe.mirai.console.plugin.Plugin
 import java.awt.Desktop
+import java.io.File
+import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.io.path.div
 
 /**
@@ -56,12 +58,40 @@ fun PluginListUi(pluginList: PluginList) {
                 }
             }
         }
-        Button(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            onClick = {
-                Desktop.getDesktop().open((MiraiCompose.rootPath / "plugins").toFile())
-            }) {
-            Text(R.String.addPlugin)
+        Row(modifier = Modifier.align(Alignment.BottomEnd)) {
+            Button(
+                modifier = Modifier.padding(5.dp),
+                onClick = {
+                    val fc = FileChooser(
+                        R.String.addPlugin,
+                        FileNameExtensionFilter("Mirai console plugin(*.mirai.jar)", "mirai.jar"),
+                        File("example.mirai.jar"),
+                        ".",
+                        false
+                    ) ?: let { return@Button }
+                    if (!fc.selectedFile.exists() || !fc.selectedFile.isFile) {
+                        //TODO: logger->error
+                        return@Button
+                    }
+                    if (fc.selectedFile.canRead()) {
+                        fc.selectedFile.copyTo(
+                            (MiraiCompose.rootPath / "plugins" / fc.selectedFile.name).toFile(),
+                            true
+                        )
+                        //TODO: logger->Info(成功)
+                    } else {
+                        //TODO: 使用全局logger输出该文件不可修改
+                    }
+                }) {
+                Text(R.String.addPlugin)
+            }
+            Button(
+                modifier = Modifier.padding(5.dp),
+                onClick = {
+                    Desktop.getDesktop().open((MiraiCompose.rootPath / "plugins").toFile())
+                }) {
+                Text(R.String.openPluginFolder)
+            }
         }
     }
 }
