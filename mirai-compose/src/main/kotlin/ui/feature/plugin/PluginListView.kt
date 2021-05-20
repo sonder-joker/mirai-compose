@@ -20,6 +20,7 @@ import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.common.PluginDescription
 import com.youngerhousea.miraicompose.utils.FileChooser
 import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.utils.MiraiLogger
 import java.awt.Desktop
 import java.io.File
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -37,7 +38,7 @@ class PluginList(
 }
 
 @Composable
-fun PluginListUi(pluginList: PluginList) {
+fun PluginListUi(pluginList: PluginList, logger: MiraiLogger) {
     Box(Modifier.clipToBounds()) {
         LazyVerticalGrid(
             cells = GridCells.Adaptive(300.dp),
@@ -70,27 +71,27 @@ fun PluginListUi(pluginList: PluginList) {
                         false
                     ) ?: let { return@Button }
                     if (!fc.selectedFile.exists() || !fc.selectedFile.isFile) {
-                        MiraiCompose.logger.error("选择的文件(${fc.selectedFile.absolutePath})不存在或不是文件")
+                        logger.error("选择的文件(${fc.selectedFile.absolutePath})不存在或不是文件")
                         return@Button
                     }
                     if (!fc.selectedFile.name.endsWith(".mirai.jar")) {
-                        MiraiCompose.logger.error("选择的文件(${fc.selectedFile.absolutePath})不是mirai插件(.mirai.jar)")
+                        logger.error("选择的文件(${fc.selectedFile.absolutePath})不是mirai插件(.mirai.jar)")
                         return@Button
                     }
                     val target = (MiraiCompose.rootPath / "plugins" / fc.selectedFile.name).toFile()
                     if (fc.selectedFile.canRead()) {
                         if (target.exists()) {
                             if (!target.canWrite()) {
-                                MiraiCompose.logger.error("导入失败, ${target.absolutePath}已存在并不可更改")
+                                logger.error("导入失败, ${target.absolutePath}已存在并不可更改")
                                 return@Button
                             }
-                            MiraiCompose.logger.warning("${fc.selectedFile.name}已存在，将会覆盖旧版本")
+                            logger.warning("${fc.selectedFile.name}已存在，将会覆盖旧版本")
                         }
                         fc.selectedFile.copyTo(target, true)
-                        MiraiCompose.logger.info("成功导入${fc.selectedFile.name}插件")
+                        logger.info("成功导入${fc.selectedFile.name}插件")
                         //TODO: do something to load plugin
                     } else {
-                        MiraiCompose.logger.error("导入失败, ${fc.selectedFile.absolutePath}无法读取")
+                        logger.error("导入失败, ${fc.selectedFile.absolutePath}无法读取")
                     }
                 }) {
                 Text(R.String.addPlugin)
