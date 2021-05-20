@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.utils
 
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -7,25 +8,28 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderColors
 import androidx.compose.material.SliderDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Navigator
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import org.jetbrains.skija.Image
+import java.awt.Cursor
 import java.net.URL
 import java.net.URLDecoder
 import java.util.*
 import kotlin.collections.set
-import kotlin.coroutines.EmptyCoroutineContext
 
 //https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
 fun getARGB(rgb: String): IntArray {
@@ -103,6 +107,22 @@ internal fun Base64ImageDecode(data: String): ImageBitmap =
     SkiaImageDecode(Base64.getDecoder().decode(data.split(",").last()))
 
 
+fun Modifier.cursorForHorizontalResize(
+): Modifier = composed {
+    var isHover by remember { mutableStateOf(false) }
+
+    if (isHover) {
+        LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
+    } else {
+        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
+    }
+
+    pointerMoveFilter(
+        onEnter = { isHover = true; true },
+        onExit = { isHover = false; true }
+    )
+}
+
 fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))
     layout(constraints.maxWidth, placeable.height) {
@@ -134,49 +154,6 @@ inline fun <T> ColumnScope.itemsWithIndexed(
     }
 }
 
-internal fun AnnotatedString.chunked(size: Int): List<AnnotatedString> {
-    return windowed(size, size, partialWindows = true)
-}
-
-internal fun AnnotatedString.windowed(
-    size: Int,
-    step: Int = 1,
-    partialWindows: Boolean = false
-): List<AnnotatedString> {
-    return windowed(size, step, partialWindows) { it }
-}
-
-internal fun <R> AnnotatedString.windowed(
-    size: Int,
-    step: Int = 1,
-    partialWindows: Boolean = false,
-    transform: (AnnotatedString) -> R
-): List<R> {
-    checkWindowSizeStep(size, step)
-    val thisSize = this.length
-    val resultCapacity = thisSize / step + if (thisSize % step == 0) 0 else 1
-    val result = ArrayList<R>(resultCapacity)
-    var index = 0
-    while (index in 0 until thisSize) {
-        val end = index + size
-        val coercedEnd = if (end < 0 || end > thisSize) {
-            if (partialWindows) thisSize else break
-        } else end
-        result.add(transform(subSequence(index, coercedEnd)))
-        index += step
-    }
-    return result
-}
-
-private fun checkWindowSizeStep(size: Int, step: Int) {
-    require(size > 0 && step > 0) {
-        if (size != step)
-            "Both size $size and step $step must be greater than zero."
-        else
-            "size $size must be greater than zero."
-    }
-}
-
 class ComponentScope(private val scope: CoroutineScope = MainScope()) :
     InstanceKeeper.Instance,
     CoroutineScope by scope {
@@ -184,3 +161,5 @@ class ComponentScope(private val scope: CoroutineScope = MainScope()) :
         scope.cancel()
     }
 }
+
+fun ComponentContext.componentScope() = instanceKeeper.getOrCreate(::ComponentScope)

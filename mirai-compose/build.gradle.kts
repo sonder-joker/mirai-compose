@@ -27,10 +27,7 @@ dependencies {
 
     implementation(yamlkt)
     implementation(compose.materialIconsExtended)
-    implementation(koin)
-
     //may remove in future
-    implementation("com.google.zxing:core:3.4.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
@@ -38,8 +35,6 @@ dependencies {
     testImplementation("junit:junit:4.13")
     testImplementation("org.jetbrains.kotlin:kotlin-test:${Versions.kotlin}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}")
-
-    testImplementation("io.insert-koin:koin-test:${Versions.koin}")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))

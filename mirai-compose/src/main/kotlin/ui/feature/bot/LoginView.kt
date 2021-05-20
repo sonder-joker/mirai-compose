@@ -169,110 +169,11 @@ class Login(
 
 @Composable
 fun LoginUi(login: Login) {
-//    HorizontalNotification(isExpand = login.isExpand, login::setIsExpand, "Login Failure")
     Children(login.state) { child ->
         child.instance()
     }
 }
 
-
-@Composable
-fun VerticalNotification(
-    isExpand: Boolean,
-    setIsExpand: (Boolean) -> Unit,
-    text: String,
-    backgroundColor: Color = MaterialTheme.colors.error,
-    textColor: Color = MaterialTheme.colors.onError
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        BoxWithConstraints(modifier = Modifier.padding(end = 10.dp)) {
-            DropdownMenu(
-                isExpand,
-                onDismissRequest = { /*setIsExpand(false)*/ },
-                modifier = Modifier.background(backgroundColor).drawBehind {
-                    drawLine(
-                        color = textColor,
-                        start = Offset(18f, 0f),
-                        end = Offset(size.width, 0f),
-                        strokeWidth = 10F
-                    )
-                    drawLine(
-                        color = textColor,
-                        start = Offset(0f, 0f),
-                        end = Offset(0f, size.height),
-                        strokeWidth = 17F
-                    )
-                }
-            ) {
-                DropdownMenuItem(onClick = { setIsExpand(false) }) {
-                    // TODO better style
-                    Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
-                        Row(modifier = Modifier.padding(top = 5.dp)) {
-                            Text(
-                                text = "Error",
-                                color = textColor,
-                                modifier = Modifier.padding(10.dp),
-                                style = TextStyle.Default.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Left
-                                )
-                            )
-                            Text(
-                                text = "X",
-                                color = textColor.copy(alpha = 0.7F),
-                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
-                                style = TextStyle.Default.copy(
-                                    fontWeight = FontWeight.ExtraBold,
-                                    textAlign = TextAlign.Right
-                                )
-                            )
-                        }
-                        Row {
-                            Text(
-                                text = text,
-                                color = textColor,
-                                modifier = Modifier.padding(10.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun HorizontalNotification(
-    isExpand: Boolean,
-    setIsExpand: (Boolean) -> Unit,
-    text: String,
-    backgroundColor: Color = MaterialTheme.colors.error,
-    textColor: Color = MaterialTheme.colors.onError
-) {
-    Box(modifier = Modifier.clipToBounds()) {
-        if (isExpand) {
-            Snackbar(
-                action = {
-                    Text(
-                        modifier = Modifier.background(color = backgroundColor)
-                            .clickable {
-                                setIsExpand(false)
-                            },
-                        text = "X",
-                        color = textColor
-                    )
-                },
-                backgroundColor = backgroundColor
-            ) {
-                Text(text = text, modifier = Modifier.background(color = backgroundColor), color = textColor)
-            }
-        }
-    }
-}
 
 
 

@@ -12,6 +12,7 @@ import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
 import com.arkivanov.decompose.statekeeper.Parcelable
+import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.plugin.Plugin
@@ -25,7 +26,6 @@ import net.mamoe.mirai.console.plugin.Plugin
 class Plugins(
     component: ComponentContext,
 ) : ComponentContext by component {
-//    val repository by inject<MiraiComposeRepository>()
     private val router: Router<Configuration, Component> = router(
         initialConfiguration = Configuration.List,
         key = "PluginRouter",
@@ -67,17 +67,8 @@ class Plugins(
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun PluginsUi(plugins: Plugins) {
-    Box(Modifier.clipToBounds()) {
-        Children(plugins.state, animation = crossfadeScale()) { child ->
-            child.instance()
-        }
-        Button(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            onClick = {
-//                plugins.repository.reload()
-            }) {
-            Text("Reload")
-        }
+    Children(plugins.state, animation = crossfadeScale()) { child ->
+        child.instance()
     }
 }
 

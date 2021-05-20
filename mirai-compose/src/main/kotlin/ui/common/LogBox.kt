@@ -1,23 +1,21 @@
 package com.youngerhousea.miraicompose.ui.common
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.utils.VerticalScrollbar
-import com.youngerhousea.miraicompose.utils.chunked
+import com.youngerhousea.miraicompose.console.ComposeLog
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.descriptor.AbstractCommandValueParameter
@@ -34,69 +32,38 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 @Composable
-internal fun LogBox(modifier: Modifier = Modifier, logs: List<AnnotatedString>) {
-    BoxWithConstraints(
-        modifier
-    ) {
-        val adaptiveLogs = remember(logs.size) {
-            logs.flatMap {
-                it.chunked(constraints.maxWidth / 9)
-            }
-        }
-        val adaptiveLogHeight = 40.dp
-        val state = remember(logs.size) { LazyListState() }
+internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>, searchText:String = "") {
+    val lazyListState = rememberLazyListState()
 
-        LazyColumn(
-            Modifier
-                .fillMaxSize(),
-            state = state
-        ) {
-            items(
-                adaptiveLogs
-            ) { adaptiveLog ->
-                //TODO:HapticFeedback.performHapticFeedback not implemented yet
+    Box(modifier) {
+        LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
+            items(logs) { adaptiveLog ->
                 SelectionContainer {
-                    Text(adaptiveLog, modifier = Modifier.height(adaptiveLogHeight))
+                    Text(adaptiveLog.parseInSearch(searchText))
                 }
             }
         }
-        VerticalScrollbar(
-            Modifier.align(Alignment.CenterEnd),
-            state,
-            adaptiveLogs.size,
-            adaptiveLogHeight
-        )
+    }
 
-        LaunchedEffect(adaptiveLogs) {
-            if (adaptiveLogs.isNotEmpty())
-                state.scrollToItem(adaptiveLogs.size - 1, 0)
-        }
+    LaunchedEffect(logs.size) {
+        if (logs.isNotEmpty())
+            lazyListState.animateScrollToItem(logs.size)
     }
 }
 
-@OptIn(ExperimentalCommandDescriptors::class)
 @Composable
 internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) {
     var currentCommand by remember(logger) { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-
-    fun onClick() {
-        if (currentCommand == "") {
-            // TODO:提示输入框为空，如输入框边框变红，抖动等
-            return
-        }
+    val onClick: () -> Unit = {
         scope.launch {
-            try {
-                SolveCommandResult(currentCommand, logger)
-            } catch (e: Exception) {
-
-            } finally {
-                currentCommand = ""
-            }
+            SolveCommandResult(currentCommand, logger)
+            currentCommand = ""
         }
     }
+
     Row(modifier) {
-            OutlinedTextField(
+        OutlinedTextField(
             currentCommand,
             onValueChange = {
                 currentCommand = it
@@ -104,7 +71,7 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
             modifier = Modifier
                 .weight(13f)
                 .shortcuts {
-                    on(Key.Enter, callback = ::onClick)
+                    on(Key.Enter, callback = onClick)
                 },
             singleLine = true,
         )
@@ -113,16 +80,30 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
             Modifier.weight(1f)
         )
 
-        FloatingActionButton(
-            onClick = ::onClick,
+        Button(
+            onClick = onClick,
             modifier = Modifier
                 .weight(2f),
-            backgroundColor = MaterialTheme.colors.background,
         ) {
             Text("Send")
         }
     }
+}
 
+/**
+ * TODO:用于自动补全
+ *
+ */
+@OptIn(ExperimentalCommandDescriptors::class)
+private suspend fun CommandPrompt(
+    currentCommand: String,
+): String {
+    return when (val result = ConsoleCommandSender.executeCommand(currentCommand)) {
+        is CommandExecuteResult.UnmatchedSignature -> {
+            result.failureReasons.render(result.command, result.call)
+        }
+        else -> ""
+    }
 }
 
 
@@ -144,7 +125,7 @@ private suspend fun SolveCommandResult(
             logger.error(result.exception)
         }
         is CommandExecuteResult.UnresolvedCommand -> {
-            logger.warning { "未知指令: ${currentCommand}, 输入 /help 获取帮助" }
+            logger.warning { "未知指令: ${currentCommand}, 输入 ? 获取帮助" }
         }
         is CommandExecuteResult.PermissionDenied -> {
             logger.warning { "权限不足." }
@@ -184,7 +165,11 @@ private fun List<CommandValueParameter<*>>.anyStringConstantUnmatched(arguments:
 internal fun UnmatchedCommandSignature.render(command: Command): String {
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
     val usage =
-        net.mamoe.mirai.console.internal.command.CommandReflector.generateUsage(command, null, listOf(this.signature))
+        net.mamoe.mirai.console.internal.command.CommandReflector.generateUsage(
+            command,
+            null,
+            listOf(this.signature)
+        )
     return usage.trim() + "    (${failureReason.render()})"
 }
 

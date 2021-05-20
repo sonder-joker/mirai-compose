@@ -1,20 +1,23 @@
 package com.youngerhousea.miraicompose.ui.feature
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
@@ -24,15 +27,21 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.cros
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
-import com.youngerhousea.miraicompose.console.annotatedLogStorage
-import com.youngerhousea.miraicompose.future.inject
+import com.youngerhousea.miraicompose.console.ComposeLog
+import com.youngerhousea.miraicompose.console.MiraiCompose
+import com.youngerhousea.miraicompose.future.splitpane.ExperimentalSplitPaneApi
+import com.youngerhousea.miraicompose.future.splitpane.HorizontalSplitPane
+import com.youngerhousea.miraicompose.future.splitpane.rememberSplitPaneState
 import com.youngerhousea.miraicompose.model.ComposeBot
 import com.youngerhousea.miraicompose.model.toComposeBot
 import com.youngerhousea.miraicompose.theme.ComposeSetting
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.feature.about.About
 import com.youngerhousea.miraicompose.ui.feature.about.AboutUi
-import com.youngerhousea.miraicompose.ui.feature.bot.*
+import com.youngerhousea.miraicompose.ui.feature.bot.Login
+import com.youngerhousea.miraicompose.ui.feature.bot.LoginUi
+import com.youngerhousea.miraicompose.ui.feature.bot.Message
+import com.youngerhousea.miraicompose.ui.feature.bot.MessageUi
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLog
 import com.youngerhousea.miraicompose.ui.feature.log.ConsoleLogUi
 import com.youngerhousea.miraicompose.ui.feature.plugin.Plugins
@@ -41,10 +50,10 @@ import com.youngerhousea.miraicompose.ui.feature.setting.Setting
 import com.youngerhousea.miraicompose.ui.feature.setting.SettingUi
 import com.youngerhousea.miraicompose.utils.Component
 import com.youngerhousea.miraicompose.utils.asComponent
+import com.youngerhousea.miraicompose.utils.cursorForHorizontalResize
 import com.youngerhousea.miraicompose.utils.items
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
-import org.koin.core.qualifier.named
 
 /**
  * 主界面
@@ -63,9 +72,8 @@ import org.koin.core.qualifier.named
 class NavHost(
     component: ComponentContext,
 ) : ComponentContext by component {
-    private var _navigationIndex by mutableStateOf(0)
 
-    private val _botList: MutableList<ComposeBot> by inject(named("ComposeBot"))
+    private val _botList: MutableList<ComposeBot> = MiraiCompose.botList
 
     private var _currentBot by mutableStateOf(_botList.firstOrNull())
 
@@ -89,7 +97,7 @@ class NavHost(
                 is Configuration.ConsoleLog ->
                     ConsoleLog(
                         componentContext,
-                        annotatedLogStorage,
+                        ComposeLog.logStorage,
                         MiraiConsole.mainLogger
                     ).asComponent { ConsoleLogUi(it) }
                 is Configuration.About ->
@@ -98,7 +106,6 @@ class NavHost(
         }
     )
 
-    val navigationIndex get() = _navigationIndex
 
     val botList: List<ComposeBot> get() = _botList
 
@@ -121,31 +128,25 @@ class NavHost(
 
     fun onRouteToSpecificBot(bot: ComposeBot) {
         _currentBot = bot
-        onRouteMessage()
     }
 
     fun onRouteMessage() {
-        _navigationIndex = 0
         router.push(Configuration.Message)
     }
 
     fun onRoutePlugin() {
-        _navigationIndex = 1
         router.push(Configuration.Plugin)
     }
 
     fun onRouteSetting() {
-        _navigationIndex = 2
         router.push(Configuration.Setting)
     }
 
     fun onRouteLog() {
-        _navigationIndex = 3
         router.push(Configuration.ConsoleLog)
     }
 
     fun onRouteAbout() {
-        _navigationIndex = 4
         router.push(Configuration.About)
     }
 
@@ -159,108 +160,156 @@ class NavHost(
     }
 }
 
-@OptIn(ExperimentalDecomposeApi::class)
+@OptIn(ExperimentalDecomposeApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
+    val height = 80.dp
 
-    Row(Modifier.fillMaxSize()) {
-        Column(
-            Modifier
-                .width(160.dp)
-                .fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            AvatarWithMenu(
-                composeBotList = navHost.botList,
-                currentBot = navHost.currentBot,
-                onMenuBotSelected = navHost::onRouteToSpecificBot,
-                onNewBotButtonSelected = navHost::addNewBot,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Message,
-                text = R.String.sideRowFirst,
-                isWishWindow = navHost.navigationIndex == 0,
-                onClick = navHost::onRouteMessage,
-                modifier = Modifier.height(80.dp),
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Extension,
-                text = R.String.sideRowSecond,
-                isWishWindow = navHost.navigationIndex == 1,
-                onClick = navHost::onRoutePlugin,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Settings,
-                text = R.String.sideRowThird,
-                isWishWindow = navHost.navigationIndex == 2,
-                onClick = navHost::onRouteSetting,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Notes,
-                text = R.String.sideRowFour,
-                isWishWindow = navHost.navigationIndex == 3,
-                onClick = navHost::onRouteLog,
-                modifier = Modifier.height(80.dp)
-            )
-            SelectEdgeText(
-                icon = Icons.Default.Forum,
-                text = R.String.sideRowFive,
-                isWishWindow = navHost.navigationIndex == 4,
-                onClick = navHost::onRouteAbout,
-                modifier = Modifier.height(80.dp)
-            )
-        }
-        Surface(color = Color(0xfffafafa)) {
-            Children(
-                navHost.state, crossfade()
-            ) { child ->
-                child.instance()
+    val splitterState = rememberSplitPaneState()
+
+    var navigationIndex by remember { mutableStateOf(0) }
+
+    HorizontalSplitPane(splitPaneState = splitterState) {
+        first(160.dp) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+            ) {
+                AvatarWithMenu(
+                    composeBotList = navHost.botList,
+                    onBoxClick = {
+                        navigationIndex = 5
+                        if (navHost.currentBot != null)
+                            navHost.onRouteMessage()
+                        else
+                            navHost.addNewBot()
+                    },
+                    onMenuBotSelected = navHost::onRouteToSpecificBot,
+                    onNewBotButtonSelected = navHost::addNewBot,
+                    modifier = Modifier.height(height),
+                ) {
+                    BotItem(navHost.currentBot)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRouteMessage()
+                        navigationIndex = 0
+                    },
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 0
+                ) {
+                    Icon(Icons.Outlined.Message, null)
+                    Text(R.String.sideRowFirst)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRoutePlugin()
+                        navigationIndex = 1
+                    },
+                    isWish = navigationIndex == 1,
+                    modifier = Modifier.height(height),
+                ) {
+                    Icon(Icons.Outlined.Extension, null)
+                    Text(R.String.sideRowSecond)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRouteSetting()
+                        navigationIndex = 2
+                    },
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 2
+                ) {
+                    Icon(Icons.Outlined.Settings, null)
+                    Text(R.String.sideRowThird)
+                }
+                SideTab(
+                    onClick = {
+                        navHost.onRouteLog()
+                        navigationIndex = 3
+                    },
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 3
+                ) {
+                    Icon(Icons.Outlined.Notes, null)
+                    Text(R.String.sideRowFour, maxLines = 1)
+                }
+                SideTab(
+                    onClick = navHost::onRouteAbout,
+                    modifier = Modifier.height(height),
+                    isWish = navigationIndex == 4
+                ) {
+                    Icon(Icons.Outlined.Forum, null)
+                    Text(R.String.sideRowFive)
+                }
             }
+        }
+
+        splitter {
+            visiblePart {
+                Box(
+                    Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colors.background)
+                )
+            }
+            handle {
+                Box(
+                    Modifier
+                        .markAsHandle()
+                        .cursorForHorizontalResize()
+                        .background(SolidColor(Color.Gray), alpha = 0.5f)
+                        .width(1.dp)
+                        .fillMaxHeight()
+                )
+            }
+        }
+
+        second(500.dp) {
+            Box(Modifier.fillMaxSize().clipToBounds()) {
+                Children(
+                    navHost.state, crossfade()
+                ) { child ->
+                    child.instance()
+                }
+            }
+
         }
     }
 }
 
-
 @Composable
 private fun AvatarWithMenu(
     composeBotList: List<ComposeBot>,
-    currentBot: ComposeBot?,
+    onBoxClick: () -> Unit,
     onMenuBotSelected: (bot: ComposeBot) -> Unit,
     onNewBotButtonSelected: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
 ) {
-    var isExpand by remember { mutableStateOf(false) }
-
+    var menuExpand by remember { mutableStateOf(false) }
     Box(modifier) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .combinedClickable(
-                    onLongClick = { isExpand = !isExpand },
-                    onClick = {
-                        if (currentBot == null) {
-                            onNewBotButtonSelected()
-                        } else {
-                            onMenuBotSelected(currentBot)
-                        }
-                    }
-                )
-        ) {
-            BotItem(currentBot)
-        }
+                    onLongClick = { menuExpand = !menuExpand },
+                    onClick = onBoxClick
+                ),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+            content = content
+        )
 
-        DropdownMenu(isExpand, onDismissRequest = { isExpand = !isExpand }) {
-            DropdownMenuItem(onClick = { isExpand = !isExpand }) {
+        DropdownMenu(menuExpand, onDismissRequest = { menuExpand = !menuExpand }) {
+            DropdownMenuItem(onClick = { menuExpand = !menuExpand }) {
                 Text(R.String.botMenuExit)
             }
 
             DropdownMenuItem(onClick = {
                 onNewBotButtonSelected()
-                isExpand = !isExpand
+                menuExpand = !menuExpand
             }) {
                 Text(R.String.botMenuAdd)
             }
@@ -268,7 +317,7 @@ private fun AvatarWithMenu(
             items(composeBotList) { item ->
                 DropdownMenuItem(onClick = {
                     onMenuBotSelected(item)
-                    isExpand = !isExpand
+                    menuExpand = !menuExpand
                 }) {
                     BotItem(item)
                 }
@@ -277,31 +326,22 @@ private fun AvatarWithMenu(
     }
 }
 
-
 @Composable
-private fun SelectEdgeText(
-    icon: ImageVector,
-    text: String,
-    isWishWindow: Boolean,
+private fun SideTab(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    isWish: Boolean,
+    content: @Composable RowScope.() -> Unit,
 ) {
-    Box(
-        modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        OutlinedButton(
-            onClick = onClick,
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = MaterialTheme.colors.background),
-            modifier = Modifier.fillMaxSize(),
-            border = null
-        ) {
-            Row(Modifier.animateContentSize()) {
-                Image(icon, null)
-                if (isWishWindow)
-                    Text(text, maxLines = 1)
-            }
-        }
+    val color by animateColorAsState(if (isWish) Color.Green else MaterialTheme.colors.primary)
+
+    CompositionLocalProvider(LocalContentColor provides color) {
+        Row(
+            modifier = modifier.fillMaxSize().clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.aligned(Alignment.CenterHorizontally),
+            content = content
+        )
     }
 }
 
@@ -312,11 +352,12 @@ private fun BotItem(
 ) {
     Row(
         modifier = modifier
-            .aspectRatio(2f),
-        horizontalArrangement = Arrangement.Center,
+            .aspectRatio(2f)
+            .clipToBounds(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.weight(1f).fillMaxHeight())
         Surface(
             modifier = Modifier
                 .weight(3f, fill = false),
@@ -325,7 +366,6 @@ private fun BotItem(
         ) {
             Image(bot?.avatar ?: ImageBitmap(200, 200), null)
         }
-
         Column(
             Modifier
                 .weight(6f),
@@ -336,6 +376,5 @@ private fun BotItem(
                 Text("${bot?.id ?: "Unknown"}", style = MaterialTheme.typography.body2)
             }
         }
-        Spacer(Modifier.weight(1f))
     }
 }

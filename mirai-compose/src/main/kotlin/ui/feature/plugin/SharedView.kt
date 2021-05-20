@@ -8,9 +8,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
+import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.common.annotatedDescription
 import com.youngerhousea.miraicompose.ui.common.annotatedExplain
 import com.youngerhousea.miraicompose.ui.common.simpleDescription
@@ -18,6 +20,12 @@ import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.yamlkt.Yaml
+import java.awt.Desktop
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 /**
  * 插件描述
@@ -71,7 +79,7 @@ private fun EditView(pluginData: PluginData) {
         )
     }
 
-    var textField by remember(pluginData) { mutableStateOf(TextFieldValue(value)) }
+    var textField by remember(pluginData) { mutableStateOf(value) }
 
     Row(
         Modifier.fillMaxWidth().padding(bottom = 40.dp),
@@ -83,9 +91,9 @@ private fun EditView(pluginData: PluginData) {
         Button(
             {
                 runCatching {
-                    Yaml.decodeFromString(pluginData.updaterSerializer, textField.text)
+                    Yaml.decodeFromString(pluginData.updaterSerializer, textField)
                 }.onSuccess {
-                    value = textField.text
+                    value = textField
                 }
             },
             Modifier
@@ -96,7 +104,6 @@ private fun EditView(pluginData: PluginData) {
         }
     }
 }
-
 
 /**
  *  插件指令
@@ -112,10 +119,6 @@ fun DetailedCommandUi(detailedCommand: DetailedCommand) {
         items(detailedCommand.commands) { registeredCommand ->
             Column {
                 Text(registeredCommand.simpleDescription)
-//                Button(onClick = {
-//                }) {
-//                    Text("Quick execute")
-//                }
             }
             Spacer(Modifier.height(20.dp))
         }
