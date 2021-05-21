@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -115,9 +118,11 @@ fun PluginListUi(pluginList: PluginList) {
         }
         Row(modifier = Modifier.align(Alignment.BottomEnd)) {
             // TODO: 做成圆形
-            Button(
-                modifier = Modifier.padding(5.dp),
-                onClick = {
+            FloatingActionButton(
+                modifier = Modifier.padding(50.dp),
+                backgroundColor = Color.Green,
+                contentColor = Color.White,
+                onClick = Button@{
                     val fc = FileChooser(
                         R.String.addPlugin,
                         FileNameExtensionFilter("Mirai console plugin(*.mirai.jar)", "mirai.jar"),
@@ -126,8 +131,10 @@ fun PluginListUi(pluginList: PluginList) {
                         false
                     ) ?: let { return@Button }
                     pluginList.onAddPluginClick(fc.selectedFile)
-                }) {
-                Text(R.String.addPlugin)
+                },
+                shape = MaterialTheme.shapes.medium.copy(CornerSize(percent = 50))
+            ) {
+                Icon(Icons.Filled.Add, R.String.addPlugin)
             }
         }
     }
