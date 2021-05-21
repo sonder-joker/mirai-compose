@@ -32,13 +32,39 @@ import kotlin.io.path.div
  */
 class PluginList(
     componentContext: ComponentContext,
+    logger: MiraiLogger,
     val onPluginCardClick: (plugin: Plugin) -> Unit
 ) : ComponentContext by componentContext {
     val plugins: List<Plugin> = MiraiCompose.loadedPlugins
+    val onAddPluginClick = L@{ f: File ->
+        if (!f.exists() || !f.isFile) {
+            logger.error("选择的文件(${f.absolutePath})不存在或不是文件")
+            return@L
+        }
+        if (!f.name.endsWith(".mirai.jar")) {
+            logger.error("选择的文件(${f.absolutePath})不是mirai插件(.mirai.jar)")
+            return@L
+        }
+        val target = (MiraiCompose.rootPath / "plugins" / f.name).toFile()
+        if (f.canRead()) {
+            if (target.exists()) {
+                if (!target.canWrite()) {
+                    logger.error("导入失败, ${target.absolutePath}已存在并不可更改")
+                    return@L
+                }
+                logger.warning("${f.name}已存在，将会覆盖旧版本")
+            }
+            f.copyTo(target, true)
+            logger.info("成功导入${f.name}插件")
+            //TODO: do something to load plugin
+        } else {
+            logger.error("导入失败, ${f.absolutePath}无法读取")
+        }
+    }
 }
 
 @Composable
-fun PluginListUi(pluginList: PluginList, logger: MiraiLogger) {
+fun PluginListUi(pluginList: PluginList) {
     Box(Modifier.clipToBounds()) {
         LazyVerticalGrid(
             cells = GridCells.Adaptive(300.dp),
@@ -70,29 +96,7 @@ fun PluginListUi(pluginList: PluginList, logger: MiraiLogger) {
                         ".",
                         false
                     ) ?: let { return@Button }
-                    if (!fc.selectedFile.exists() || !fc.selectedFile.isFile) {
-                        logger.error("选择的文件(${fc.selectedFile.absolutePath})不存在或不是文件")
-                        return@Button
-                    }
-                    if (!fc.selectedFile.name.endsWith(".mirai.jar")) {
-                        logger.error("选择的文件(${fc.selectedFile.absolutePath})不是mirai插件(.mirai.jar)")
-                        return@Button
-                    }
-                    val target = (MiraiCompose.rootPath / "plugins" / fc.selectedFile.name).toFile()
-                    if (fc.selectedFile.canRead()) {
-                        if (target.exists()) {
-                            if (!target.canWrite()) {
-                                logger.error("导入失败, ${target.absolutePath}已存在并不可更改")
-                                return@Button
-                            }
-                            logger.warning("${fc.selectedFile.name}已存在，将会覆盖旧版本")
-                        }
-                        fc.selectedFile.copyTo(target, true)
-                        logger.info("成功导入${fc.selectedFile.name}插件")
-                        //TODO: do something to load plugin
-                    } else {
-                        logger.error("导入失败, ${fc.selectedFile.absolutePath}无法读取")
-                    }
+                    pluginList.onAddPluginClick(fc.selectedFile)
                 }) {
                 Text(R.String.addPlugin)
             }

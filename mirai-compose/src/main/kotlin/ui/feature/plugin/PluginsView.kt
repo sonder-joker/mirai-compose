@@ -30,8 +30,9 @@ class Plugins(
                 is Configuration.List ->
                     PluginList(
                         componentContext,
+                        logger,
                         onPluginCardClick = ::routToSpecificPlugin
-                    ).asComponent { PluginListUi(it, logger) }
+                    ).asComponent { PluginListUi(it) }
 
                 is Configuration.Specific -> {
                     SpecificPlugin(
