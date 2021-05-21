@@ -120,7 +120,7 @@ fun PluginListUi(pluginList: PluginList) {
             // TODO: 做成圆形
             FloatingActionButton(
                 modifier = Modifier.padding(50.dp),
-                backgroundColor = Color.Green,
+                backgroundColor = Color(0xff6EC177),
                 contentColor = Color.White,
                 onClick = Button@{
                     val fc = FileChooser(
