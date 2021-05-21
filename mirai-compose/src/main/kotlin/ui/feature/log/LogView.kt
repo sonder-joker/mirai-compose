@@ -135,7 +135,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     }
 }
 
-private suspend fun PointerInputScope.onRightClick(run: (MouseEvent) -> Unit) {
+suspend fun PointerInputScope.onRightClick(run: (MouseEvent) -> Unit) {
     suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
         var event: PointerEvent
         do {
