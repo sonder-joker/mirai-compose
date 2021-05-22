@@ -1,0 +1,25 @@
+[versions]
+app = "1.0.0"
+kotlin = "1.5.0"
+compose-jb = "0.4.0-build209"
+decompose = "0.2.4"
+mirai = "2.6.4"
+yamlkt = "0.9.0"
+json = "1.2.1"
+junit = "4.13"
+
+[libraries]
+plugin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
+plugin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-composejb = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version.ref = "compose-jb" }
+plugin-miraiconsole = { group = "net.mamoe", name = "mirai-console-gradle", version.ref = "mirai"}
+decompose-main = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
+decompose-extension = { group = "com.arkivanov.decompose", name = "extensions-compose-jetbrains", version.ref = "decompose" }
+mirai-core = { group = "net.mamoe", name = "mirai-core", version.ref = "mirai" }
+mirai-console = { group = "net.mamoe", name = "mirai-console", version.ref = "mirai" }
+serialization-yaml = { group = "net.mamoe.yamlkt", name = "yamlkt", version.ref = "yamlkt" }
+serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json" }
+junit4-core = { group = "junit", name = "junit", version.ref = "junit" }
+junit4-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+

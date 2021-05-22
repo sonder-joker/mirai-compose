@@ -6,19 +6,6 @@
 
 # gradle
 .gradle/
-buildSrc/.gradle/
 
 # build
-mirai-compose/build/
-mirai-compose/run/
-mirai-compose/out/
-
-mirai-compose/data/
-mirai-compose/config/
-mirai-compose/bots/
-mirai-compose/plugins/
-
-buildSrc/build/
 build/
-
-cef/

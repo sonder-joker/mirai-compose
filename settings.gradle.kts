@@ -1,15 +1,7 @@
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        jcenter()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-
-}
-
 rootProject.name = "mirai-compose"
 
-include (":mirai-compose")
+include (":app")
+include(":test-plugin")
 
-//enableFeaturePreview("VERSION_CATALOGS")
+enableFeaturePreview("VERSION_CATALOGS")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

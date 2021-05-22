@@ -3,30 +3,18 @@
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-plugins {
-    kotlin("jvm") version Versions.kotlin
-    kotlin("plugin.serialization") version Versions.kotlin apply false
-    id("org.jetbrains.compose") version Versions.compose apply false
-//    id("de.undercouch.download") version Versions.download
-}
+group = "com.youngerhousea"
+version = libs.versions.app.get()
 
-allprojects {
-    group = "com.youngerhousea"
-
+subprojects {
     repositories {
         google()
         mavenLocal()
         mavenCentral()
-        jcenter()
-        maven(url = "https://jitpack.io/")
+        maven("https://jitpack.io/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://packages.jetbrains.team/maven/p/ui/dev")
     }
-}
-
-subprojects {
     afterEvaluate {
-        apply<Build>()
         configureJvmTarget()
         configureEncoding()
         configureKotlinExperimentalUsages()
@@ -41,13 +29,6 @@ val experimentalAnnotations = arrayOf(
     "kotlin.ExperimentalUnsignedTypes",
     "kotlin.ExperimentalStdlibApi",
     "kotlin.experimental.ExperimentalTypeInference",
-    "kotlin.io.path.ExperimentalPathApi",
-
-    "net.mamoe.mirai.console.ConsoleFrontEndImplementation",
-    "net.mamoe.mirai.console.util.ConsoleExperimentalApi",
-    "net.mamoe.mirai.utils.MiraiExperimentalApi",
-
-    "androidx.compose.foundation.ExperimentalFoundationApi"
 )
 
 fun Project.configureJvmTarget() {
@@ -55,7 +36,7 @@ fun Project.configureJvmTarget() {
         kotlinOptions.jvmTarget = "1.8"
     }
 
-    extensions.findByType(JavaPluginExtension::class.java)?.run {
+    extensions.findByType<JavaPluginExtension>()?.run {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
