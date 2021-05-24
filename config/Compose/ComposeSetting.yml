@@ -1,0 +1,21 @@
+AppTheme: 
+  materialLight: 
+    primary: ff979595
+    primaryVariant: ff3700b3
+    secondary: ff03dac6
+    secondaryVariant: ff018786
+    background: ffffffff
+    surface: ffffffff
+    error: ffb00020
+    onPrimary: ffffffff
+    onSecondary: ff000000
+    onBackground: ff000000
+    onSurface: ff000000
+    onError: ffffffff
+    isLight: true
+  logColors: 
+    debug: ff00ffff
+    verbose: ffff00ff
+    info: ff00ff00
+    warning: ffffff00
+    error: ffff0000
