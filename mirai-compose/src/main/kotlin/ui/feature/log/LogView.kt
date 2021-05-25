@@ -46,7 +46,8 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
 
     val (searchText, setSearchText) = remember { mutableStateOf("") }
 
-    Column {
+
+    Scaffold(topBar = {
         TextField(
             searchText,
             setSearchText,
@@ -58,83 +59,6 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
-        Box(
-            modifier = Modifier
-                .padding(top = offset.y)
-                .offset(x = offset.x - 160.dp)
-        ) {
-            DropdownMenu(
-                isExpand,
-                onDismissRequest = { isExpand = false }
-            ) {
-                DropdownMenuItem(onClick = {
-                    isExpand = false
-                    // open maybe slow
-                    val previousLF = UIManager.getLookAndFeel();
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    val fc = JFileChooser()
-                    UIManager.setLookAndFeel(previousLF);
-                    fc.selectedFile = File("${LocalDate.now()}.log")
-                    fc.dialogTitle = "Save log"
-                    fc.dragEnabled = true
-                    fc.fileSelectionMode = JFileChooser.FILES_ONLY
-                    fc.fileFilter = FileNameExtensionFilter("log(*.log, *.txt)", "log", "txt")
-                    if (fc.showSaveDialog(AppManager.focusedWindow!!.window) == JFileChooser.APPROVE_OPTION) {
-                        val f = fc.selectedFile
-                        consoleLog.logger.info("储存当前日志到文件: ${f.absolutePath}")
-                        if (f.exists()) {
-                            consoleLog.logger.error("储存失败,文件已存在")
-                        } else {
-                            f.createNewFile()
-                            f.writeText(consoleLog.loggerStorage.joinToString("\n"))
-                            consoleLog.logger.info("写入完成")
-                        }
-                    }
-                }) {
-                    Text("Save log")
-                }
-//                DropdownMenuItem(onClick = {
-//                    //TODO report error or do else
-//                    isExpand = false
-//                }) {
-//                    Text("Report")
-//                }
-            }
-        }
-        Column {
-            LogBox(
-                Modifier
-                    .fillMaxSize()
-                    .weight(8f)
-                    .padding(horizontal = 40.dp, vertical = 20.dp)
-                    .pointerInput(Unit) {
-                        onRightClick {
-                            isExpand = true
-                            offset = DpOffset(it.x.dp, it.y.dp)
-                        }
-                    },
-                consoleLog.loggerStorage,
-                searchText
-            )
-
-            CommandSendBox(
-                consoleLog.logger,
-                Modifier
-                    .padding(20.dp),
-            )
-        }
-    }
-
-    /*
-    Scaffold(topBar = {
-        TopAppBar {
-            TextField(
-                searchText,
-                setSearchText,
-                leadingIcon = { Icon(Icons.Default.Search, null) },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
     }) {
         Box(
             modifier = Modifier
@@ -204,7 +128,6 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
         }
     }
 
-     */
 
     DisposableEffect(Unit) {
         AppManager.windows.first().let {
