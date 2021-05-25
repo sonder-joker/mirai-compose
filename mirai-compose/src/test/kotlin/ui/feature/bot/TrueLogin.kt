@@ -6,7 +6,7 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import org.junit.Rule
 
 class TrueLogin {
-    val compose = MiraiCompose().apply { start() }
+    val compose = MiraiCompose.apply { start() }
 
 //    TODO: login
 //    val a = InitLogin(fakeContext(), onClick = { account: Long, password: String ->

@@ -89,7 +89,6 @@ class NavHost(
                 is Configuration.Plugin ->
                     Plugins(
                         componentContext,
-                        MiraiCompose.logger
                     ).asComponent { PluginsUi(it) }
                 is Configuration.Setting ->
                     Setting(

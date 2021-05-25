@@ -9,25 +9,17 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.console.MiraiCompose
 import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.common.PluginDescription
-import com.youngerhousea.miraicompose.ui.feature.log.onRightClick
-import com.youngerhousea.miraicompose.utils.FileChooser
+import com.youngerhousea.miraicompose.utils.componentScope
 import net.mamoe.mirai.console.plugin.Plugin
-import net.mamoe.mirai.utils.MiraiLogger
 import java.awt.Desktop
-import java.io.File
-import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.io.path.div
 
 /**
@@ -36,50 +28,59 @@ import kotlin.io.path.div
  */
 class PluginList(
     componentContext: ComponentContext,
-    logger: MiraiLogger,
     val onPluginCardClick: (plugin: Plugin) -> Unit
 ) : ComponentContext by componentContext {
     val plugins: List<Plugin> = MiraiCompose.loadedPlugins
-    val onAddPluginClick = L@{ f: File ->
-        if (!f.exists() || !f.isFile) {
-            logger.error("选择的文件(${f.absolutePath})不存在或不是文件")
-            return@L
-        }
-        if (!f.name.endsWith(".mirai.jar")) {
-            logger.error("选择的文件(${f.absolutePath})不是mirai插件(.mirai.jar)")
-            return@L
-        }
-        val target = (MiraiCompose.rootPath / "plugins" / f.name).toFile()
-        if (f.canRead()) {
-            if (target.exists()) {
-                if (!target.canWrite()) {
-                    logger.error("导入失败, ${target.absolutePath}已存在并不可更改")
-                    return@L
-                }
-                logger.warning("${f.name}已存在，将会覆盖旧版本")
-            }
-            f.copyTo(target, true)
-            logger.info("成功导入${f.name}插件")
-            //TODO: do something to load plugin
-        } else {
-            logger.error("导入失败, ${f.absolutePath}无法读取")
-        }
-    }
+
+    val scope = componentScope()
+
+    val snackbarHostState = SnackbarHostState()
+
+//    val onAddPluginClick: (File) -> Unit = { file ->
+//        scope.launch {
+//            when {
+//                !file.exists() || !file.isFile -> {
+//                    snackbarHostState.showSnackbar("选择的文件(${file.absolutePath})不存在或不是文件")
+//                }
+//                !file.name.endsWith(".jar") -> {
+//                    snackbarHostState.showSnackbar("选择的文件(${file.absolutePath})不是mirai插件(.jar)")
+//                }
+//                file.canRead() -> {
+//                    val target = (MiraiCompose.rootPath / "plugins" / file.name).toFile()
+//                    if (target.exists()) {
+//                        if (!target.canWrite()) {
+//                            snackbarHostState.showSnackbar("导入失败, ${target.absolutePath}已存在并不可更改")
+//                        }
+//                        snackbarHostState.showSnackbar("${file.name}已存在，将会覆盖旧版本")
+//                    }
+//                    file.copyTo(target, true)
+//                    snackbarHostState.showSnackbar("成功导入${file.name}插件")
+//                }
+//                else -> {
+//                    snackbarHostState.showSnackbar("导入失败, ${file.absolutePath}无法读取")
+//                }
+//            }
+//        }
+//    }
 }
 
 @Composable
 fun PluginListUi(pluginList: PluginList) {
-    var isExpand by remember { mutableStateOf(false) }
-    var offset by remember { mutableStateOf(DpOffset(100.dp, 100.dp)) }
-    Box(
-        modifier = Modifier
-            .clipToBounds()
-            .pointerInput(Unit) {
-                onRightClick {
-                    isExpand = true
-                    offset = DpOffset(it.x.dp, it.y.dp)
-                }
+    Scaffold(
+        scaffoldState = rememberScaffoldState(snackbarHostState = pluginList.snackbarHostState),
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier.padding(50.dp),
+                backgroundColor = Color(0xff6EC177),
+                contentColor = Color.White,
+                onClick = {
+                    Desktop.getDesktop().open((MiraiCompose.rootPath / "plugins").toFile())
+                },
+                shape = MaterialTheme.shapes.medium.copy(CornerSize(percent = 50))
+            ) {
+                Icon(Icons.Filled.Add, R.String.addPlugin)
             }
+        }
     ) {
         LazyVerticalGrid(
             cells = GridCells.Adaptive(300.dp),
@@ -98,43 +99,6 @@ fun PluginListUi(pluginList: PluginList) {
                 ) {
                     PluginDescription(plugin, Modifier.padding(10.dp))
                 }
-            }
-        }
-        Box(
-            modifier = Modifier.padding(top = offset.y).offset(x = offset.x - 110.dp)
-        ) {
-            DropdownMenu(
-                isExpand,
-                onDismissRequest = { isExpand = false }
-            ) {
-                DropdownMenuItem(onClick = {
-                    isExpand = false
-                    // open maybe slow
-                    Desktop.getDesktop().open((MiraiCompose.rootPath / "plugins").toFile())
-                }) {
-                    Text(R.String.openPluginFolder)
-                }
-            }
-        }
-        Row(modifier = Modifier.align(Alignment.BottomEnd)) {
-            // TODO: 做成圆形
-            FloatingActionButton(
-                modifier = Modifier.padding(50.dp),
-                backgroundColor = Color(0xff6EC177),
-                contentColor = Color.White,
-                onClick = Button@{
-                    val fc = FileChooser(
-                        R.String.addPlugin,
-                        FileNameExtensionFilter("Mirai console plugin(*.mirai.jar)", "mirai.jar"),
-                        File("example.mirai.jar"),
-                        ".",
-                        false
-                    ) ?: let { return@Button }
-                    pluginList.onAddPluginClick(fc.selectedFile)
-                },
-                shape = MaterialTheme.shapes.medium.copy(CornerSize(percent = 50))
-            ) {
-                Icon(Icons.Filled.Add, R.String.addPlugin)
             }
         }
     }

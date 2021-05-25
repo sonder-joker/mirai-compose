@@ -178,7 +178,7 @@ fun FileChooser(
     val previousLF = UIManager.getLookAndFeel()
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     val fc = JFileChooser(defaultPath)
-    UIManager.setLookAndFeel(previousLF);
+    UIManager.setLookAndFeel(previousLF)
     fc.selectedFile = defaultFile
     fc.dialogTitle = title
     fc.dragEnabled = true
@@ -195,3 +195,6 @@ fun FileChooser(
     }
     return null
 }
+
+class FileChooserState(
+)

@@ -68,8 +68,6 @@ object MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
 
     override fun createLogger(identity: String?): MiraiLogger = MiraiComposeLogger(identity)
 
-    val logger = createLogger("compose")
-
     // 一般不应该被使用
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) = SwingSolver
 
@@ -84,6 +82,8 @@ object MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
 
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
+
+    val logger = createLogger("compose")
 
     override fun postPhase(phase: String) {
         when (phase) {
@@ -100,6 +100,7 @@ object MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
         alreadyLoaded = true
     }
 }
+
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
     override val name: String = "MiraiCompose"
     override val vendor: String = "Noire"
