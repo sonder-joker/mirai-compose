@@ -31,6 +31,7 @@ import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.SwingSolver
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.createDirectories
 import kotlin.io.path.div
 
 /**
@@ -49,6 +50,8 @@ object MiraiCompose : MiraiConsoleImplementation,  MiraiComposeRepository,
         }
     ) {
     override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
+
+    internal val logPath = (rootPath / "log").createDirectories()
 
     override val builtInPluginLoaders = listOf(lazy { JvmPluginLoader })
 
