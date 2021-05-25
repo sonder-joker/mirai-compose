@@ -16,15 +16,16 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.console.ComposeLog
+import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.ui.common.CommandSendBox
 import com.youngerhousea.miraicompose.ui.common.LogBox
+import com.youngerhousea.miraicompose.utils.FileChooser
 import net.mamoe.mirai.utils.MiraiLogger
 import java.awt.event.MouseEvent
 import java.io.File
 import java.time.LocalDate
-import javax.swing.JFileChooser
-import javax.swing.UIManager
 import javax.swing.filechooser.FileNameExtensionFilter
+
 
 /**
  * Compose的所有日志
@@ -55,8 +56,8 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     }) {
         Box(
             modifier = Modifier
-                .padding(top = offset.y)
-                .offset(x = offset.x - 160.dp)
+                .padding(top = offset.y - 55.dp)
+                .offset(x = offset.x - 110.dp)
         ) {
             DropdownMenu(
                 isExpand,
@@ -65,34 +66,33 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                 DropdownMenuItem(onClick = {
                     isExpand = false
                     // open maybe slow
-                    val previousLF = UIManager.getLookAndFeel();
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    val fc = JFileChooser()
-                    UIManager.setLookAndFeel(previousLF);
-                    fc.selectedFile = File("${LocalDate.now()}.log")
-                    fc.dialogTitle = "Save log"
-                    fc.dragEnabled = true
-                    fc.fileSelectionMode = JFileChooser.FILES_ONLY
-                    fc.fileFilter = FileNameExtensionFilter("log(*.log, *.txt)", "log", "txt")
-                    if (fc.showSaveDialog(AppManager.focusedWindow!!.window) == JFileChooser.APPROVE_OPTION) {
-                        val f = fc.selectedFile
-                        consoleLog.logger.info("储存当前日志到文件: ${f.absolutePath}")
-                        if (f.exists()) {
-                            consoleLog.logger.error("储存失败,文件已存在")
-                        } else {
-                            f.createNewFile()
-                            f.writeText(consoleLog.loggerStorage.joinToString("\n"))
-                            consoleLog.logger.info("写入完成")
-                        }
+                    val fc = FileChooser(
+                        R.String.saveLog,
+                        FileNameExtensionFilter("log(*.log, *.txt)", "log", "txt"),
+                        File("${LocalDate.now()}.log"),
+                        ".",
+                        true
+                    ) ?: let {
+                        return@DropdownMenuItem
                     }
+                    val f = fc.selectedFile
+                    consoleLog.logger.info("储存当前日志到文件: ${f.absolutePath}")
+                    if (f.exists()) {
+                        consoleLog.logger.error("储存失败,文件已存在")
+                    } else {
+                        f.createNewFile()
+                        f.writeText(consoleLog.loggerStorage.joinToString("\n"))
+                        consoleLog.logger.info("写入完成")
+                    }
+
                 }) {
-                    Text("Save log")
+                    Text(R.String.saveLog)
                 }
 //                DropdownMenuItem(onClick = {
 //                    //TODO report error or do else
 //                    isExpand = false
 //                }) {
-//                    Text("Report")
+//                    Text(R.String.reportError)
 //                }
             }
         }
@@ -135,7 +135,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     }
 }
 
-private suspend fun PointerInputScope.onRightClick(run: (MouseEvent) -> Unit) {
+suspend fun PointerInputScope.onRightClick(run: (MouseEvent) -> Unit) {
     suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
         var event: PointerEvent
         do {
