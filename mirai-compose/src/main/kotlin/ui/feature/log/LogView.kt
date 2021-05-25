@@ -4,11 +4,13 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.pointer.*
@@ -45,14 +47,19 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
 
     val (searchText, setSearchText) = remember { mutableStateOf("") }
 
+
     Scaffold(topBar = {
-        TopAppBar {
-            TextField(
-                searchText,
-                setSearchText,
-                leadingIcon = { Icon(Icons.Default.Search, null) }
+        TextField(
+            searchText,
+            setSearchText,
+            leadingIcon = { Icon(Icons.Default.Search, null) },
+            modifier = Modifier.fillMaxWidth().padding(30.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
             )
-        }
+        )
     }) {
         Box(
             modifier = Modifier
@@ -120,6 +127,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
             )
         }
     }
+
 
     DisposableEffect(Unit) {
         AppManager.windows.first().let {

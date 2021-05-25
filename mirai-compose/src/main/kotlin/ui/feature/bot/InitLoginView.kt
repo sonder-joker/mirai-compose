@@ -196,17 +196,18 @@ private fun PasswordTextField(
             )
         },
         trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.RemoveRedEye,
-                contentDescription = null,
-                modifier = Modifier.clickable {
-                    passwordVisualTransformation =
-                        if (passwordVisualTransformation != VisualTransformation.None)
-                            VisualTransformation.None
-                        else
-                            PasswordVisualTransformation()
-                }
-            )
+            IconButton(onClick = {
+                passwordVisualTransformation =
+                    if (passwordVisualTransformation != VisualTransformation.None)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation()
+            }){
+                Icon(
+                    imageVector = Icons.Default.RemoveRedEye,
+                    contentDescription = null
+                )
+            }
         },
         visualTransformation = passwordVisualTransformation,
         keyboardOptions = KeyboardOptions(
