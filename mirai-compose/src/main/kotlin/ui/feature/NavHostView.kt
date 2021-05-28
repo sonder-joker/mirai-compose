@@ -98,7 +98,7 @@ class NavHost(
                 is Configuration.ConsoleLog ->
                     ConsoleLog(
                         componentContext,
-                        ComposeLog.logStorage,
+                        ComposeLog.storage,
                         MiraiCompose.logger
                     ).asComponent { ConsoleLogUi(it) }
                 is Configuration.About ->
