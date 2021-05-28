@@ -26,6 +26,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import org.jetbrains.skija.Image
 import java.awt.Cursor
+import java.awt.Desktop
 import java.io.File
 import java.net.URL
 import java.net.URLDecoder
@@ -196,5 +197,4 @@ fun FileChooser(
     return null
 }
 
-class FileChooserState(
-)
+inline val Desktop: Desktop get()  = java.awt.Desktop.getDesktop()
