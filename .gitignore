@@ -2,10 +2,10 @@
 *.class
 
 # idea
-.idea/
+.idea
 
 # gradle
-.gradle/
+.gradle
 
 # build
-build/
+build

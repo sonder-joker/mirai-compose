@@ -6,13 +6,14 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 group = "com.youngerhousea"
 version = libs.versions.app.get()
 
-subprojects {
+allprojects {
     repositories {
         google()
         mavenLocal()
         mavenCentral()
         maven("https://jitpack.io/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        gradlePluginPortal()
     }
     afterEvaluate {
         configureJvmTarget()

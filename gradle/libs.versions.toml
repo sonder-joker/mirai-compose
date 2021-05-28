@@ -1,9 +1,9 @@
 [versions]
 app = "1.0.0"
-kotlin = "1.5.0"
-compose-jb = "0.4.0-build209"
-decompose = "0.2.4"
-mirai = "2.6.4"
+kotlin = "1.5.10"
+compose-jb = "0.4.0"
+decompose = "0.2.5"
+mirai = "2.6.5"
 yamlkt = "0.9.0"
 json = "1.2.1"
 junit = "4.13"
