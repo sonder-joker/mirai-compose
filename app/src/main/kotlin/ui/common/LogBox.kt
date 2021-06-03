@@ -12,6 +12,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
@@ -62,7 +63,10 @@ internal fun CommandSendBox(logger: MiraiLogger, modifier: Modifier = Modifier) 
         }
     }
 
-    Row(modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         OutlinedTextField(
             currentCommand,
             onValueChange = {

@@ -11,7 +11,6 @@ allprojects {
         google()
         mavenLocal()
         mavenCentral()
-        maven("https://jitpack.io/")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         gradlePluginPortal()
     }
@@ -45,7 +44,7 @@ fun Project.configureJvmTarget() {
 }
 
 fun Project.configureEncoding() {
-    tasks.withType(JavaCompile::class.java) {
+    tasks.withType<JavaCompile>() {
         options.encoding = "UTF8"
     }
 }

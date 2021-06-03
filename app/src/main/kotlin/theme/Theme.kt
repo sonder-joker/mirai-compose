@@ -28,15 +28,15 @@ class LogColor {
 
     @SerialName("info")
     @Serializable(MutableStateSerializer::class)
-    private var _info: MutableState<@Serializable(ColorSerializer::class) Color> = mutableStateOf(Color.Green)
+    private var _info: MutableState<@Serializable(ColorSerializer::class) Color> = mutableStateOf(Color(0xFF019d4e))
 
     @SerialName("warning")
     @Serializable(MutableStateSerializer::class)
-    private var _warning: MutableState<@Serializable(ColorSerializer::class) Color> = mutableStateOf(Color.Yellow)
+    private var _warning: MutableState<@Serializable(ColorSerializer::class) Color> = mutableStateOf(Color(0xFFf2a111))
 
     @SerialName("error")
     @Serializable(MutableStateSerializer::class)
-    private var _error: MutableState<@Serializable(ColorSerializer::class) Color> = mutableStateOf(Color.Red)
+    private var _error: MutableState<@Serializable(ColorSerializer::class) Color> = mutableStateOf(Color(0xFFea3c5b))
 
     var debug: Color by _debug
 

@@ -27,8 +27,8 @@ dependencies {
     testImplementation(libs.kotlin.test)
 
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
 }
-
 
 compose.desktop {
     application {
@@ -43,16 +43,16 @@ compose.desktop {
 
             macOS {
                 bundleID = "com.youngerhousea.miraicompose"
-                iconFile.set(project.file("icons/mirai.icns"))
+//                iconFile.set(project.file("icons/mirai.icns"))
             }
 
             linux {
-                iconFile.set(project.file("icons/mirai.png"))
+//                iconFile.set(project.file("icons/mirai.png"))
             }
 
             windows {
                 dirChooser = true
-                iconFile.set(project.file("icons/mirai.ico"))
+//                iconFile.set(project.file("icons/mirai.ico"))
                 upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
             }
         }
@@ -68,6 +68,7 @@ kotlin {
         languageSettings.useExperimentalAnnotation("androidx.compose.foundation.ExperimentalFoundationApi")
     }
 }
-project.afterEvaluate {
-    apply<MiraiComposeHelper>()
-}
+
+//project.afterEvaluate {
+//    apply<MiraiComposeHelper>()
+//}

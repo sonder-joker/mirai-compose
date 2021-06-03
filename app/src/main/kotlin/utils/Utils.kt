@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.utils
 
+import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
@@ -15,7 +16,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Navigator
@@ -26,9 +26,14 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import org.jetbrains.skija.Image
 import java.awt.Cursor
+import java.awt.Desktop
+import java.io.File
 import java.net.URL
 import java.net.URLDecoder
 import java.util.*
+import javax.swing.JFileChooser
+import javax.swing.UIManager
+import javax.swing.filechooser.FileFilter
 import kotlin.collections.set
 
 //https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
@@ -163,3 +168,33 @@ class ComponentScope(private val scope: CoroutineScope = MainScope()) :
 }
 
 fun ComponentContext.componentScope() = instanceKeeper.getOrCreate(::ComponentScope)
+
+fun FileChooser(
+    title: String,
+    f: FileFilter,
+    defaultFile: File = File(""),
+    defaultPath: String = ".",
+    save: Boolean = true
+): JFileChooser? {
+    val previousLF = UIManager.getLookAndFeel()
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+    val fc = JFileChooser(defaultPath)
+    UIManager.setLookAndFeel(previousLF)
+    fc.selectedFile = defaultFile
+    fc.dialogTitle = title
+    fc.dragEnabled = true
+    fc.fileSelectionMode = JFileChooser.FILES_ONLY
+    fc.fileFilter = f
+    if (save) {
+        if (fc.showSaveDialog(AppManager.focusedWindow!!.window) == JFileChooser.APPROVE_OPTION) {
+            return fc
+        }
+    } else {
+        if (fc.showOpenDialog(AppManager.focusedWindow!!.window) == JFileChooser.APPROVE_OPTION) {
+            return fc
+        }
+    }
+    return null
+}
+
+inline val Desktop: Desktop get()  = java.awt.Desktop.getDesktop()

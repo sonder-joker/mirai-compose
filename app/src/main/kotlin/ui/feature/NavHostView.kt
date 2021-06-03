@@ -53,8 +53,6 @@ import com.youngerhousea.miraicompose.utils.asComponent
 import com.youngerhousea.miraicompose.utils.cursorForHorizontalResize
 import com.youngerhousea.miraicompose.utils.items
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.ConsoleFrontEndImplementation
-import net.mamoe.mirai.console.MiraiConsole
 
 /**
  * 主界面
@@ -89,7 +87,9 @@ class NavHost(
                 is Configuration.Message ->
                     Message(componentContext, botList).asComponent { MessageUi(it) }
                 is Configuration.Plugin ->
-                    Plugins(componentContext).asComponent { PluginsUi(it) }
+                    Plugins(
+                        componentContext,
+                    ).asComponent { PluginsUi(it) }
                 is Configuration.Setting ->
                     Setting(
                         componentContext,
@@ -98,8 +98,8 @@ class NavHost(
                 is Configuration.ConsoleLog ->
                     ConsoleLog(
                         componentContext,
-                        ComposeLog.logStorage,
-                        MiraiConsole.mainLogger
+                        ComposeLog.storage,
+                        MiraiCompose.logger
                     ).asComponent { ConsoleLogUi(it) }
                 is Configuration.About ->
                     About(componentContext).asComponent { AboutUi(it) }

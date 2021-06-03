@@ -35,12 +35,12 @@ class MiraiComposeHelper : Plugin<Project> {
             delete("bot")
         }
 
-        val autoCleanRun by tasks.composeRegister("autoCleanRun") {
-            dependsOn(tasks.getByName("run"))
-        }
-
-        autoCleanRun.finalizedBy(cleanGenerate)
-        cleanGenerate.mustRunAfter(autoCleanRun)
+//        val autoCleanRun by tasks.composeRegister("autoCleanRun") {
+//            dependsOn(tasks.getByName("run"))
+//        }
+//
+//        autoCleanRun.finalizedBy(cleanGenerate)
+//        cleanGenerate.mustRunAfter(autoCleanRun)
 
         compileKotlin.dependsOn(fillBuildConstants)
     }
