@@ -1,7 +1,6 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
-version = libs.versions.app
 
 plugins {
     kotlin("jvm")
@@ -29,8 +28,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
 
     testImplementation(libs.junit4.core)
-//    testImplementation(libs.junit4.kotlin)
-//    testImplementation(libs.kotlin.test)
+    testImplementation(libs.junit4.kotlin)
+    testImplementation(libs.kotlin.test)
 
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
 }
@@ -43,12 +42,12 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
 
             packageName = "mirai-compose"
-            packageVersion = libs.versions.app.get()
+            packageVersion = rootProject.version.toString()
             vendor = rootProject.group as String
 
             macOS {
                 bundleID = "com.youngerhousea.miraicompose"
-                iconFile.set(project.file("icons/mirai.icns"))
+//                iconFile.set(project.file("icons/mirai.icns"))
             }
 
             linux {
@@ -65,15 +64,15 @@ compose.desktop {
 }
 
 
-//kotlin {
-//    sourceSets.all {
-//        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.util.ConsoleExperimentalApi")
-//        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.utils.MiraiExperimentalApi")
-//        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
-//        languageSettings.useExperimentalAnnotation("androidx.compose.foundation.ExperimentalFoundationApi")
-//    }
-//}
+kotlin {
+    sourceSets.all {
+        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.util.ConsoleExperimentalApi")
+        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.utils.MiraiExperimentalApi")
+        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
+        languageSettings.useExperimentalAnnotation("androidx.compose.foundation.ExperimentalFoundationApi")
+    }
+}
 
-//project.afterEvaluate {
-//    apply<MiraiComposeHelper>()
-//}
+project.afterEvaluate {
+    apply<MiraiComposeHelper>()
+}

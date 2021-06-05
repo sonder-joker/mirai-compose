@@ -5,8 +5,9 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
@@ -23,19 +24,19 @@ import kotlin.system.exitProcess
 @OptIn(ExperimentalComposeUiApi::class)
 fun MiraiComposeView() = application {
     // 设置默认处理函数
-    val state = rememberWindowState()
+    val state = rememberWindowState(size = WindowSize(1280.dp, 768.dp))
     SetDefaultExceptionHandler()
+
     DisposableEffect(Unit) {
         MiraiCompose.start()
         onDispose {
             MiraiCompose.cancel("Normal Exit")
-
         }
     }
+
     Window(
         state = state,
         title = "Mirai compose",
-//        size = IntSize(1280, 768),
         icon = ResourceImage.icon,
     ) {
         DesktopMaterialTheme(
@@ -46,6 +47,8 @@ fun MiraiComposeView() = application {
             }.asComponent { NavHostUi(it) }()
         }
     }
+
+
 }
 
 
@@ -57,8 +60,8 @@ private fun SetDefaultExceptionHandler() {
             return@setDefaultUncaughtExceptionHandler
         }
         println(exception.stackTraceToString())
-        Window(
-            onCloseRequest = {
+        androidx.compose.desktop.Window(
+            onDismissRequest = {
                 exitProcess(1)
             }
         ) {
