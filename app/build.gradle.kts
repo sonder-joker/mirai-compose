@@ -47,16 +47,13 @@ compose.desktop {
 
             macOS {
                 bundleID = "com.youngerhousea.miraicompose"
-//                iconFile.set(project.file("icons/mirai.icns"))
             }
 
             linux {
-//                iconFile.set(project.file("icons/mirai.png"))
             }
 
             windows {
                 dirChooser = true
-//                iconFile.set(project.file("icons/mirai.ico"))
                 upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
             }
         }

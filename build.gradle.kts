@@ -1,17 +1,14 @@
-
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 group = "com.youngerhousea"
-version = "1.0.0"
+version = libs.versions.app.get()
 
 allprojects {
     repositories {
-        google()
-        mavenLocal()
         mavenCentral()
+        google()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        gradlePluginPortal()
     }
     afterEvaluate {
         configureEncoding()

@@ -1,0 +1,46 @@
+package com.youngerhousea.miraicompose.component.impl.plugin
+
+import androidx.compose.material.SnackbarHostState
+import com.arkivanov.decompose.ComponentContext
+import com.youngerhousea.miraicompose.component.plugin.PluginList
+import com.youngerhousea.miraicompose.console.MiraiCompose
+import com.youngerhousea.miraicompose.utils.componentScope
+import net.mamoe.mirai.console.plugin.Plugin
+
+class PluginListImpl(
+    componentContext: ComponentContext,
+    override val onPluginCardClick: (plugin: Plugin) -> Unit
+) : PluginList, ComponentContext by componentContext {
+    val scope = componentScope()
+
+    override val plugins: List<Plugin> = MiraiCompose.loadedPlugins
+
+    override val snackbarHostState = SnackbarHostState()
+
+//    val onAddPluginClick: (File) -> Unit = { file ->
+//        scope.launch {
+//            when {
+//                !file.exists() || !file.isFile -> {
+//                    snackbarHostState.showSnackbar("选择的文件(${file.absolutePath})不存在或不是文件")
+//                }
+//                !file.name.endsWith(".jar") -> {
+//                    snackbarHostState.showSnackbar("选择的文件(${file.absolutePath})不是mirai插件(.jar)")
+//                }
+//                file.canRead() -> {
+//                    val target = (MiraiCompose.rootPath / "plugins" / file.name).toFile()
+//                    if (target.exists()) {
+//                        if (!target.canWrite()) {
+//                            snackbarHostState.showSnackbar("导入失败, ${target.absolutePath}已存在并不可更改")
+//                        }
+//                        snackbarHostState.showSnackbar("${file.name}已存在，将会覆盖旧版本")
+//                    }
+//                    file.copyTo(target, true)
+//                    snackbarHostState.showSnackbar("成功导入${file.name}插件")
+//                }
+//                else -> {
+//                    snackbarHostState.showSnackbar("导入失败, ${file.absolutePath}无法读取")
+//                }
+//            }
+//        }
+//    }
+}

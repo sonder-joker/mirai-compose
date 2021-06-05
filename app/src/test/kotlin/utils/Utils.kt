@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.utils
+package utils
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
@@ -13,19 +13,19 @@ fun fakeContext(): ComponentContext = DefaultComponentContext(LifecycleRegistry(
 class UtilsTest {
     val s = mutableListOf<AnnotatedString>()
 
-    @Before
-    fun before() {
-        s.add(AnnotatedString("2021/05/13 20:02:13 I/org.example.my-plugin: Hi: test"))
-        s.add(AnnotatedString("bbbbbbbbbbbbbbbbbbbbbbb"))
-        s.add(AnnotatedString("cccccccccccccccccccccccccccccccccc"))
-        s.add(AnnotatedString("ddddddddddddddddddddddddddddddddddddd"))
-        s.add(AnnotatedString("eeeeeeeeeeeeee"))
-    }
-
-    @Test
-    fun t() {
-        for (m in s[0].split(Regex("((?<=a)|(?=a))"))) {
-            println(m)
-        }
-    }
+//    @Before
+//    fun before() {
+//        s.add(AnnotatedString("2021/05/13 20:02:13 I/org.example.my-plugin: Hi: test"))
+//        s.add(AnnotatedString("bbbbbbbbbbbbbbbbbbbbbbb"))
+//        s.add(AnnotatedString("cccccccccccccccccccccccccccccccccc"))
+//        s.add(AnnotatedString("ddddddddddddddddddddddddddddddddddddd"))
+//        s.add(AnnotatedString("eeeeeeeeeeeeee"))
+//    }
+//
+//    @Test
+//    fun t() {
+//        for (m in s[0].split(Regex("((?<=a)|(?=a))"))) {
+//            println(m)
+//        }
+//    }
 }

@@ -1,18 +1,10 @@
-import org.gradle.accessors.dm.LibrariesForLibs
-
-@Suppress("UnstableApiUsage")
-val libs = project.extensions.getByType<VersionCatalogsExtension>().named("libs") as LibrariesForLibs
-
 plugins {
     `kotlin-dsl`
 }
 
 repositories {
-    google()
-    mavenLocal()
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     gradlePluginPortal()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {

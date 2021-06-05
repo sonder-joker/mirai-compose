@@ -36,28 +36,6 @@ import javax.swing.UIManager
 import javax.swing.filechooser.FileFilter
 import kotlin.collections.set
 
-//https://stackoverflow.com/questions/44057578/hex-to-rgb-converter-android-studio
-fun getARGB(rgb: String): IntArray {
-    return when (rgb.length) {
-        6 -> {
-            val r = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
-            val g = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
-            val b = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
-            intArrayOf(r, g, b)
-        }
-        8 -> {
-            val a = Integer.parseInt(rgb.substring(0, 2), 16) // 16 for hex
-            val r = Integer.parseInt(rgb.substring(2, 4), 16) // 16 for hex
-            val g = Integer.parseInt(rgb.substring(4, 6), 16) // 16 for hex
-            val b = Integer.parseInt(rgb.substring(6, 8), 16) // 16 for hex
-            intArrayOf(a, r, g, b)
-        }
-        else -> {
-            throw InputMismatchException()
-        }
-    }
-}
-
 @Composable
 fun IntSlider(
     value: Int,
@@ -82,16 +60,6 @@ fun IntSlider(
     colors
 )
 
-@Composable
-internal fun VerticalScrollbar(
-    modifier: Modifier,
-    scrollState: LazyListState,
-    itemCount: Int,
-    averageItemSize: Dp
-) = androidx.compose.foundation.VerticalScrollbar(
-    rememberScrollbarAdapter(scrollState, itemCount, averageItemSize),
-    modifier
-)
 
 fun URL.splitQuery(): Map<String, String> {
     val queryPairs: MutableMap<String, String> = LinkedHashMap()
@@ -111,29 +79,6 @@ internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
 internal fun Base64ImageDecode(data: String): ImageBitmap =
     SkiaImageDecode(Base64.getDecoder().decode(data.split(",").last()))
 
-
-fun Modifier.cursorForHorizontalResize(
-): Modifier = composed {
-    var isHover by remember { mutableStateOf(false) }
-
-    if (isHover) {
-        LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
-    } else {
-        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
-    }
-
-    pointerMoveFilter(
-        onEnter = { isHover = true; true },
-        onExit = { isHover = false; true }
-    )
-}
-
-fun Modifier.withoutWidthConstraints() = layout { measurable, constraints ->
-    val placeable = measurable.measure(constraints.copy(maxWidth = Int.MAX_VALUE))
-    layout(constraints.maxWidth, placeable.height) {
-        placeable.place(0, 0)
-    }
-}
 
 fun <C : Any> Navigator<C>.pushIfNotCurrent(configuration: C) {
     navigate { if (it.last() != configuration) it + configuration else it }

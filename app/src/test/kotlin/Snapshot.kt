@@ -1,5 +1,3 @@
-package com.youngerhousea.miraicompose
-
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.*
 import kotlinx.coroutines.CoroutineScope

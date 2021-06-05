@@ -1,8 +1,8 @@
-build
-run
-out
-
-data
-config
-bots
-plugins
+#build
+#run
+#out
+#
+#data
+#config
+#bots
+#./plugins
