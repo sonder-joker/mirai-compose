@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.log
+package com.youngerhousea.miraicompose.app.ui.log
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.component.log.ConsoleLog
-import com.youngerhousea.miraicompose.ui.shared.CommandSendBox
-import com.youngerhousea.miraicompose.ui.shared.LogBox
+import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
+import com.youngerhousea.miraicompose.app.ui.shared.CommandSendBox
+import com.youngerhousea.miraicompose.app.ui.shared.LogBox
 
 @Composable
 fun ConsoleLogUi(consoleLog: ConsoleLog) {

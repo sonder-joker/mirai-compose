@@ -1,10 +1,10 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
-
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
+
     id("org.jetbrains.compose")
 }
 
@@ -12,8 +12,8 @@ dependencies {
     implementation(libs.decompose.main)
     implementation(libs.decompose.extension)
 
-    implementation(libs.mirai.core)
-    implementation(libs.mirai.console)
+    api(libs.mirai.core)
+    api(libs.mirai.console)
 
     implementation(libs.serialization.json)
     implementation(libs.serialization.yaml)
@@ -36,9 +36,10 @@ dependencies {
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
 }
 
+
 compose.desktop {
     application {
-        mainClass = "com.youngerhousea.miraicompose.MiraiComposeLoader"
+        mainClass = "com.youngerhousea.miraicompose.app.MiraiComposeLoader"
         nativeDistributions {
             modules(*jdkModules)
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
@@ -70,8 +71,4 @@ kotlin {
         languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
         languageSettings.useExperimentalAnnotation("androidx.compose.foundation.ExperimentalFoundationApi")
     }
-}
-
-project.afterEvaluate {
-    apply<MiraiComposeHelper>()
 }

@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.future.splitpane
+package com.youngerhousea.miraicompose.app.future.splitpane
 
 import androidx.compose.runtime.Composable
 

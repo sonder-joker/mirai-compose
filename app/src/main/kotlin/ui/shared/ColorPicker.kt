@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.shared
+package com.youngerhousea.miraicompose.app.ui.shared
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.utils.*
+import com.youngerhousea.miraicompose.app.utils.*
 
 @Composable
 fun ColorPicker(

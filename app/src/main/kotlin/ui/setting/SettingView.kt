@@ -1,6 +1,5 @@
-package com.youngerhousea.miraicompose.ui.setting
+package com.youngerhousea.miraicompose.app.ui.setting
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.VerticalScrollbar
@@ -12,14 +11,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.component.setting.Setting
-import com.youngerhousea.miraicompose.ui.shared.ColorPicker
+import com.youngerhousea.miraicompose.core.component.setting.Setting
+import com.youngerhousea.miraicompose.core.component.setting.StringColor
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SettingUi(setting: Setting) {
+    val (debug, setDebug) = remember { mutableStateOf(setting.debug) }
+    val (verbose, setVerbose) = remember { mutableStateOf(setting.verbose) }
+    val (info, setInfo) = remember { mutableStateOf(setting.info) }
+    val (warning, setWarning) = remember { mutableStateOf(setting.warning) }
+    val (error, setError) = remember { mutableStateOf(setting.error) }
+
     Box(Modifier.fillMaxSize()) {
         val scrollState = rememberScrollState()
         Column(
@@ -31,11 +35,26 @@ fun SettingUi(setting: Setting) {
             Row(Modifier.fillMaxWidth()) {
                 Text("自定义日志配色")
             }
-            ColorSetSlider("Debug", value = setting.debug, onValueChange = setting::onDebugColorSet)
-            ColorSetSlider("Verbose", setting.verbose, onValueChange = setting::onVerboseColorSet)
-            ColorSetSlider("Info", setting.info, onValueChange = setting::onInfoColorSet)
-            ColorSetSlider("Warning", setting.warning, onValueChange = setting::onWarningColorSet)
-            ColorSetSlider("Error", setting.error, onValueChange = setting::onErrorColorSet)
+            ColorSetSlider("Debug", debug, onValueChange = {
+                setDebug(it)
+                setting.onDebugColorSet(debug)
+            })
+            ColorSetSlider("Verbose", verbose, onValueChange = {
+                setVerbose(it)
+                setting.onVerboseColorSet(verbose)
+            })
+            ColorSetSlider("Info", info, onValueChange = {
+                setInfo(it)
+                setting.onInfoColorSet(info)
+            })
+            ColorSetSlider("Warning", warning, onValueChange = {
+                setWarning(it)
+                setting.onWarningColorSet(warning)
+            })
+            ColorSetSlider("Error", error, onValueChange = {
+                setError(it)
+                setting.onErrorColorSet(error)
+            })
 //            TODO:With a more good way
 //            Row(Modifier.fillMaxWidth()) {
 //                Text("自定义主题配色")
@@ -73,8 +92,10 @@ fun SettingUi(setting: Setting) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
+fun ColorSetSlider(text: String, value: StringColor, onValueChange: (StringColor) -> Unit) {
     var isExpand by remember(text) { mutableStateOf(false) }
+
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(
             Modifier
@@ -91,13 +112,14 @@ fun ColorSetSlider(text: String, value: Color, onValueChange: (Color) -> Unit) {
             Button({
                 isExpand = !isExpand
             }) {
-                Text("#" + value.value.toString(16).substring(0, 8))
+                Text("#$value")
             }
         }
-        AnimatedVisibility(isExpand) {
-            ColorPicker(value) { red, green, blue, alpha ->
-                onValueChange(Color(red, green, blue, alpha))
-            }
-        }
+//        TODO:
+//        AnimatedVisibility(isExpand) {
+//            ColorPicker(value) { red, green, blue, alpha ->
+//                onValueChange(Color(red, green, blue, alpha))
+//            }
+//        }
     }
 }

@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.plugin
+package com.youngerhousea.miraicompose.app.ui.plugin
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
@@ -7,10 +7,10 @@ import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
-import com.youngerhousea.miraicompose.component.plugin.CKotlinPlugin
-import com.youngerhousea.miraicompose.component.plugin.shared.DetailedCommand
-import com.youngerhousea.miraicompose.component.plugin.shared.DetailedData
-import com.youngerhousea.miraicompose.component.plugin.shared.DetailedDescription
+import com.youngerhousea.miraicompose.core.component.plugin.CKotlinPlugin
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedCommand
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedData
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedDescription
 
 
 @OptIn(ExperimentalDecomposeApi::class)

@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.utils
+package com.youngerhousea.miraicompose.app.utils
 
 import androidx.compose.material.Colors
 import androidx.compose.runtime.MutableState

@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.plugin
+package com.youngerhousea.miraicompose.app.ui.plugin
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,21 +10,24 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.component.plugin.PluginList
-import com.youngerhousea.miraicompose.console.MiraiCompose
-import com.youngerhousea.miraicompose.theme.R
-import com.youngerhousea.miraicompose.ui.shared.PluginDescription
+import com.youngerhousea.miraicompose.app.utils.R
+import com.youngerhousea.miraicompose.core.component.plugin.PluginList
+import com.youngerhousea.miraicompose.core.console.MiraiCompose
+import com.youngerhousea.miraicompose.app.ui.shared.PluginDescription
 import java.awt.Desktop
 import kotlin.io.path.div
 
 
 @Composable
 fun PluginListUi(pluginList: PluginList) {
+    val state = remember { SnackbarHostState() }
+
     Scaffold(
-        scaffoldState = rememberScaffoldState(snackbarHostState = pluginList.snackbarHostState),
+        scaffoldState = rememberScaffoldState(snackbarHostState = state),
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.padding(50.dp),

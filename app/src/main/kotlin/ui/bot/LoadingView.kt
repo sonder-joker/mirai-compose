@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.bot
+package com.youngerhousea.miraicompose.app.ui.bot
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -16,13 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
-import com.youngerhousea.miraicompose.component.bot.SolvePicCaptcha
-import com.youngerhousea.miraicompose.component.bot.SolveSliderCaptcha
-import com.youngerhousea.miraicompose.component.bot.SolveUnsafeDeviceLoginVerify
-import com.youngerhousea.miraicompose.utils.SkiaImageDecode
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import net.mamoe.mirai.network.CustomLoginFailedException
+import com.youngerhousea.miraicompose.core.component.bot.ReturnException
+import com.youngerhousea.miraicompose.core.component.bot.SolvePicCaptcha
+import com.youngerhousea.miraicompose.core.component.bot.SolveSliderCaptcha
+import com.youngerhousea.miraicompose.core.component.bot.SolveUnsafeDeviceLoginVerify
+import com.youngerhousea.miraicompose.app.utils.SkiaImageDecode
 
 @Composable
 fun SolvePicCaptchaUi(solvePicCaptcha: SolvePicCaptcha) {
@@ -76,27 +74,4 @@ fun SolveUnsafeDeviceLoginVerifyUi(solveUnsafeDeviceLoginVerify: SolveUnsafeDevi
         }
     }
 }
-
-@Serializable
-data class Req1(
-    @SerialName("str_dev_auth_token") val s: String,
-    @SerialName("uint32_flag") val flag: Int
-)
-
-@Serializable
-data class Req(
-    @SerialName("bytes_token") val bytesToken: String,
-    @SerialName("uint32_flag") val flag: Int
-)
-
-@Serializable
-data class Res(
-    @SerialName("str_url") val strUrl: String = "",
-    @SerialName("ActionStatus") val actionStatus: String,
-    @SerialName("ErrorCode") val errorCode: Int,
-    @SerialName("ErrorInfo") val errorInfo: String,
-    @SerialName("WaterKeyInfo") val waterKeyInfo: String
-)
-
-class ReturnException(killBot: Boolean = true, message: String = "返回") : CustomLoginFailedException(killBot, message)
 

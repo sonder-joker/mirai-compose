@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.plugin
+package com.youngerhousea.miraicompose.app.ui.plugin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,12 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.component.plugin.shared.DetailedCommand
-import com.youngerhousea.miraicompose.component.plugin.shared.DetailedData
-import com.youngerhousea.miraicompose.component.plugin.shared.DetailedDescription
-import com.youngerhousea.miraicompose.ui.shared.annotatedDescription
-import com.youngerhousea.miraicompose.ui.shared.annotatedExplain
-import com.youngerhousea.miraicompose.ui.shared.simpleDescription
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedCommand
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedData
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedDescription
+import com.youngerhousea.miraicompose.app.ui.shared.annotatedDescription
+import com.youngerhousea.miraicompose.app.ui.shared.annotatedExplain
+import com.youngerhousea.miraicompose.app.ui.shared.simpleDescription
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.yamlkt.Yaml
 

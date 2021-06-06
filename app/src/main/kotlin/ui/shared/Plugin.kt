@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.shared
+package com.youngerhousea.miraicompose.app.ui.shared
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youngerhousea.miraicompose.theme.ResourceImage
+import com.youngerhousea.miraicompose.app.utils.ResourceImage
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.Command.Companion.allNames
 import net.mamoe.mirai.console.data.*

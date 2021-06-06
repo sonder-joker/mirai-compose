@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.about
+package com.youngerhousea.miraicompose.app.ui.about
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +15,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import com.youngerhousea.miraicompose.component.about.About
-import com.youngerhousea.miraicompose.theme.ResourceImage
-import com.youngerhousea.miraicompose.utils.Desktop
+import com.youngerhousea.miraicompose.core.component.about.About
+import com.youngerhousea.miraicompose.app.utils.ResourceImage
+import com.youngerhousea.miraicompose.app.utils.Desktop
 import net.mamoe.mirai.console.MiraiConsole
 import java.net.URI
 

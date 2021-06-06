@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.ui.bot
+package com.youngerhousea.miraicompose.app.ui.bot
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
@@ -20,9 +20,9 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.component.bot.InitLogin
-import com.youngerhousea.miraicompose.theme.R
-import com.youngerhousea.miraicompose.theme.ResourceImage
+import com.youngerhousea.miraicompose.core.component.bot.InitLogin
+import com.youngerhousea.miraicompose.app.utils.R
+import com.youngerhousea.miraicompose.app.utils.ResourceImage
 import kotlinx.coroutines.*
 import net.mamoe.mirai.network.*
 

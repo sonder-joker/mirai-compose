@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose
+package com.youngerhousea.miraicompose.app
 
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -8,12 +8,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
-import com.youngerhousea.miraicompose.component.impl.NavHostImpl
-import com.youngerhousea.miraicompose.console.MiraiCompose
-import com.youngerhousea.miraicompose.theme.ComposeSetting
-import com.youngerhousea.miraicompose.theme.ResourceImage
-import com.youngerhousea.miraicompose.ui.NavHostUi
-import com.youngerhousea.miraicompose.utils.asComponent
+import com.youngerhousea.miraicompose.core.console.MiraiCompose
+import com.youngerhousea.miraicompose.app.utils.ResourceImage
+import com.youngerhousea.miraicompose.app.ui.NavHostUi
+import com.youngerhousea.miraicompose.core.component.impl.NavHostImpl
 import kotlinx.coroutines.cancel
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import kotlin.system.exitProcess
@@ -86,11 +84,10 @@ private fun MiraiComposeWindow(
         icon = ResourceImage.icon,
     ) {
         DesktopMaterialTheme(
-            colors = ComposeSetting.AppTheme.materialLight
         ) {
-            rememberRootComponent { componentContext ->
+            NavHostUi(rememberRootComponent { componentContext ->
                 NavHostImpl(componentContext)
-            }.asComponent { NavHostUi(it) }()
+            })
         }
     }
 }

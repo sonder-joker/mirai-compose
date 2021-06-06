@@ -1,8 +1,8 @@
-package com.youngerhousea.miraicompose.ui.bot
+package com.youngerhousea.miraicompose.app.ui.bot
 
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.youngerhousea.miraicompose.component.bot.*
+import com.youngerhousea.miraicompose.core.component.bot.*
 
 
 @Composable
