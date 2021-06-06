@@ -15,6 +15,7 @@ import net.mamoe.mirai.console.plugin.Plugin
  * @see SpecificPlugin
  */
 interface Plugins {
+
     val state: Value<RouterState<Configuration, ComponentContext>>
 
     sealed class Configuration : Parcelable {

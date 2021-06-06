@@ -1,12 +1,10 @@
 package com.youngerhousea.miraicompose.component.bot
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.ui.bot.ReturnException
-import com.youngerhousea.miraicompose.utils.Component
 import net.mamoe.mirai.Bot
 
 /**
@@ -26,7 +24,7 @@ interface Login{
         object InitLogin : Configuration()
         class SolvePicCaptcha(
             val bot: Bot,
-            val imageBitmap: ImageBitmap,
+            val data: ByteArray,
             val onSuccess: (String?, ReturnException?) -> Unit
         ) : Configuration()
 

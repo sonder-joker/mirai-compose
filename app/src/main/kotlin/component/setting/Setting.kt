@@ -29,3 +29,4 @@ interface Setting {
 
     fun onWarningColorSet(color: Color)
 }
+

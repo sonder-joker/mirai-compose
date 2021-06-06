@@ -19,17 +19,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.youngerhousea.miraicompose.component.bot.SolvePicCaptcha
 import com.youngerhousea.miraicompose.component.bot.SolveSliderCaptcha
 import com.youngerhousea.miraicompose.component.bot.SolveUnsafeDeviceLoginVerify
+import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.network.CustomLoginFailedException
-
 
 @Composable
 fun SolvePicCaptchaUi(solvePicCaptcha: SolvePicCaptcha) {
     var value by mutableStateOf(TextFieldValue())
     Column {
         Text("Mirai PicCaptcha(${solvePicCaptcha.bot.id})")
-        Image(solvePicCaptcha.imageBitmap, null)
+        Image(SkiaImageDecode(solvePicCaptcha.data), null)
         TextField(value = value, onValueChange = { value = it })
         Row {
             Button(onClick = { solvePicCaptcha.result(null, ReturnException()) }) {

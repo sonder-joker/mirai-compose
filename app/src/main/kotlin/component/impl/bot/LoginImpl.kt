@@ -5,7 +5,6 @@ import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.youngerhousea.miraicompose.component.bot.Login
-import com.youngerhousea.miraicompose.utils.SkiaImageDecode
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
@@ -36,7 +35,7 @@ class LoginImpl(
                     SolvePicCaptchaImpl(
                         componentContext,
                         configuration.bot,
-                        configuration.imageBitmap,
+                        configuration.data,
                         configuration.onSuccess
                     )
                 is Login.Configuration.SolveSliderCaptcha ->
@@ -66,7 +65,7 @@ class LoginImpl(
 
     override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? =
         suspendCoroutine { continuation ->
-            router.push(Login.Configuration.SolvePicCaptcha(bot, SkiaImageDecode(data)) { string, exception ->
+            router.push(Login.Configuration.SolvePicCaptcha(bot, data) { string, exception ->
                 if (exception != null) {
                     router.push(Login.Configuration.InitLogin)
                     continuation.resumeWithException(exception)

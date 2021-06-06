@@ -21,12 +21,72 @@ import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.component.bot.InitLogin
+import com.youngerhousea.miraicompose.theme.R
 import com.youngerhousea.miraicompose.theme.ResourceImage
+import kotlinx.coroutines.*
+import net.mamoe.mirai.network.*
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InitLoginUi(initLogin: InitLogin) {
-    Scaffold(scaffoldState = rememberScaffoldState(snackbarHostState = initLogin.state)) {
+    val scope = rememberCoroutineScope()
+
+    val (account, setAccount) = remember { mutableStateOf(TextFieldValue()) }
+
+    val (password, setPassword) = remember { mutableStateOf(TextFieldValue()) }
+
+    var isLoading by remember { mutableStateOf(false) }
+
+    val state = remember { SnackbarHostState() }
+
+    //TODO:
+    val onLogin: () -> Unit = {
+        scope.launch {
+            runCatching {
+                withTimeout(20_000) {
+                    initLogin.onLogin(account.text.toLong(), password.text)
+                }
+                if (state.showSnackbar("Loading", "Cancel") == SnackbarResult.ActionPerformed)
+                    cancel()
+            }.onFailure {
+                val snackBarText = when (it) {
+                    is WrongPasswordException -> {
+                        R.String.wrongPassword
+                    }
+                    is RetryLaterException -> {
+                        R.String.retryLater
+                    }
+                    is UnsupportedSliderCaptchaException -> {
+                        R.String.unsupportedSliderCaptcha
+                    }
+                    is UnsupportedSMSLoginException -> {
+                        R.String.unsupportedSMSLogin
+                    }
+                    is NoStandardInputForCaptchaException -> {
+                        R.String.noStandardInputForCaptcha
+                    }
+                    is NoServerAvailableException -> {
+                        R.String.noServerAvailable
+                    }
+                    is IllegalArgumentException -> {
+                        R.String.passwordLengthMuch
+                    }
+                    is TimeoutCancellationException -> {
+                        R.String.loginTimeOut
+                    }
+                    is CancellationException -> {
+                        R.String.loginDismiss
+                    }
+                    else -> throw it
+                }
+                state.showSnackbar(snackBarText)
+            }
+        }.invokeOnCompletion {
+            isLoading = false
+        }
+    }
+
+    Scaffold(scaffoldState = rememberScaffoldState(snackbarHostState = state)) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -39,18 +99,18 @@ fun InitLoginUi(initLogin: InitLogin) {
                     .padding(5.dp)
             )
             AccountTextField(
-                account = initLogin.account,
-                onAccountTextChange = initLogin::onAccountTextChange,
-                onKeyEnter = initLogin::onLogin
+                account = account,
+                onAccountTextChange = setAccount,
+                onKeyEnter = onLogin
             )
             PasswordTextField(
-                password = initLogin.password,
-                onPasswordTextChange = initLogin::onPasswordTextChange,
-                onKeyEnter = initLogin::onLogin
+                password = password,
+                onPasswordTextChange = setPassword,
+                onKeyEnter = onLogin
             )
             LoginButton(
-                onClick = initLogin::onLogin,
-                isLoading = initLogin.isLoading
+                onClick = onLogin,
+                isLoading = isLoading
             )
         }
     }
@@ -117,7 +177,7 @@ private fun PasswordTextField(
                         VisualTransformation.None
                     else
                         PasswordVisualTransformation()
-            }){
+            }) {
                 Icon(
                     imageVector = Icons.Default.RemoveRedEye,
                     contentDescription = null
