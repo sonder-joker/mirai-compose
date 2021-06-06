@@ -1,12 +1,15 @@
 package com.youngerhousea.miraicompose.ui.shared
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
@@ -33,7 +36,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 @Composable
-internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>, searchText:String = "") {
+internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>, searchText: String = "") {
     val lazyListState = rememberLazyListState()
 
     Box(modifier) {
@@ -44,6 +47,13 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>, searc
                 }
             }
         }
+
+        VerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            adapter = rememberScrollbarAdapter(
+                scrollState = lazyListState
+            )
+        )
     }
 
     LaunchedEffect(logs.size) {

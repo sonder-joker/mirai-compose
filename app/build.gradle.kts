@@ -31,6 +31,8 @@ dependencies {
     testImplementation(libs.junit4.kotlin)
     testImplementation(libs.kotlin.test)
 
+    implementation(projects.core)
+
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
 }
 

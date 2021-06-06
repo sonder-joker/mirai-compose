@@ -4,10 +4,6 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.router
 import com.youngerhousea.miraicompose.component.plugin.SpecificPlugin
-import com.youngerhousea.miraicompose.ui.plugin.CJvmPluginUi
-import com.youngerhousea.miraicompose.ui.plugin.CommonPluginUi
-import com.youngerhousea.miraicompose.utils.Component
-import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -17,7 +13,7 @@ class SpecificPluginImpl(
     override val plugin: Plugin,
     override val onExitButtonClicked: () -> Unit,
 ) : SpecificPlugin, ComponentContext by component {
-    private val router: Router<SpecificPlugin.Configuration, Component> = router(
+    private val router: Router<SpecificPlugin.Configuration, ComponentContext> = router(
         initialConfiguration = when (plugin) {
             is JavaPlugin -> SpecificPlugin.Configuration.Java(plugin)
             is KotlinPlugin -> SpecificPlugin.Configuration.Kotlin(plugin)
@@ -30,21 +26,15 @@ class SpecificPluginImpl(
                 is SpecificPlugin.Configuration.Common -> CommonPluginImpl(
                     componentContext,
                     configuration.plugin
-                ).asComponent {
-                    CommonPluginUi(it)
-                }
-                is SpecificPlugin.Configuration.Java -> CJvmPluginImpl(
+                )
+                is SpecificPlugin.Configuration.Java -> CJavaPluginImpl(
                     componentContext,
                     plugin = configuration.javaPlugin,
-                ).asComponent {
-                    CJvmPluginUi(it)
-                }
-                is SpecificPlugin.Configuration.Kotlin -> CJvmPluginImpl(
+                )
+                is SpecificPlugin.Configuration.Kotlin -> CKotlinPluginImpl(
                     componentContext,
                     plugin = configuration.kotlinPlugin,
-                ).asComponent {
-                    CJvmPluginUi(it)
-                }
+                )
             }
         }
     )

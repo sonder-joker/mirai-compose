@@ -8,13 +8,26 @@ import com.youngerhousea.miraicompose.utils.Component
 
 
 /**
- * 普通插件 一般不应该出现
+ * Kotlin插件的页面
  *
+ * @see DetailedDescription
+ * @see DetailedData
+ * @see DetailedCommand
  */
-interface CommonPlugin {
+interface CKotlinPlugin {
     val state: Value<RouterState<Configuration, ComponentContext>>
+
+    fun onDescriptionClick()
+
+    fun onDataClick()
+
+    fun onCommandClick()
 
     sealed class Configuration : Parcelable {
         object Description : Configuration()
+        object Command : Configuration()
+        object Data : Configuration()
     }
 }
+
+

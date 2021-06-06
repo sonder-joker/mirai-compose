@@ -23,11 +23,23 @@ import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
 import com.youngerhousea.miraicompose.component.NavHost
+import com.youngerhousea.miraicompose.component.about.About
+import com.youngerhousea.miraicompose.component.bot.Login
+import com.youngerhousea.miraicompose.component.log.ConsoleLog
+import com.youngerhousea.miraicompose.component.message.Message
+import com.youngerhousea.miraicompose.component.plugin.Plugins
+import com.youngerhousea.miraicompose.component.setting.Setting
+import com.youngerhousea.miraicompose.console.ComposeBot
 import com.youngerhousea.miraicompose.future.splitpane.ExperimentalSplitPaneApi
 import com.youngerhousea.miraicompose.future.splitpane.HorizontalSplitPane
 import com.youngerhousea.miraicompose.future.splitpane.rememberSplitPaneState
-import com.youngerhousea.miraicompose.console.ComposeBot
 import com.youngerhousea.miraicompose.theme.R
+import com.youngerhousea.miraicompose.ui.about.AboutUi
+import com.youngerhousea.miraicompose.ui.bot.LoginUi
+import com.youngerhousea.miraicompose.ui.log.ConsoleLogUi
+import com.youngerhousea.miraicompose.ui.message.MessageUi
+import com.youngerhousea.miraicompose.ui.plugin.PluginsUi
+import com.youngerhousea.miraicompose.ui.setting.SettingUi
 import com.youngerhousea.miraicompose.utils.items
 
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalSplitPaneApi::class)
@@ -140,7 +152,14 @@ fun NavHostUi(navHost: NavHost) {
                 Children(
                     navHost.state, crossfade()
                 ) { child ->
-                    child.instance()
+                    when(val ch = child.instance) {
+                        is Login -> LoginUi(ch)
+                        is ConsoleLog -> ConsoleLogUi(ch)
+                        is About -> AboutUi(ch)
+                        is Setting -> SettingUi(ch)
+                        is Plugins -> PluginsUi(ch)
+                        is Message -> MessageUi(ch)
+                    }
                 }
             }
 

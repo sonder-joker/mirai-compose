@@ -11,9 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.youngerhousea.miraicompose.component.plugin.CJavaPlugin
+import com.youngerhousea.miraicompose.component.plugin.CKotlinPlugin
+import com.youngerhousea.miraicompose.component.plugin.CommonPlugin
 import com.youngerhousea.miraicompose.component.plugin.SpecificPlugin
 import com.youngerhousea.miraicompose.ui.shared.annotatedName
-
 
 @Composable
 fun SpecificPluginUi(specificPlugin: SpecificPlugin) {
@@ -33,7 +35,11 @@ fun SpecificPluginUi(specificPlugin: SpecificPlugin) {
         })
     }) {
         Children(specificPlugin.state) { child ->
-            child.instance()
+            when(val ch = child.instance) {
+                is CommonPlugin -> CommonPluginUi(ch)
+                is CJavaPlugin -> CJavaPluginUi(ch)
+                is CKotlinPlugin -> CKotlinPluginUi(ch)
+            }
         }
     }
 }

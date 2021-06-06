@@ -1,15 +1,12 @@
 package com.youngerhousea.miraicompose.component
 
-import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.outlined.Login
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.console.ComposeBot
-import com.youngerhousea.miraicompose.ui.bot.MessageUi
 import com.youngerhousea.miraicompose.utils.Component
-
-
+import com.youngerhousea.miraicompose.component.plugin.Plugins
 /**
  * 主界面
  *
@@ -18,7 +15,7 @@ import com.youngerhousea.miraicompose.utils.Component
  * @property currentBot 目前的显示的机器人
  *
  * @see [Login]
- * @see [MessageUi]
+ * @see [Message]
  * @see [Setting]
  * @see [About]
  * @see [ConsoleLog]
@@ -29,7 +26,7 @@ interface NavHost {
 
     val currentBot: ComposeBot?
 
-    val state: Value<RouterState<Configuration, Component>>
+    val state: Value<RouterState<Configuration, ComponentContext>>
 
     // 登录机器人
     fun addNewBot()
@@ -45,13 +42,14 @@ interface NavHost {
     fun onRouteLog()
 
     fun onRouteAbout()
+
+    sealed class Configuration : Parcelable {
+        object Message : Configuration()
+        object Login : Configuration()
+        object Setting : Configuration()
+        object About : Configuration()
+        object ConsoleLog : Configuration()
+        object Plugin : Configuration()
+    }
 }
 
-sealed class Configuration : Parcelable {
-    object Message : Configuration()
-    object Login : Configuration()
-    object Setting : Configuration()
-    object About : Configuration()
-    object ConsoleLog : Configuration()
-    object Plugin : Configuration()
-}

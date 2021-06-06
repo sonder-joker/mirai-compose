@@ -11,7 +11,7 @@ class PluginListImpl(
     componentContext: ComponentContext,
     override val onPluginCardClick: (plugin: Plugin) -> Unit
 ) : PluginList, ComponentContext by componentContext {
-    val scope = componentScope()
+//    val scope = componentScope()
 
     override val plugins: List<Plugin> = MiraiCompose.loadedPlugins
 

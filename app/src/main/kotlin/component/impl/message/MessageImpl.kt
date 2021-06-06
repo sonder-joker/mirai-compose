@@ -1,7 +1,7 @@
-package com.youngerhousea.miraicompose.component.impl.bot
+package com.youngerhousea.miraicompose.component.impl.message
 
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.component.bot.Message
+import com.youngerhousea.miraicompose.component.message.Message
 import com.youngerhousea.miraicompose.console.ComposeBot
 
 class MessageImpl(

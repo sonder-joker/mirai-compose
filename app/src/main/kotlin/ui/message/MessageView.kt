@@ -1,9 +1,9 @@
-package com.youngerhousea.miraicompose.ui.bot
+package com.youngerhousea.miraicompose.ui.message
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import com.youngerhousea.miraicompose.component.bot.Message
+import com.youngerhousea.miraicompose.component.message.Message
 
 
 @Composable

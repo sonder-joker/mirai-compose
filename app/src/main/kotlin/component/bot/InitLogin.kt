@@ -7,7 +7,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 /**
  * bot的登录的界面
  */
-interface InitLogin{
+interface InitLogin {
 
     val account: TextFieldValue
 

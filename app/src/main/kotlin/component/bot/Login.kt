@@ -1,6 +1,7 @@
 package com.youngerhousea.miraicompose.component.bot
 
 import androidx.compose.ui.graphics.ImageBitmap
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
@@ -19,7 +20,7 @@ import net.mamoe.mirai.Bot
  * @see SolveUnsafeDeviceLoginVerify
  */
 interface Login{
-    val state: Value<RouterState<Configuration, Component>>
+    val state: Value<RouterState<Configuration, ComponentContext>>
 
     sealed class Configuration : Parcelable {
         object InitLogin : Configuration()

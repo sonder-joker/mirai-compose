@@ -11,7 +11,7 @@ import net.mamoe.mirai.console.plugin.Plugin
 class PluginsImpl(
     component: ComponentContext,
 ) : Plugins, ComponentContext by component {
-    private val router: Router<Plugins.Configuration, Component> = router(
+    private val router: Router<Plugins.Configuration, ComponentContext> = router(
         initialConfiguration = Plugins.Configuration.List,
         key = "PluginRouter",
         handleBackButton = true,
@@ -21,14 +21,14 @@ class PluginsImpl(
                     PluginListImpl(
                         componentContext,
                         onPluginCardClick = ::routToSpecificPlugin
-                    ).asComponent { PluginListUi(it) }
+                    )
 
                 is Plugins.Configuration.Specific -> {
                     SpecificPluginImpl(
                         componentContext,
                         plugin = configuration.plugin,
                         onExitButtonClicked = ::popToPluginList
-                    ).asComponent { SpecificPluginUi(it) }
+                    )
                 }
             }
         })

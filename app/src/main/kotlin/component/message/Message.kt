@@ -1,4 +1,4 @@
-package com.youngerhousea.miraicompose.component.bot
+package com.youngerhousea.miraicompose.component.message
 
 import com.youngerhousea.miraicompose.console.ComposeBot
 
@@ -9,5 +9,4 @@ import com.youngerhousea.miraicompose.console.ComposeBot
  */
 interface Message {
     val botList: List<ComposeBot>
-
 }

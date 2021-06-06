@@ -8,27 +8,18 @@ import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.value.Value
-import com.youngerhousea.miraicompose.component.Configuration
 import com.youngerhousea.miraicompose.component.NavHost
 import com.youngerhousea.miraicompose.component.impl.about.AboutImpl
 import com.youngerhousea.miraicompose.component.impl.bot.LoginImpl
-import com.youngerhousea.miraicompose.component.impl.bot.MessageImpl
+import com.youngerhousea.miraicompose.component.impl.message.MessageImpl
 import com.youngerhousea.miraicompose.component.impl.log.ConsoleLogImpl
 import com.youngerhousea.miraicompose.component.impl.plugin.PluginsImpl
 import com.youngerhousea.miraicompose.component.impl.setting.SettingImpl
+import com.youngerhousea.miraicompose.console.ComposeBot
 import com.youngerhousea.miraicompose.console.ComposeLog
 import com.youngerhousea.miraicompose.console.MiraiCompose
-import com.youngerhousea.miraicompose.console.ComposeBot
 import com.youngerhousea.miraicompose.console.toComposeBot
 import com.youngerhousea.miraicompose.theme.ComposeSetting
-import com.youngerhousea.miraicompose.ui.about.AboutUi
-import com.youngerhousea.miraicompose.ui.bot.LoginUi
-import com.youngerhousea.miraicompose.ui.bot.MessageUi
-import com.youngerhousea.miraicompose.ui.log.ConsoleLogUi
-import com.youngerhousea.miraicompose.ui.plugin.PluginsUi
-import com.youngerhousea.miraicompose.ui.setting.SettingUi
-import com.youngerhousea.miraicompose.utils.Component
-import com.youngerhousea.miraicompose.utils.asComponent
 import net.mamoe.mirai.Bot
 
 class NavHostImpl(
@@ -39,33 +30,33 @@ class NavHostImpl(
 
     private var _currentBot by mutableStateOf(_botList.firstOrNull())
 
-    private val router = router<Configuration, Component>(
-        initialConfiguration = Configuration.Login,
+    private val router = router<NavHost.Configuration, ComponentContext>(
+        initialConfiguration = NavHost.Configuration.Login,
         handleBackButton = true,
         key = "NavHost",
         childFactory = { config, componentContext ->
             when (config) {
-                is Configuration.Login ->
-                    LoginImpl(componentContext, onLoginSuccess = ::onLoginSuccess).asComponent { LoginUi(it) }
-                is Configuration.Message ->
-                    MessageImpl(componentContext, botList).asComponent { MessageUi(it) }
-                is Configuration.Plugin ->
+                is NavHost.Configuration.Login ->
+                    LoginImpl(componentContext, onLoginSuccess = ::onLoginSuccess)
+                is NavHost.Configuration.Message ->
+                    MessageImpl(componentContext, botList)
+                is NavHost.Configuration.Plugin ->
                     PluginsImpl(
                         componentContext,
-                    ).asComponent { PluginsUi(it) }
-                is Configuration.Setting ->
+                    )
+                is NavHost.Configuration.Setting ->
                     SettingImpl(
                         componentContext,
                         ComposeSetting.AppTheme
-                    ).asComponent { SettingUi(it) }
-                is Configuration.ConsoleLog ->
+                    )
+                is NavHost.Configuration.ConsoleLog ->
                     ConsoleLogImpl(
                         componentContext,
                         ComposeLog.storage,
                         MiraiCompose.logger
-                    ).asComponent { ConsoleLogUi(it) }
-                is Configuration.About ->
-                    AboutImpl(componentContext).asComponent { AboutUi(it) }
+                    )
+                is NavHost.Configuration.About ->
+                    AboutImpl(componentContext)
             }
         }
     )
@@ -75,18 +66,18 @@ class NavHostImpl(
 
     override val currentBot: ComposeBot? get() = _currentBot
 
-    override val state: Value<RouterState<Configuration, Component>> get() = router.state
+    override val state: Value<RouterState<NavHost.Configuration, ComponentContext>> get() = router.state
 
     // 当机器人登录成功
     private fun onLoginSuccess(bot: Bot) {
         val composeBot = bot.toComposeBot()
         _currentBot = composeBot
         _botList.add(composeBot)
-        router.push(Configuration.Message)
+        router.push(NavHost.Configuration.Message)
     }
 
     override fun addNewBot() {
-        router.push(Configuration.Login)
+        router.push(NavHost.Configuration.Login)
     }
 
     override fun onRouteToSpecificBot(bot: ComposeBot) {
@@ -94,22 +85,22 @@ class NavHostImpl(
     }
 
     override fun onRouteMessage() {
-        router.push(Configuration.Message)
+        router.push(NavHost.Configuration.Message)
     }
 
     override fun onRoutePlugin() {
-        router.push(Configuration.Plugin)
+        router.push(NavHost.Configuration.Plugin)
     }
 
     override fun onRouteSetting() {
-        router.push(Configuration.Setting)
+        router.push(NavHost.Configuration.Setting)
     }
 
     override fun onRouteLog() {
-        router.push(Configuration.ConsoleLog)
+        router.push(NavHost.Configuration.ConsoleLog)
     }
 
     override fun onRouteAbout() {
-        router.push(Configuration.About)
+        router.push(NavHost.Configuration.About)
     }
 }

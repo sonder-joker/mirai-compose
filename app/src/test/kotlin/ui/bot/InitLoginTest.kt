@@ -2,6 +2,8 @@ package ui.bot
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.input.TextFieldValue
 import com.youngerhousea.miraicompose.component.impl.bot.InitLoginImpl
 import com.youngerhousea.miraicompose.ui.bot.InitLoginUi
@@ -30,6 +32,9 @@ internal class InitLoginTest {
         composeTestRule.onNodeWithText("Account").assertExists()
         composeTestRule.onNodeWithText("Password").assertExists()
         composeTestRule.onNodeWithText("Login").assertExists()
+
+//        composeTestRule.onNodeWithText("Account").performTextInput("1")
+//        composeTestRule.onNodeWithText("Login").performClick()
     }
 
     @Test

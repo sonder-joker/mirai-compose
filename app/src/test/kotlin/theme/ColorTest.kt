@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.mamoe.yamlkt.Yaml
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class ColorTest {
