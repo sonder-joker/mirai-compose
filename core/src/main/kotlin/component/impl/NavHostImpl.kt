@@ -18,15 +18,18 @@ import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.console.toComposeBot
 import com.youngerhousea.miraicompose.core.theme.ComposeSetting
 import net.mamoe.mirai.Bot
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 
-class NavHostImpl(
+internal class NavHostImpl(
     component: ComponentContext,
 ) : NavHost, ComponentContext by component {
 
     private val _botList: MutableList<ComposeBot> = MiraiCompose.botList
 
-    //TODO:
 //    private var _currentBot = _botList.firstOrNull()
 
     private val router = router<NavHost.Configuration, ComponentContext>(
@@ -60,6 +63,14 @@ class NavHostImpl(
         }
     )
 
+    fun magic(): List<Bot> {
+        val instance = Bot.Companion::class.memberProperties.find { it.name == "_instances" }
+        instance?.let {
+            it.isAccessible = true
+            return (instance.get(Bot.Companion) as ConcurrentHashMap<Long, Bot>).values.toList()
+        }
+        return listOf<Bot>()
+    }
 
     override val botList: List<ComposeBot> get() = _botList
 

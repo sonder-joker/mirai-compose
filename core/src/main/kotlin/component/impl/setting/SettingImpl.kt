@@ -5,9 +5,9 @@ import com.youngerhousea.miraicompose.core.component.setting.StringColor
 import com.youngerhousea.miraicompose.core.component.setting.Setting
 import com.youngerhousea.miraicompose.core.theme.AppTheme
 
-class SettingImpl(
+internal class SettingImpl(
     componentContext: ComponentContext,
-    val theme: AppTheme
+    private val theme: AppTheme
 ) : Setting, ComponentContext by componentContext {
 
     override val debug  = theme.logColors.debug

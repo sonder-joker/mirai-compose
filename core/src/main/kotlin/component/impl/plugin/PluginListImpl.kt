@@ -5,7 +5,7 @@ import com.youngerhousea.miraicompose.core.component.plugin.PluginList
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import net.mamoe.mirai.console.plugin.Plugin
 
-class PluginListImpl(
+internal class PluginListImpl(
     componentContext: ComponentContext,
     override val onPluginCardClick: (plugin: Plugin) -> Unit
 ) : PluginList, ComponentContext by componentContext {

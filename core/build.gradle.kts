@@ -8,12 +8,10 @@ plugins {
 
 dependencies {
     implementation(libs.decompose.main)
-    implementation(libs.decompose.extension)
 
     implementation(libs.mirai.core)
     implementation(libs.mirai.console)
 
-    implementation(libs.serialization.json)
     implementation(libs.serialization.yaml)
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.10")

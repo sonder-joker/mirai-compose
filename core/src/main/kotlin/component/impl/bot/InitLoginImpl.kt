@@ -6,7 +6,7 @@ import com.youngerhousea.miraicompose.core.utils.componentScope
 import kotlinx.coroutines.launch
 
 
-class InitLoginImpl(
+internal class InitLoginImpl(
     componentContext: ComponentContext,
     private val onClick: suspend (account: Long, password: String) -> Unit,
 ) : InitLogin, ComponentContext by componentContext {

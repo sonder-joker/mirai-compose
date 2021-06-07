@@ -9,13 +9,12 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.decompose.main)
+    api(libs.decompose.main)
     implementation(libs.decompose.extension)
 
     api(libs.mirai.core)
     api(libs.mirai.console)
 
-    implementation(libs.serialization.json)
     implementation(libs.serialization.yaml)
 
     implementation(compose.desktop.currentOs)

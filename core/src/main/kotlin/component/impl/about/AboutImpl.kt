@@ -5,7 +5,7 @@ import com.youngerhousea.miraicompose.core.component.about.About
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import net.mamoe.mirai.console.MiraiConsole
 
-class AboutImpl(
+internal class AboutImpl(
     componentContext: ComponentContext
 ) : About, ComponentContext by componentContext {
 

@@ -4,7 +4,7 @@ import com.arkivanov.decompose.*
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
 import net.mamoe.mirai.console.plugin.Plugin
 
-class PluginsImpl(
+internal class PluginsImpl(
     component: ComponentContext,
 ) : Plugins, ComponentContext by component {
     private val router: Router<Plugins.Configuration, ComponentContext> = router(

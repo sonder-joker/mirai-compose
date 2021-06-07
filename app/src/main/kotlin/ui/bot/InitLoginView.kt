@@ -39,7 +39,6 @@ fun InitLoginUi(initLogin: InitLogin) {
 
     val state = remember { SnackbarHostState() }
 
-    //TODO:
     val onLogin: () -> Unit = {
         scope.launch {
             runCatching {

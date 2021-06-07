@@ -6,7 +6,7 @@ import com.youngerhousea.miraicompose.core.component.bot.SolveSliderCaptcha
 import net.mamoe.mirai.Bot
 
 
-class SolveSliderCaptchaImpl(
+internal class SolveSliderCaptchaImpl(
     context: ComponentContext,
     val bot: Bot,
     override val url: String,

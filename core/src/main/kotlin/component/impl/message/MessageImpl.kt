@@ -4,8 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.core.component.message.Message
 import com.youngerhousea.miraicompose.core.console.ComposeBot
 
-class MessageImpl(
+internal class MessageImpl(
     componentContext: ComponentContext,
     override val botList: List<ComposeBot>
-) : Message, ComponentContext by componentContext {
-}
+) : Message, ComponentContext by componentContext

@@ -13,7 +13,7 @@ import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 
-class CKotlinPluginImpl(
+internal class CKotlinPluginImpl(
     componentContext: ComponentContext,
     val plugin: KotlinPlugin,
 ) : CKotlinPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose {

@@ -14,7 +14,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 
-class LoginImpl(
+internal class LoginImpl(
     componentContext: ComponentContext,
     private val onLoginSuccess: (bot: Bot) -> Unit,
 ) : Login, LoginSolver(), ComponentContext by componentContext {

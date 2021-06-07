@@ -7,7 +7,7 @@ import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.Detailed
 import com.youngerhousea.miraicompose.core.component.plugin.CommonPlugin
 import net.mamoe.mirai.console.plugin.Plugin
 
-class CommonPluginImpl(
+internal class CommonPluginImpl(
     componentContext: ComponentContext,
     val plugin: Plugin,
 ) : CommonPlugin, ComponentContext by componentContext {

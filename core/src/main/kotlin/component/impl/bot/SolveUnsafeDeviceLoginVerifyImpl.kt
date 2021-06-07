@@ -3,7 +3,7 @@ package com.youngerhousea.miraicompose.core.component.impl.bot
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.core.component.bot.ReturnException
 import com.youngerhousea.miraicompose.core.component.bot.SolveUnsafeDeviceLoginVerify
-import com.youngerhousea.miraicompose.core.utils.ComponentScope
+import com.youngerhousea.miraicompose.core.utils.componentScope
 import com.youngerhousea.miraicompose.core.utils.splitQuery
 import io.ktor.client.*
 import io.ktor.client.features.cookies.*
@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import java.net.URL
 
-class SolveUnsafeDeviceLoginVerifyImpl(
+internal class SolveUnsafeDeviceLoginVerifyImpl(
     context: ComponentContext,
     override val bot: Bot,
     url: String,
@@ -40,7 +40,7 @@ class SolveUnsafeDeviceLoginVerifyImpl(
         return res.strUrl
     }
 
-    private val scope = ComponentScope()
+    private val scope = componentScope()
 
     private val qrCodeParameter = URL(url).splitQuery()
 

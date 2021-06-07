@@ -13,7 +13,7 @@ import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 
-class CJavaPluginImpl(
+internal class CJavaPluginImpl(
     componentContext: ComponentContext,
     val plugin: JavaPlugin,
 ) : CJavaPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose {

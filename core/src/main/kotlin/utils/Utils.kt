@@ -11,7 +11,7 @@ import java.net.URL
 import java.net.URLDecoder
 import kotlin.collections.set
 
-fun URL.splitQuery(): Map<String, String> {
+internal fun URL.splitQuery(): Map<String, String> {
     val queryPairs: MutableMap<String, String> = LinkedHashMap()
     val query: String = this.query
     val pairs = query.split("&".toRegex()).toTypedArray()
@@ -24,17 +24,12 @@ fun URL.splitQuery(): Map<String, String> {
 }
 
 
-fun <C : Any> Navigator<C>.pushIfNotCurrent(configuration: C) {
-    navigate { if (it.last() != configuration) it + configuration else it }
-}
-
-
-class ComponentScope(private val scope: CoroutineScope = MainScope()) :
-    InstanceKeeper.Instance,
-    CoroutineScope by scope {
+private class ComponentScope(
+    private val scope: CoroutineScope = MainScope()
+) : InstanceKeeper.Instance, CoroutineScope by scope {
     override fun onDestroy() {
         scope.cancel()
     }
 }
 
-fun ComponentContext.componentScope() = instanceKeeper.getOrCreate(::ComponentScope)
+internal fun ComponentContext.componentScope(): CoroutineScope = instanceKeeper.getOrCreate(::ComponentScope)

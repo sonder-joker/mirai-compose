@@ -11,7 +11,7 @@ import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 
-class SpecificPluginImpl(
+internal class SpecificPluginImpl(
     component: ComponentContext,
     override val plugin: Plugin,
     override val onExitButtonClicked: () -> Unit,

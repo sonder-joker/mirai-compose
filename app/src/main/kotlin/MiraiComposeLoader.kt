@@ -11,7 +11,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.app.utils.ResourceImage
 import com.youngerhousea.miraicompose.app.ui.NavHostUi
-import com.youngerhousea.miraicompose.core.component.impl.NavHostImpl
+import com.youngerhousea.miraicompose.core.navHost
 import kotlinx.coroutines.cancel
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import kotlin.system.exitProcess
@@ -86,7 +86,7 @@ private fun MiraiComposeWindow(
         DesktopMaterialTheme(
         ) {
             NavHostUi(rememberRootComponent { componentContext ->
-                NavHostImpl(componentContext)
+                navHost(componentContext)
             })
         }
     }

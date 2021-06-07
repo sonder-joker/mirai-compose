@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+
     implementation(projects.app)
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3")
     implementation("io.vertx:vertx-core:4.1.0")

@@ -1,5 +1,7 @@
 package com.youngerhousea.miraicompose.core.console
 
+import com.arkivanov.decompose.value.MutableValue
+import com.arkivanov.decompose.value.reduce
 import io.ktor.client.request.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -17,9 +19,11 @@ fun Bot.toComposeBot(): ComposeBot = ComposeBotImpl(this)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ComposeBotImpl(bot: Bot) : Bot by bot, ComposeBot {
-    override var avatar = ByteArray(100)
+    private var _messageSpeed = MutableValue(0)
 
-    override var messageSpeed = 0
+    override var avatar = ByteArray(1)
+
+    override val messageSpeed get() = _messageSpeed.value
 
     init {
         launch {
@@ -29,7 +33,7 @@ internal class ComposeBotImpl(bot: Bot) : Bot by bot, ComposeBot {
                 }
             launch {
                 bot.eventChannel.subscribeAlways<MessageEvent> {
-                    messageSpeed++
+                    _messageSpeed.value++
                 }
             }
         }

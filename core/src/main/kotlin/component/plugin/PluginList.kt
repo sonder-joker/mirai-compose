@@ -9,5 +9,4 @@ interface PluginList {
     val onPluginCardClick: (plugin: Plugin) -> Unit
 
     val plugins: List<Plugin>
-
 }

@@ -43,10 +43,11 @@ import com.youngerhousea.miraicompose.app.ui.setting.SettingUi
 import com.youngerhousea.miraicompose.app.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.app.utils.items
 
+private val RailTabHeight = 80.dp
+
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
-    val height = 80.dp
 
     val splitterState = rememberSplitPaneState()
 
@@ -69,57 +70,60 @@ fun NavHostUi(navHost: NavHost) {
                     },
                     onMenuBotSelected = navHost::onRouteToSpecificBot,
                     onNewBotButtonSelected = navHost::addNewBot,
-                    modifier = Modifier.height(height),
+                    modifier = Modifier.height(RailTabHeight),
                 ) {
                     BotItem(navHost.currentBot)
                 }
-                SideTab(
+                RailTab(
                     onClick = {
                         navHost.onRouteMessage()
                         navigationIndex = 0
                     },
-                    modifier = Modifier.height(height),
+                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 0
                 ) {
                     Icon(Icons.Outlined.Message, null)
                     Text(R.String.sideRowFirst)
                 }
-                SideTab(
+                RailTab(
                     onClick = {
                         navHost.onRoutePlugin()
                         navigationIndex = 1
                     },
                     isWish = navigationIndex == 1,
-                    modifier = Modifier.height(height),
+                    modifier = Modifier.height(RailTabHeight),
                 ) {
                     Icon(Icons.Outlined.Extension, null)
                     Text(R.String.sideRowSecond)
                 }
-                SideTab(
+                RailTab(
                     onClick = {
                         navHost.onRouteSetting()
                         navigationIndex = 2
                     },
-                    modifier = Modifier.height(height),
+                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 2
                 ) {
                     Icon(Icons.Outlined.Settings, null)
                     Text(R.String.sideRowThird)
                 }
-                SideTab(
+                RailTab(
                     onClick = {
                         navHost.onRouteLog()
                         navigationIndex = 3
                     },
-                    modifier = Modifier.height(height),
+                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 3
                 ) {
                     Icon(Icons.Outlined.Notes, null)
                     Text(R.String.sideRowFour, maxLines = 1)
                 }
-                SideTab(
-                    onClick = navHost::onRouteAbout,
-                    modifier = Modifier.height(height),
+                RailTab(
+                    onClick = {
+                        navHost.onRouteAbout()
+                        navigationIndex = 4
+                    },
+                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 4
                 ) {
                     Icon(Icons.Outlined.Forum, null)
@@ -216,7 +220,7 @@ private fun AvatarWithMenu(
 }
 
 @Composable
-private fun SideTab(
+private fun RailTab(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     isWish: Boolean,
