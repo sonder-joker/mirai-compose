@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
@@ -23,6 +20,7 @@ import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedData
 import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedDescription
 
 @OptIn(ExperimentalDecomposeApi::class)
+@Composable
 fun JvmPluginUi(
     state: Value<RouterState<*, ComponentContext>>,
     onDescriptionClick: () -> Unit,

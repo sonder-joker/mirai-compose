@@ -1,6 +1,3 @@
-import org.jetbrains.compose.compose
-
-
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
@@ -23,8 +20,6 @@ dependencies {
     testImplementation(libs.junit4.core)
     testImplementation(libs.junit4.kotlin)
     testImplementation(libs.kotlin.test)
-
-    testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
 }
 
 kotlin {

@@ -1,6 +1,6 @@
 package com.youngerhousea.miraicompose.core.component.message
 
-import com.youngerhousea.miraicompose.core.console.ComposeBot
+import net.mamoe.mirai.Bot
 
 
 /**
@@ -8,5 +8,5 @@ import com.youngerhousea.miraicompose.core.console.ComposeBot
  *
  */
 interface Message {
-    val botList: List<ComposeBot>
+    val botList: List<Bot>
 }

@@ -22,15 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
-import com.youngerhousea.miraicompose.app.utils.R
-import com.youngerhousea.miraicompose.core.component.NavHost
-import com.youngerhousea.miraicompose.core.component.about.About
-import com.youngerhousea.miraicompose.core.component.bot.Login
-import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
-import com.youngerhousea.miraicompose.core.component.message.Message
-import com.youngerhousea.miraicompose.core.component.plugin.Plugins
-import com.youngerhousea.miraicompose.core.component.setting.Setting
-import com.youngerhousea.miraicompose.core.console.ComposeBot
 import com.youngerhousea.miraicompose.app.future.splitpane.ExperimentalSplitPaneApi
 import com.youngerhousea.miraicompose.app.future.splitpane.HorizontalSplitPane
 import com.youngerhousea.miraicompose.app.future.splitpane.rememberSplitPaneState
@@ -40,8 +31,16 @@ import com.youngerhousea.miraicompose.app.ui.log.ConsoleLogUi
 import com.youngerhousea.miraicompose.app.ui.message.MessageUi
 import com.youngerhousea.miraicompose.app.ui.plugin.PluginsUi
 import com.youngerhousea.miraicompose.app.ui.setting.SettingUi
-import com.youngerhousea.miraicompose.app.utils.SkiaImageDecode
+import com.youngerhousea.miraicompose.app.utils.R
 import com.youngerhousea.miraicompose.app.utils.items
+import com.youngerhousea.miraicompose.core.component.NavHost
+import com.youngerhousea.miraicompose.core.component.about.About
+import com.youngerhousea.miraicompose.core.component.bot.Login
+import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
+import com.youngerhousea.miraicompose.core.component.message.Message
+import com.youngerhousea.miraicompose.core.component.plugin.Plugins
+import com.youngerhousea.miraicompose.core.component.setting.Setting
+import net.mamoe.mirai.Bot
 
 private val RailTabHeight = 80.dp
 
@@ -53,6 +52,8 @@ fun NavHostUi(navHost: NavHost) {
 
     var navigationIndex by remember { mutableStateOf(0) }
 
+    var currentbot:Bot? by remember { mutableStateOf(navHost.botList.firstOrNull()) }
+
     HorizontalSplitPane(splitPaneState = splitterState) {
         first(160.dp) {
             Column(
@@ -63,23 +64,24 @@ fun NavHostUi(navHost: NavHost) {
                     composeBotList = navHost.botList,
                     onBoxClick = {
                         navigationIndex = 5
-                        if (navHost.currentBot != null)
+                        if (currentbot != null)
                             navHost.onRouteMessage()
                         else
                             navHost.addNewBot()
                     },
-                    onMenuBotSelected = navHost::onRouteToSpecificBot,
+                    onMenuBotSelected = {
+                        currentbot = it
+                        navHost.onRouteToSpecificBot(it)
+                    },
                     onNewBotButtonSelected = navHost::addNewBot,
-                    modifier = Modifier.height(RailTabHeight),
                 ) {
-                    BotItem(navHost.currentBot)
+                    BotItem(currentbot)
                 }
                 RailTab(
                     onClick = {
                         navHost.onRouteMessage()
                         navigationIndex = 0
                     },
-                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 0
                 ) {
                     Icon(Icons.Outlined.Message, null)
@@ -91,7 +93,6 @@ fun NavHostUi(navHost: NavHost) {
                         navigationIndex = 1
                     },
                     isWish = navigationIndex == 1,
-                    modifier = Modifier.height(RailTabHeight),
                 ) {
                     Icon(Icons.Outlined.Extension, null)
                     Text(R.String.sideRowSecond)
@@ -101,7 +102,6 @@ fun NavHostUi(navHost: NavHost) {
                         navHost.onRouteSetting()
                         navigationIndex = 2
                     },
-                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 2
                 ) {
                     Icon(Icons.Outlined.Settings, null)
@@ -112,7 +112,6 @@ fun NavHostUi(navHost: NavHost) {
                         navHost.onRouteLog()
                         navigationIndex = 3
                     },
-                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 3
                 ) {
                     Icon(Icons.Outlined.Notes, null)
@@ -123,7 +122,6 @@ fun NavHostUi(navHost: NavHost) {
                         navHost.onRouteAbout()
                         navigationIndex = 4
                     },
-                    modifier = Modifier.height(RailTabHeight),
                     isWish = navigationIndex == 4
                 ) {
                     Icon(Icons.Outlined.Forum, null)
@@ -174,9 +172,9 @@ fun NavHostUi(navHost: NavHost) {
 
 @Composable
 private fun AvatarWithMenu(
-    composeBotList: List<ComposeBot>,
+    composeBotList: List<Bot>,
     onBoxClick: () -> Unit,
-    onMenuBotSelected: (bot: ComposeBot) -> Unit,
+    onMenuBotSelected: (bot: Bot) -> Unit,
     onNewBotButtonSelected: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
@@ -230,7 +228,7 @@ private fun RailTab(
 
     CompositionLocalProvider(LocalContentColor provides color) {
         Row(
-            modifier = modifier.fillMaxSize().clickable(onClick = onClick),
+            modifier = modifier.fillMaxWidth().height(RailTabHeight).clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.aligned(Alignment.CenterHorizontally),
             content = content
@@ -240,10 +238,10 @@ private fun RailTab(
 
 @Composable
 private fun BotItem(
-    bot: ComposeBot?,
+    bot: Bot?,
     modifier: Modifier = Modifier,
 ) {
-    val avatar = remember(bot) { bot?.let { SkiaImageDecode(it.avatar) } ?: ImageBitmap(200, 200) }
+    val avatar = remember(bot) { /*TODO:bot?.let { SkiaImageDecode(it.avatar) } ?:*/ ImageBitmap(200, 200) }
 
     Row(
         modifier = modifier

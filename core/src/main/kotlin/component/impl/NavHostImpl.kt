@@ -8,18 +8,15 @@ import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.NavHost
 import com.youngerhousea.miraicompose.core.component.impl.about.AboutImpl
 import com.youngerhousea.miraicompose.core.component.impl.bot.LoginImpl
-import com.youngerhousea.miraicompose.core.component.impl.message.MessageImpl
 import com.youngerhousea.miraicompose.core.component.impl.log.ConsoleLogImpl
+import com.youngerhousea.miraicompose.core.component.impl.message.MessageImpl
 import com.youngerhousea.miraicompose.core.component.impl.plugin.PluginsImpl
 import com.youngerhousea.miraicompose.core.component.impl.setting.SettingImpl
-import com.youngerhousea.miraicompose.core.console.ComposeBot
 import com.youngerhousea.miraicompose.core.console.ComposeLog
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
-import com.youngerhousea.miraicompose.core.console.toComposeBot
 import com.youngerhousea.miraicompose.core.theme.ComposeSetting
 import net.mamoe.mirai.Bot
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
@@ -27,9 +24,6 @@ import kotlin.reflect.jvm.isAccessible
 internal class NavHostImpl(
     component: ComponentContext,
 ) : NavHost, ComponentContext by component {
-
-    private val _botList: MutableList<ComposeBot> = MiraiCompose.botList
-
 //    private var _currentBot = _botList.firstOrNull()
 
     private val router = router<NavHost.Configuration, ComponentContext>(
@@ -63,26 +57,24 @@ internal class NavHostImpl(
         }
     )
 
-    fun magic(): List<Bot> {
+    @Suppress("UNCHECKED_CAST")
+    private fun magic(): List<Bot> {
         val instance = Bot.Companion::class.memberProperties.find { it.name == "_instances" }
         instance?.let {
             it.isAccessible = true
             return (instance.get(Bot.Companion) as ConcurrentHashMap<Long, Bot>).values.toList()
-        }
-        return listOf<Bot>()
+        } ?: error("Reflect error")
     }
 
-    override val botList: List<ComposeBot> get() = _botList
-
-    override val currentBot: ComposeBot? get() = /*_currentBot*/ null
+    override val botList: List<Bot> = magic()
 
     override val state: Value<RouterState<NavHost.Configuration, ComponentContext>> get() = router.state
 
     // 当机器人登录成功
     private fun onLoginSuccess(bot: Bot) {
-        val composeBot = bot.toComposeBot()
+//        val composeBot = bot.toComposeBot()
 //        _currentBot = composeBot
-        _botList.add(composeBot)
+//        _botList.add(composeBot)
         router.push(NavHost.Configuration.Message)
     }
 
@@ -90,7 +82,7 @@ internal class NavHostImpl(
         router.push(NavHost.Configuration.Login)
     }
 
-    override fun onRouteToSpecificBot(bot: ComposeBot) {
+    override fun onRouteToSpecificBot(bot: Bot) {
 //        _currentBot = bot
     }
 

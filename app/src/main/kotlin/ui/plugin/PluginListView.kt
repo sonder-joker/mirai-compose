@@ -14,10 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.youngerhousea.miraicompose.app.ui.shared.PluginDescription
 import com.youngerhousea.miraicompose.app.utils.R
 import com.youngerhousea.miraicompose.core.component.plugin.PluginList
-import com.youngerhousea.miraicompose.core.console.MiraiCompose
-import com.youngerhousea.miraicompose.app.ui.shared.PluginDescription
+import net.mamoe.mirai.console.MiraiConsole
 import java.awt.Desktop
 import kotlin.io.path.div
 
@@ -34,7 +34,7 @@ fun PluginListUi(pluginList: PluginList) {
                 backgroundColor = Color(0xff6EC177),
                 contentColor = Color.White,
                 onClick = {
-                    Desktop.getDesktop().open((MiraiCompose.rootPath / "plugins").toFile())
+                    Desktop.getDesktop().open((MiraiConsole.rootPath / "plugins").toFile())
                 },
                 shape = MaterialTheme.shapes.medium.copy(CornerSize(percent = 50))
             ) {

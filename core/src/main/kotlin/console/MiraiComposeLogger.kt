@@ -1,5 +1,6 @@
 package com.youngerhousea.miraicompose.core.console
 
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -45,7 +46,7 @@ class MiraiComposeLogger(
     companion object {
         private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.SIMPLIFIED_CHINESE)
         private val currentDate: String = logTimeFormat.format(Date())
-        private val fileName = (MiraiCompose.logPath / currentDate).createFile()
+        private val fileName = (MiraiConsole.rootPath / "log" / currentDate).createFile()
     }
 
     private fun printLog(message: String?, priority: LogPriority) {

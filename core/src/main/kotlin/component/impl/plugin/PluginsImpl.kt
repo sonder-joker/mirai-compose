@@ -3,6 +3,7 @@ package com.youngerhousea.miraicompose.core.component.impl.plugin
 import com.arkivanov.decompose.*
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
 import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.console.plugin.PluginManager
 
 internal class PluginsImpl(
     component: ComponentContext,
@@ -16,7 +17,8 @@ internal class PluginsImpl(
                 is Plugins.Configuration.List ->
                     PluginListImpl(
                         componentContext,
-                        onPluginCardClick = ::routToSpecificPlugin
+                        onPluginCardClick = ::routToSpecificPlugin,
+                        plugins = PluginManager.plugins
                     )
 
                 is Plugins.Configuration.Specific -> {

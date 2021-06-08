@@ -10,7 +10,7 @@ import com.youngerhousea.miraicompose.core.component.message.Message
 fun MessageUi(message: Message) {
     Column {
         message.botList.forEach {
-            Text("目前消息流量:${it.messageSpeed}")
+//            Text("目前消息流量:${it.messageSpeed}")
         }
     }
 }

@@ -5,7 +5,7 @@ import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
-import com.youngerhousea.miraicompose.core.console.ComposeBot
+import net.mamoe.mirai.Bot
 
 /**
  * 主界面
@@ -21,16 +21,14 @@ import com.youngerhousea.miraicompose.core.console.ComposeBot
  * @see [Plugins]
  */
 interface NavHost {
-    val botList: List<ComposeBot>
-
-    val currentBot: ComposeBot?
+    val botList: List<Bot>
 
     val state: Value<RouterState<Configuration, ComponentContext>>
 
     // 登录机器人
     fun addNewBot()
 
-    fun onRouteToSpecificBot(bot: ComposeBot)
+    fun onRouteToSpecificBot(bot: Bot)
 
     fun onRouteMessage()
 

@@ -4,7 +4,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
@@ -12,8 +11,6 @@ import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.data.PluginDataHolder
-import net.mamoe.mirai.console.plugin.Plugin
-import net.mamoe.mirai.console.plugin.PluginManager
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
@@ -24,14 +21,13 @@ import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.SwingSolver
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.createDirectories
 import kotlin.io.path.div
 
 /**
  * MiraiCompose 的实现
  *
  */
-object MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository,
+object MiraiCompose : MiraiConsoleImplementation, AccessibleHolder,
     CoroutineScope by CoroutineScope(
         NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
             if (throwable is CancellationException) {
@@ -43,8 +39,6 @@ object MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository,
     ) {
 
     override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
-
-    internal val logPath = (rootPath / "log").createDirectories()
 
     override val builtInPluginLoaders = listOf(lazy { JvmPluginLoader })
 
@@ -67,10 +61,6 @@ object MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository,
     // 一般不应该被使用
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) = SwingSolver
 
-    override val botList: MutableList<ComposeBot> = /*TODO:mutableStateListOf()*/ mutableListOf()
-
-    override val loadedPlugins: List<Plugin> by lazy { PluginManager.plugins }
-
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
@@ -81,10 +71,6 @@ object MiraiCompose : MiraiConsoleImplementation, MiraiComposeRepository,
 
     override fun postPhase(phase: String) {
         when (phase) {
-            "auto-login bots" ->
-                Bot.instances.map { it.toComposeBot() }.forEach {
-                    botList.add(it)
-                }
             "load configurations" ->
                 ComposeDataScope.reloadAll()
         }

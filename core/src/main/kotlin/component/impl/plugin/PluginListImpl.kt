@@ -4,14 +4,14 @@ import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.core.component.plugin.PluginList
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.console.plugin.PluginManager
 
 internal class PluginListImpl(
     componentContext: ComponentContext,
-    override val onPluginCardClick: (plugin: Plugin) -> Unit
+    override val onPluginCardClick: (plugin: Plugin) -> Unit,
+    override val plugins: List<Plugin>
 ) : PluginList, ComponentContext by componentContext {
 //    val scope = componentScope()
-
-    override val plugins: List<Plugin> = MiraiCompose.loadedPlugins
 
 
 //    val onAddPluginClick: (File) -> Unit = { file ->
