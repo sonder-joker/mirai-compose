@@ -1,12 +1,11 @@
 package com.youngerhousea.miraicompose.core.console
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
+import com.arkivanov.decompose.instancekeeper.InstanceKeeper
+import kotlinx.coroutines.*
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
@@ -19,7 +18,6 @@ import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
-import net.mamoe.mirai.utils.SwingSolver
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.div
@@ -31,7 +29,7 @@ import kotlin.io.path.div
 class MiraiCompose(
     val loginSolver: (requesterBot: Long, configuration: BotConfiguration) -> LoginSolver
 ) : MiraiConsoleImplementation, AccessibleHolder,
-    CoroutineScope by CoroutineScope(
+    InstanceKeeper.Instance, CoroutineScope by CoroutineScope(
         NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
             if (throwable is CancellationException) {
                 return@CoroutineExceptionHandler
@@ -79,6 +77,10 @@ class MiraiCompose(
         }
     }
 
+    override fun onDestroy() {
+        cancel("Normal Exit")
+    }
+
     init {
         instance = this
     }
@@ -88,6 +90,7 @@ class MiraiCompose(
 
         val logger by lazy { MiraiConsole.createLogger("compose") }
     }
+
 }
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {

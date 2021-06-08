@@ -32,6 +32,7 @@ import com.youngerhousea.miraicompose.app.ui.message.MessageUi
 import com.youngerhousea.miraicompose.app.ui.plugin.PluginsUi
 import com.youngerhousea.miraicompose.app.ui.setting.SettingUi
 import com.youngerhousea.miraicompose.app.utils.R
+import com.youngerhousea.miraicompose.app.utils.SkiaImageDecode
 import com.youngerhousea.miraicompose.app.utils.items
 import com.youngerhousea.miraicompose.core.component.NavHost
 import com.youngerhousea.miraicompose.core.component.about.About
@@ -41,6 +42,7 @@ import com.youngerhousea.miraicompose.core.component.message.Message
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
 import com.youngerhousea.miraicompose.core.component.setting.Setting
 import net.mamoe.mirai.Bot
+import java.awt.image.BufferedImage
 
 private val RailTabHeight = 80.dp
 
@@ -51,12 +53,12 @@ fun NavHostUi(navHost: NavHost) {
 
     var navigationIndex by remember { mutableStateOf(0) }
 
-    var currentbot:Bot? by remember { mutableStateOf(navHost.botList.firstOrNull()) }
+    var currentbot: Bot? by remember { mutableStateOf(navHost.botList.firstOrNull()) }
 
     HorizontalSplitPane(splitPaneState = splitterState) {
         first(160.dp) {
             Column(
-                Modifier.fillMaxSize(),
+                Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Top,
             ) {
                 AvatarWithMenu(
@@ -179,7 +181,7 @@ private fun AvatarWithMenu(
     content: @Composable RowScope.() -> Unit
 ) {
     var menuExpand by remember { mutableStateOf(false) }
-    Box(modifier) {
+    Box(modifier.height(RailTabHeight).fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -263,10 +265,17 @@ private fun BotItem(
                 .weight(6f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(bot?.nick ?: "Login", fontWeight = FontWeight.Bold, maxLines = 1)
+            Text(bot?.run {
+                try {
+                    nick
+                } catch (e: UninitializedPropertyAccessException) {
+                    "Unknown"
+                }
+            } ?: "Login", fontWeight = FontWeight.Bold, maxLines = 1)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text("${bot?.id ?: "Unknown"}", style = MaterialTheme.typography.body2)
             }
         }
     }
 }
+

@@ -72,10 +72,7 @@ private fun MiraiComposeWindow(
     state: WindowState = rememberWindowState(size = WindowSize(1280.dp, 768.dp))
 ) {
     DisposableEffect(Unit) {
-        val compose = MiraiCompose()
-        MiraiCompose().start()
         onDispose {
-            compose.cancel("Normal Exit")
         }
     }
 

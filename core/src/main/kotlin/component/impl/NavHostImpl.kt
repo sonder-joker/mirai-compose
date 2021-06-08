@@ -2,6 +2,7 @@ package com.youngerhousea.miraicompose.core.component.impl
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.value.Value
@@ -16,24 +17,33 @@ import com.youngerhousea.miraicompose.core.console.ComposeLog
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.theme.ComposeSetting
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.utils.BotConfiguration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
-
 internal class NavHostImpl(
     component: ComponentContext,
 ) : NavHost, ComponentContext by component {
-//    private var _currentBot = _botList.firstOrNull()
-
     private val router = router<NavHost.Configuration, ComponentContext>(
         initialConfiguration = NavHost.Configuration.Login,
         handleBackButton = true,
         key = "NavHost",
         childFactory = { config, componentContext ->
             when (config) {
-                is NavHost.Configuration.Login ->
-                    LoginImpl(componentContext, onLoginSuccess = ::onLoginSuccess)
+                is NavHost.Configuration.Login -> {
+                    LoginImpl(
+                        componentContext,
+                        onLoginSuccess = ::onLoginSuccess,
+                        composeFactory = { loginSolver ->
+                            instanceKeeper.getOrCreate {
+                                MiraiCompose { _: Long, _: BotConfiguration ->
+                                    loginSolver
+                                }
+                            }
+                        }
+                    )
+                }
                 is NavHost.Configuration.Message ->
                     MessageImpl(componentContext, botList)
                 is NavHost.Configuration.Plugin ->
@@ -58,15 +68,17 @@ internal class NavHostImpl(
     )
 
     @Suppress("UNCHECKED_CAST")
-    private fun magic(): List<Bot> {
+    private fun magic(): ConcurrentHashMap<Long, Bot> {
         val instance = Bot.Companion::class.memberProperties.find { it.name == "_instances" }
         instance?.let {
             it.isAccessible = true
-            return (instance.get(Bot.Companion) as ConcurrentHashMap<Long, Bot>).values.toList()
+            return instance.get(Bot.Companion) as ConcurrentHashMap<Long, Bot>
         } ?: error("Reflect error")
     }
 
-    override val botList: List<Bot> = magic()
+    private val map = magic()
+
+    override val botList: List<Bot> get() = if (map != null) map.values.toList() else emptyList()
 
     override val state: Value<RouterState<NavHost.Configuration, ComponentContext>> get() = router.state
 

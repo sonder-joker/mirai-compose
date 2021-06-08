@@ -20,6 +20,8 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
 
+    implementation(libs.zxing.core)
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.10")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.5.10")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.10")

@@ -2,11 +2,12 @@
 app = "1.0.0"
 kotlin = "1.5.10"
 compose-jb = "0.4.0"
-decompose = "0.2.5"
+decompose = "0.2.6"
 mirai = "2.6.5"
 yamlkt = "0.9.0"
 json = "1.2.1"
 junit = "4.13"
+zxing = "3.4.1"
 
 [libraries]
 plugin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
@@ -22,4 +23,4 @@ serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serializ
 junit4-core = { group = "junit", name = "junit", version.ref = "junit" }
 junit4-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
-
+zxing-core={group = "com.google.zxing", name = "core", version.ref = "zxing" }

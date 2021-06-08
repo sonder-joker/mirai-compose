@@ -2,12 +2,19 @@ package com.youngerhousea.miraicompose.core.component.impl.bot
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
+import com.arkivanov.decompose.lifecycle.subscribe
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.youngerhousea.miraicompose.core.component.bot.Login
+import com.youngerhousea.miraicompose.core.console.MiraiCompose
+import com.youngerhousea.miraicompose.core.utils.componentScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.utils.LoginSolver
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -17,7 +24,9 @@ import kotlin.coroutines.suspendCoroutine
 internal class LoginImpl(
     componentContext: ComponentContext,
     private val onLoginSuccess: (bot: Bot) -> Unit,
+    val composeFactory: (LoginSolver) -> MiraiCompose
 ) : Login, LoginSolver(), ComponentContext by componentContext {
+    val compose = composeFactory(this)
 
     private val router: Router<Login.Configuration, ComponentContext> = router(
         initialConfiguration = Login.Configuration.InitLogin,
@@ -56,6 +65,21 @@ internal class LoginImpl(
         }
     )
 
+    init {
+        //NOT GOOD
+        componentScope().launch(Dispatchers.IO) {
+            while (true) {
+                @Suppress("SENSELESS_COMPARISON")
+                if (router != null) {
+                    compose.start()
+                }
+                if (compose.isActive) {
+                    break
+                }
+            }
+
+        }
+    }
 
     override val state get() = router.state
 
@@ -93,10 +117,16 @@ internal class LoginImpl(
             router.push(Login.Configuration.SolveUnsafeDeviceLoginVerify(bot, url) { string, exception ->
                 if (exception != null) {
                     router.push(Login.Configuration.InitLogin)
+//                        continuation.resumeWithException(ReturnException(message =))
                     continuation.resumeWithException(exception)
                 } else {
                     continuation.resume(string)
                 }
+//                try {
+//                    continuation.resume(string)
+//                } catch (e: Exception) {
+//                    continuation.resumeWithException(e)
+//                }
             })
         }
 
