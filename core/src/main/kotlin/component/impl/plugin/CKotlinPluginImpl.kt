@@ -16,7 +16,7 @@ import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 internal class CKotlinPluginImpl(
     componentContext: ComponentContext,
     val plugin: KotlinPlugin,
-) : CKotlinPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose {
+) : CKotlinPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose.instance {
     private val router: Router<CKotlinPlugin.Configuration, ComponentContext> = router(
         initialConfiguration = CKotlinPlugin.Configuration.Description,
         handleBackButton = true,

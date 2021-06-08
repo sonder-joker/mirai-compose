@@ -2,7 +2,6 @@ package com.youngerhousea.miraicompose.core.component.impl.about
 
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.core.component.about.About
-import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.console.MiraiComposeDescription
 import net.mamoe.mirai.console.MiraiConsole
 

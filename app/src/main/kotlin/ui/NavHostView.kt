@@ -47,7 +47,6 @@ private val RailTabHeight = 80.dp
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
-
     val splitterState = rememberSplitPaneState()
 
     var navigationIndex by remember { mutableStateOf(0) }
@@ -228,7 +227,7 @@ private fun RailTab(
 
     CompositionLocalProvider(LocalContentColor provides color) {
         Row(
-            modifier = modifier.fillMaxWidth().height(RailTabHeight).clickable(onClick = onClick),
+            modifier = modifier.height(RailTabHeight).fillMaxWidth().clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.aligned(Alignment.CenterHorizontally),
             content = content

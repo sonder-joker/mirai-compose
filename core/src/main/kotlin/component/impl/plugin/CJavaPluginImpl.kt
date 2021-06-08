@@ -16,7 +16,7 @@ import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 internal class CJavaPluginImpl(
     componentContext: ComponentContext,
     val plugin: JavaPlugin,
-) : CJavaPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose {
+) : CJavaPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose.instance {
     private val router: Router<CJavaPlugin.Configuration, ComponentContext> = router(
         initialConfiguration = CJavaPlugin.Configuration.Description,
         handleBackButton = true,

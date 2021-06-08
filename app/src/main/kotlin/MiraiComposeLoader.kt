@@ -19,7 +19,7 @@ import kotlin.system.exitProcess
 object MiraiComposeLoader {
     // Compose Entry Point
     @JvmStatic
-    fun main(arg:Array<String> = emptyArray()) {
+    fun main(arg: Array<String> = emptyArray()) {
         MiraiComposeView()
     }
 }
@@ -72,9 +72,10 @@ private fun MiraiComposeWindow(
     state: WindowState = rememberWindowState(size = WindowSize(1280.dp, 768.dp))
 ) {
     DisposableEffect(Unit) {
-        MiraiCompose.start()
+        val compose = MiraiCompose()
+        MiraiCompose().start()
         onDispose {
-            MiraiCompose.cancel("Normal Exit")
+            compose.cancel("Normal Exit")
         }
     }
 

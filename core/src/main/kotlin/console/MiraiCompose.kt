@@ -17,6 +17,7 @@ import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.SwingSolver
 import java.nio.file.Path
@@ -27,7 +28,9 @@ import kotlin.io.path.div
  * MiraiCompose 的实现
  *
  */
-object MiraiCompose : MiraiConsoleImplementation, AccessibleHolder,
+class MiraiCompose(
+    val loginSolver: (requesterBot: Long, configuration: BotConfiguration) -> LoginSolver
+) : MiraiConsoleImplementation, AccessibleHolder,
     CoroutineScope by CoroutineScope(
         NamedSupervisorJob("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
             if (throwable is CancellationException) {
@@ -59,7 +62,8 @@ object MiraiCompose : MiraiConsoleImplementation, AccessibleHolder,
     override fun createLogger(identity: String?): MiraiLogger = MiraiComposeLogger(identity)
 
     // 一般不应该被使用
-    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) = SwingSolver
+    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
+        loginSolver(requesterBot, configuration)
 
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
@@ -67,7 +71,6 @@ object MiraiCompose : MiraiConsoleImplementation, AccessibleHolder,
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
-    val logger = createLogger("compose")
 
     override fun postPhase(phase: String) {
         when (phase) {
@@ -76,6 +79,15 @@ object MiraiCompose : MiraiConsoleImplementation, AccessibleHolder,
         }
     }
 
+    init {
+        instance = this
+    }
+
+    companion object {
+        lateinit var instance: MiraiCompose
+
+        val logger by lazy { MiraiConsole.createLogger("compose") }
+    }
 }
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {
