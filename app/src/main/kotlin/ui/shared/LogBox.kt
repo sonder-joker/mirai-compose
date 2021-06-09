@@ -24,6 +24,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import com.youngerhousea.miraicompose.core.console.ComposeLog
+import com.youngerhousea.miraicompose.core.console.LogPriority
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.descriptor.AbstractCommandValueParameter
@@ -40,46 +41,35 @@ import java.util.regex.PatternSyntaxException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-//private inline val ANSI_RESET get() = "\u001B[0m"
-//private inline val ANSI_BLACK get() = "\u001B[30m"
-//private inline val ANSI_RED get() = "\u001B[31m"
-//private inline val ANSI_GREEN get() = "\u001B[32m"
-//private inline val ANSI_YELLOW get() = "\u001B[33m"
-//private inline val ANSI_BLUE get() = "\u001B[34m"
-//private inline val ANSI_PURPLE get() = "\u001B[35m"
-//private inline val ANSI_CYAN get() = "\u001B[36m"
-//private inline val ANSI_WHITE get() = "\u001B[37m"
-//
-//
 //val ComposeLog.color: Color
 //    get() = when (priority) {
-//        MiraiComposeLogger.LogPriority.VERBOSE -> ComposeSetting.AppTheme.logColors.verbose
-//        MiraiComposeLogger.LogPriority.INFO -> ComposeSetting.AppTheme.logColors.info
-//        MiraiComposeLogger.LogPriority.WARNING -> ComposeSetting.AppTheme.logColors.warning
-//        MiraiComposeLogger.LogPriority.ERROR -> ComposeSetting.AppTheme.logColors.error
-//        MiraiComposeLogger.LogPriority.DEBUG -> ComposeSetting.AppTheme.logColors.debug
+//        LogPriority.VERBOSE -> ComposeSetting.AppTheme.logColors.verbose
+//        LogPriority.INFO -> ComposeSetting.AppTheme.logColors.info
+//        LogPriority.WARNING -> ComposeSetting.AppTheme.logColors.warning
+//        LogPriority.ERROR -> ComposeSetting.AppTheme.logColors.error
+//        LogPriority.DEBUG -> ComposeSetting.AppTheme.logColors.debug
 //    }
-//
-//fun parseInConsole(): String = when (priority) {
-//    MiraiComposeLogger.LogPriority.VERBOSE -> text
-//    MiraiComposeLogger.LogPriority.DEBUG -> text
-//    MiraiComposeLogger.LogPriority.INFO -> ANSI_GREEN + text + ANSI_RESET
-//    MiraiComposeLogger.LogPriority.WARNING -> ANSI_YELLOW + text + ANSI_RESET
-//    MiraiComposeLogger.LogPriority.ERROR -> ANSI_RED + text + ANSI_RESET
-//}
 
-fun ComposeLog.parseInCompose(): AnnotatedString {
-    return buildAnnotatedString {
+//internal object Color {
+//    object AppTheme {
+//
+//    }
+//}
+//
+//val ComposeLog.composeLog
+//    get(): AnnotatedString =
+//        buildAnnotatedString {
 //        pushStyle(SpanStyle(color))
-        append(text)
-    }
-}
+//            append(original)
+//        }
+
+
 
 fun ComposeLog.parseInSearch(searchText: String): AnnotatedString {
-    if (searchText.isEmpty()) return parseInCompose()
+//    if (searchText.isEmpty()) return parseInCompose()
     val builder = AnnotatedString.Builder()
     try {
-        text.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
+        original.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
             if (it == searchText)
                 builder.append(
                     AnnotatedString(
@@ -98,7 +88,7 @@ fun ComposeLog.parseInSearch(searchText: String): AnnotatedString {
         }
     } catch (e: PatternSyntaxException) {
         //TODO:
-        return parseInCompose()
+//        return parseInCompose()
     }
     return builder.toAnnotatedString()
 }

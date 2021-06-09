@@ -22,11 +22,11 @@ dependencies {
 
     implementation(libs.zxing.core)
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.5.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.10")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${libs.versions.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-common:${libs.versions.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${libs.versions.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libs.versions.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${libs.versions.kotlin}")
 
     testImplementation(libs.junit4.core)
     testImplementation(libs.junit4.kotlin)

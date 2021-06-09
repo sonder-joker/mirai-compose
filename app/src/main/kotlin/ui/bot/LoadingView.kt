@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -25,10 +22,9 @@ import com.youngerhousea.miraicompose.core.component.bot.SolvePicCaptcha
 import com.youngerhousea.miraicompose.core.component.bot.SolveSliderCaptcha
 import com.youngerhousea.miraicompose.core.component.bot.SolveUnsafeDeviceLoginVerify
 
-
 @Composable
 fun SolvePicCaptchaUi(solvePicCaptcha: SolvePicCaptcha) {
-    var value by mutableStateOf(TextFieldValue())
+    var value by remember { mutableStateOf(TextFieldValue()) }
     Column {
         Text("Mirai PicCaptcha(${solvePicCaptcha.bot.id})")
         Image(SkiaImageDecode(solvePicCaptcha.data), null)
@@ -68,7 +64,6 @@ fun SolveUnsafeDeviceLoginVerifyUi(solveUnsafeDeviceLoginVerify: SolveUnsafeDevi
                 Text("Sure")
             }
             Button(onClick = {
-
                 solveUnsafeDeviceLoginVerify.onFinish(null, ReturnException())
             }) {
                 Text("Return")
@@ -81,7 +76,7 @@ private val qrCodeWriter = QRCodeWriter()
 
 @Composable
 fun QRCode(string: String) {
-    val bitMatrix = qrCodeWriter.encode(string, BarcodeFormat.QR_CODE, 200, 200)
+    val bitMatrix = remember(string) { qrCodeWriter.encode(string, BarcodeFormat.QR_CODE, 200, 200) }
     Canvas(Modifier.size(200.dp)) {
         for (y in 0 until bitMatrix.height) {
             for (x in 0 until bitMatrix.width) {
