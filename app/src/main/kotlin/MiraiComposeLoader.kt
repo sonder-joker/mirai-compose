@@ -29,8 +29,10 @@ object MiraiComposeLoader {
 fun MiraiComposeView() = application {
     // 设置默认处理函数
     ExceptionWindows()
+
     MiraiComposeWindow()
 }
+
 
 @ExperimentalComposeUiApi
 @Composable
@@ -71,18 +73,13 @@ fun ExceptionWindows(
 private fun MiraiComposeWindow(
     state: WindowState = rememberWindowState(size = WindowSize(1280.dp, 768.dp))
 ) {
-    DisposableEffect(Unit) {
-        onDispose {
-        }
-    }
 
     Window(
         state = state,
         title = "Mirai compose",
         icon = ResourceImage.icon,
     ) {
-        DesktopMaterialTheme(
-        ) {
+        DesktopMaterialTheme() {
             NavHostUi(rememberRootComponent { componentContext ->
                 navHost(componentContext)
             })

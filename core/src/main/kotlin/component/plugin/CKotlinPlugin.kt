@@ -1,20 +1,18 @@
 package com.youngerhousea.miraicompose.core.component.plugin
 
-import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
-import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedCommand
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedData
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedDescription
 
 
 /**
  * Kotlin插件的页面
  *
- * @see DetailedDescription
- * @see DetailedData
- * @see DetailedCommand
  */
 interface CKotlinPlugin {
-    val state: Value<RouterState<Configuration, ComponentContext>>
+    val state: Value<RouterState<*, Children>>
 
     fun onDescriptionClick()
 
@@ -22,11 +20,12 @@ interface CKotlinPlugin {
 
     fun onCommandClick()
 
-    sealed class Configuration : Parcelable {
-        object Description : Configuration()
-        object Command : Configuration()
-        object Data : Configuration()
+    sealed class Children {
+        class Description(val detailedDescription: DetailedDescription ) : Children()
+        class Command(val detailedCommand: DetailedCommand) : Children()
+        class Data(val detailedData: DetailedData) : Children()
     }
+
 }
 
 

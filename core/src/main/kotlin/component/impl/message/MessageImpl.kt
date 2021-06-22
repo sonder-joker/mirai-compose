@@ -6,5 +6,5 @@ import net.mamoe.mirai.Bot
 
 internal class MessageImpl(
     componentContext: ComponentContext,
-    override val botList: List<Bot>
+//    override val botList: List<Bot>
 ) : Message, ComponentContext by componentContext

@@ -1,10 +1,7 @@
 package com.youngerhousea.miraicompose.core.component.bot
 
-import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
-import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.network.CustomLoginFailedException
 
 /**
@@ -17,29 +14,16 @@ import net.mamoe.mirai.network.CustomLoginFailedException
  * @see SolveSliderCaptcha
  * @see SolveUnsafeDeviceLoginVerify
  */
-interface Login{
-    val state: Value<RouterState<Configuration, ComponentContext>>
+interface Login {
+    val state: Value<RouterState<*, Children>>
 
-    sealed class Configuration : Parcelable {
-        object InitLogin : Configuration()
-        class SolvePicCaptcha(
-            val bot: Bot,
-            val data: ByteArray,
-            val onSuccess: (String?, ReturnException?) -> Unit
-        ) : Configuration()
-
-        class SolveSliderCaptcha(
-            val bot: Bot,
-            val url: String,
-            val result: (String?, ReturnException?) -> Unit
-        ) : Configuration()
-
-        class SolveUnsafeDeviceLoginVerify(
-            val bot: Bot,
-            val url: String,
-            val result: (String?, ReturnException?) -> Unit
-        ) : Configuration()
+    sealed class Children {
+        class CInitLogin(val initLogin: InitLogin) : Children()
+        class CSolvePicCaptcha(val solvePicCaptcha: SolvePicCaptcha) : Children()
+        class CSolveSliderCaptcha(val solveSliderCaptcha: SolveSliderCaptcha) : Children()
+        class CSolveUnsafeDeviceLoginVerify(val solveUnsafeDeviceLoginVerify: SolveUnsafeDeviceLoginVerify) : Children()
     }
+
 }
 
 class ReturnException(killBot: Boolean = true, message: String = "返回") : CustomLoginFailedException(killBot, message)

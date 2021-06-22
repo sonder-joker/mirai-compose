@@ -18,11 +18,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.shortcuts
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.core.component.bot.InitLogin
 import com.youngerhousea.miraicompose.app.utils.R
 import com.youngerhousea.miraicompose.app.utils.ResourceImage
+import com.youngerhousea.miraicompose.core.component.bot.InitLogin
 import kotlinx.coroutines.*
 import net.mamoe.mirai.network.*
 
@@ -31,9 +34,7 @@ import net.mamoe.mirai.network.*
 fun InitLoginUi(initLogin: InitLogin) {
     val scope = rememberCoroutineScope()
 
-    val (account, setAccount) = remember { mutableStateOf(TextFieldValue()) }
-
-    val (password, setPassword) = remember { mutableStateOf(TextFieldValue()) }
+    val data by initLogin.data.collectAsState()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -43,7 +44,7 @@ fun InitLoginUi(initLogin: InitLogin) {
         scope.launch {
             runCatching {
                 withTimeout(20_000) {
-                    initLogin.onLogin(account.text.toLong(), password.text)
+                    initLogin.onLogin(data.account.toLong(), data.password)
                 }
                 if (state.showSnackbar("Loading", "Cancel") == SnackbarResult.ActionPerformed)
                     cancel()
@@ -98,13 +99,13 @@ fun InitLoginUi(initLogin: InitLogin) {
                     .padding(5.dp)
             )
             AccountTextField(
-                account = account,
-                onAccountTextChange = setAccount,
+                account = data.account,
+                onAccountTextChange = initLogin::onAccountChange,
                 onKeyEnter = onLogin
             )
             PasswordTextField(
-                password = password,
-                onPasswordTextChange = setPassword,
+                password = data.password,
+                onPasswordTextChange = initLogin::onPasswordChange,
                 onKeyEnter = onLogin
             )
             LoginButton(
@@ -119,15 +120,15 @@ fun InitLoginUi(initLogin: InitLogin) {
 
 @Composable
 private fun AccountTextField(
-    account: TextFieldValue,
-    onAccountTextChange: (TextFieldValue) -> Unit,
+    account: String,
+    onAccountTextChange: (String) -> Unit,
     onKeyEnter: () -> Unit
 ) {
     var isError by remember { mutableStateOf(false) }
     OutlinedTextField(
         value = account,
         onValueChange = {
-            isError = !it.text.matches("^[0-9]{0,15}$".toRegex())
+            isError = !it.matches("^[0-9]{0,15}$".toRegex())
             onAccountTextChange(it)
         },
         modifier = Modifier
@@ -148,15 +149,17 @@ private fun AccountTextField(
 
 @Composable
 private fun PasswordTextField(
-    password: TextFieldValue,
-    onPasswordTextChange: (TextFieldValue) -> Unit,
+    password: String,
+    onPasswordTextChange: (String) -> Unit,
     onKeyEnter: () -> Unit
 ) {
     var passwordVisualTransformation: VisualTransformation by remember { mutableStateOf(PasswordVisualTransformation()) }
 
     OutlinedTextField(
         value = password,
-        onValueChange = onPasswordTextChange,
+        onValueChange = {
+            onPasswordTextChange(it)
+        },
         modifier = Modifier
             .padding(40.dp)
             .shortcuts {

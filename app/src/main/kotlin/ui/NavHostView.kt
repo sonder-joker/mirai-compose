@@ -20,8 +20,10 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.youngerhousea.miraicompose.app.future.splitpane.ExperimentalSplitPaneApi
 import com.youngerhousea.miraicompose.app.future.splitpane.HorizontalSplitPane
 import com.youngerhousea.miraicompose.app.future.splitpane.rememberSplitPaneState
@@ -33,7 +35,8 @@ import com.youngerhousea.miraicompose.app.ui.plugin.PluginsUi
 import com.youngerhousea.miraicompose.app.ui.setting.SettingUi
 import com.youngerhousea.miraicompose.app.utils.R
 import com.youngerhousea.miraicompose.app.utils.SkiaImageDecode
-import com.youngerhousea.miraicompose.app.utils.items
+import com.youngerhousea.miraicompose.core.component.AvatarMenu
+import com.youngerhousea.miraicompose.core.component.BotItem
 import com.youngerhousea.miraicompose.core.component.NavHost
 import com.youngerhousea.miraicompose.core.component.about.About
 import com.youngerhousea.miraicompose.core.component.bot.Login
@@ -41,19 +44,17 @@ import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
 import com.youngerhousea.miraicompose.core.component.message.Message
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
 import com.youngerhousea.miraicompose.core.component.setting.Setting
-import net.mamoe.mirai.Bot
-import java.awt.image.BufferedImage
+import com.youngerhousea.miraicompose.core.utils.activeConfiguration
 
 private val RailTabHeight = 80.dp
+
 
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun NavHostUi(navHost: NavHost) {
     val splitterState = rememberSplitPaneState()
 
-    var navigationIndex by remember { mutableStateOf(0) }
-
-    var currentbot: Bot? by remember { mutableStateOf(navHost.botList.firstOrNull()) }
+    val router by navHost.state.subscribeAsState()
 
     HorizontalSplitPane(splitPaneState = splitterState) {
         first(160.dp) {
@@ -61,69 +62,38 @@ fun NavHostUi(navHost: NavHost) {
                 Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Top,
             ) {
-                AvatarWithMenu(
-                    composeBotList = navHost.botList,
-                    onBoxClick = {
-                        navigationIndex = 5
-                        if (currentbot != null)
-                            navHost.onRouteMessage()
-                        else
-                            navHost.addNewBot()
-                    },
-                    onMenuBotSelected = {
-                        currentbot = it
-                        navHost.onRouteToSpecificBot(it)
-                    },
-                    onNewBotButtonSelected = navHost::addNewBot,
-                ) {
-                    BotItem(currentbot)
-                }
+                AvatarWithMenu(navHost.avatarMenu)
                 RailTab(
-                    onClick = {
-                        navHost.onRouteMessage()
-                        navigationIndex = 0
-                    },
-                    isWish = navigationIndex == 0
+                    onClick = navHost::onRouteMessage,
+                    isWish = router.activeConfiguration is NavHost.Child.CMessage
                 ) {
                     Icon(Icons.Outlined.Message, null)
                     Text(R.String.sideRowFirst)
                 }
                 RailTab(
-                    onClick = {
-                        navHost.onRoutePlugin()
-                        navigationIndex = 1
-                    },
-                    isWish = navigationIndex == 1,
+                    onClick = navHost::onRoutePlugin,
+                    isWish = router.activeConfiguration is NavHost.Child.CPlugins,
                 ) {
                     Icon(Icons.Outlined.Extension, null)
                     Text(R.String.sideRowSecond)
                 }
                 RailTab(
-                    onClick = {
-                        navHost.onRouteSetting()
-                        navigationIndex = 2
-                    },
-                    isWish = navigationIndex == 2
+                    onClick = navHost::onRouteSetting,
+                    isWish = router.activeConfiguration is NavHost.Child.CSetting
                 ) {
                     Icon(Icons.Outlined.Settings, null)
                     Text(R.String.sideRowThird)
                 }
                 RailTab(
-                    onClick = {
-                        navHost.onRouteLog()
-                        navigationIndex = 3
-                    },
-                    isWish = navigationIndex == 3
+                    onClick = navHost::onRouteLog,
+                    isWish = router.activeConfiguration is NavHost.Child.CConsoleLog
                 ) {
                     Icon(Icons.Outlined.Notes, null)
                     Text(R.String.sideRowFour, maxLines = 1)
                 }
                 RailTab(
-                    onClick = {
-                        navHost.onRouteAbout()
-                        navigationIndex = 4
-                    },
-                    isWish = navigationIndex == 4
+                    onClick = navHost::onRouteAbout,
+                    isWish = router.activeConfiguration is NavHost.Child.CAbout
                 ) {
                     Icon(Icons.Outlined.Forum, null)
                     Text(R.String.sideRowFive)
@@ -135,9 +105,9 @@ fun NavHostUi(navHost: NavHost) {
             visiblePart {
                 Box(
                     Modifier
-                        .width(1.dp)
+                        .width(10.dp)
                         .fillMaxHeight()
-                        .background(MaterialTheme.colors.background)
+                        .background(Color.Gray)
                 )
             }
             handle {
@@ -145,7 +115,7 @@ fun NavHostUi(navHost: NavHost) {
                     Modifier
                         .markAsHandle()
                         .background(SolidColor(Color.Gray), alpha = 0.5f)
-                        .width(1.dp)
+                        .width(10.dp)
                         .fillMaxHeight()
                 )
             }
@@ -153,63 +123,58 @@ fun NavHostUi(navHost: NavHost) {
 
         second(500.dp) {
             Box(Modifier.fillMaxSize().clipToBounds()) {
-                Children(
-                    navHost.state, crossfade()
-                ) { child ->
+                Children(router, crossfade()) { child ->
                     when (val ch = child.instance) {
-                        is Login -> LoginUi(ch)
-                        is ConsoleLog -> ConsoleLogUi(ch)
-                        is About -> AboutUi(ch)
-                        is Setting -> SettingUi(ch)
-                        is Plugins -> PluginsUi(ch)
-                        is Message -> MessageUi(ch)
+                        is NavHost.Child.CLogin -> LoginUi(ch.login)
+                        is NavHost.Child.CConsoleLog -> ConsoleLogUi(ch.log)
+                        is NavHost.Child.CAbout -> AboutUi(ch.about)
+                        is NavHost.Child.CSetting -> SettingUi(ch.setting)
+                        is NavHost.Child.CPlugins -> PluginsUi(ch.plugins)
+                        is NavHost.Child.CMessage -> MessageUi(ch.message)
                     }
                 }
             }
-
         }
     }
 }
 
 @Composable
-private fun AvatarWithMenu(
-    composeBotList: List<Bot>,
-    onBoxClick: () -> Unit,
-    onMenuBotSelected: (bot: Bot) -> Unit,
-    onNewBotButtonSelected: () -> Unit,
+fun AvatarWithMenu(
+    avatarMenu: AvatarMenu,
     modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
 ) {
-    var menuExpand by remember { mutableStateOf(false) }
+    val currentBot by avatarMenu.currentBot.collectAsState()
+    val isExpand by avatarMenu.isExpand.collectAsState()
+
     Box(modifier.height(RailTabHeight).fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .combinedClickable(
-                    onLongClick = { menuExpand = !menuExpand },
-                    onClick = onBoxClick
+                    onLongClick = avatarMenu::openExpandMenu,
+                    onClick = avatarMenu::onAvatarBoxClick
                 ),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
+        ) {
+            BotItem(currentBot)
+        }
 
-        DropdownMenu(menuExpand, onDismissRequest = { menuExpand = !menuExpand }) {
-            DropdownMenuItem(onClick = { menuExpand = !menuExpand }) {
+        DropdownMenu(isExpand, onDismissRequest = avatarMenu::dismissExpandMenu) {
+            DropdownMenuItem(onClick = avatarMenu::dismissExpandMenu) {
                 Text(R.String.botMenuExit)
             }
 
             DropdownMenuItem(onClick = {
-                onNewBotButtonSelected()
-                menuExpand = !menuExpand
+                avatarMenu.addNewBot()
+                avatarMenu.dismissExpandMenu()
             }) {
                 Text(R.String.botMenuAdd)
             }
 
-            items(composeBotList) { item ->
+            avatarMenu.botList.forEach { item ->
                 DropdownMenuItem(onClick = {
-                    onMenuBotSelected(item)
-                    menuExpand = !menuExpand
+                    avatarMenu.onItemClick(item)
                 }) {
                     BotItem(item)
                 }
@@ -219,30 +184,16 @@ private fun AvatarWithMenu(
 }
 
 @Composable
-private fun RailTab(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    isWish: Boolean,
-    content: @Composable RowScope.() -> Unit,
-) {
-    val color by animateColorAsState(if (isWish) Color.Green else MaterialTheme.colors.primary)
-
-    CompositionLocalProvider(LocalContentColor provides color) {
-        Row(
-            modifier = modifier.height(RailTabHeight).fillMaxWidth().clickable(onClick = onClick),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.aligned(Alignment.CenterHorizontally),
-            content = content
-        )
-    }
-}
-
-@Composable
 private fun BotItem(
-    bot: Bot?,
-    modifier: Modifier = Modifier,
+    botItem: BotItem?,
+    modifier: Modifier = Modifier
 ) {
-    val avatar = remember(bot) { /*TODO:bot?.let { SkiaImageDecode(it.avatar) } ?:*/ ImageBitmap(200, 200) }
+    var avatar: ImageBitmap by remember(botItem) { mutableStateOf(ImageBitmap(200, 200)) }
+    LaunchedEffect(botItem) {
+        botItem?.avatar?.let {
+            avatar = SkiaImageDecode(it)
+        }
+    }
 
     Row(
         modifier = modifier
@@ -265,7 +216,7 @@ private fun BotItem(
                 .weight(6f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(bot?.run {
+            Text(botItem?.bot?.run {
                 try {
                     nick
                 } catch (e: UninitializedPropertyAccessException) {
@@ -273,9 +224,30 @@ private fun BotItem(
                 }
             } ?: "Login", fontWeight = FontWeight.Bold, maxLines = 1)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text("${bot?.id ?: "Unknown"}", style = MaterialTheme.typography.body2)
+                Text("${botItem?.bot?.id ?: "Unknown"}", style = MaterialTheme.typography.body2)
             }
         }
     }
 }
+
+@Composable
+private fun RailTab(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    isWish: Boolean,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val color by animateColorAsState(if (isWish) Color.Green else MaterialTheme.colors.primary)
+
+    CompositionLocalProvider(LocalContentColor provides color) {
+        Row(
+            modifier = modifier.height(RailTabHeight).fillMaxWidth().clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            content = content
+        )
+    }
+}
+
+
 

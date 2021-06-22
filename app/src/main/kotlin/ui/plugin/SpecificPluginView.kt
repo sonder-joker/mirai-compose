@@ -35,10 +35,10 @@ fun SpecificPluginUi(specificPlugin: SpecificPlugin) {
         })
     }) {
         Children(specificPlugin.state) { child ->
-            when(val ch = child.instance) {
-                is CommonPlugin -> CommonPluginUi(ch)
-                is CJavaPlugin -> CJavaPluginUi(ch)
-                is CKotlinPlugin -> CKotlinPluginUi(ch)
+            when (val ch = child.instance) {
+                is SpecificPlugin.Children.Common -> CommonPluginUi(ch.plugin)
+                is SpecificPlugin.Children.Java -> CJavaPluginUi(ch.javaPlugin)
+                is SpecificPlugin.Children.Kotlin -> CKotlinPluginUi(ch.kotlinPlugin)
             }
         }
     }

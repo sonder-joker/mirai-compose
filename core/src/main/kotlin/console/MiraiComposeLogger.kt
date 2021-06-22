@@ -1,18 +1,20 @@
 package com.youngerhousea.miraicompose.core.console
 
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
-import java.nio.file.Files
-import java.nio.file.StandardOpenOption
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.div
 
 
-private val logTimeFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
-private inline val ComposeLog.currentDate: String get() = logTimeFormat.format(Date())
+private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
 
 /**
  * Compose log
@@ -28,13 +30,10 @@ class ComposeLog(
     identity: String?,
     message: String
 ) {
-    val original = "$currentDate ${priority.simpleName}/$identity: $message"
 
-    companion object {
-        internal val storage: MutableList<ComposeLog> = mutableListOf()
-    }
+    val original = "${LocalDateTime.now().format(format)} ${priority.simpleName}/$identity: $message"
+
 }
-
 
 private const val ANSI_RESET = "\u001B[0m"
 private const val ANSI_BLACK = "\u001B[30m"
@@ -55,29 +54,15 @@ val ComposeLog.consoleText
         LogPriority.ERROR -> ANSI_RED + original + ANSI_RESET
     }
 
-interface LogPerform<T> {
-    fun <T> loggerKind(text: String): T
+internal val MiraiConsole.logPath get() = (rootPath / "log").createDirectories()
 
-}
+private val fileNameFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+private val fileName = (MiraiConsole.logPath / LocalDateTime.now().format(fileNameFormat)).createFile()
 
-internal val MiraiConsole.logPath get() = rootPath / "log"
+//println(compose.consoleText)
+//Files.write(fileName, (message + "\n").toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND)
 
-private val fileNameFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.SIMPLIFIED_CHINESE)
-private val fileName = (MiraiConsole.logPath / fileNameFormat.format(Date())).createFile()
-
-sealed class Kind{
-    object Default:Kind()
-}
-
-val Default = Kind.Default
-
-
-interface LoggerStorageOwner {
-
-    val kind: Kind get() = Default
-
-    fun <T> loggerKind(text: String): T
-}
+val scope = MainScope()
 
 /**
  * [MiraiCompose] 默认Logger实现
@@ -86,12 +71,23 @@ class MiraiComposeLogger(
     override val identity: String?
 ) : MiraiLoggerPlatformBase() {
 
+    companion object {
+
+        val storage = MutableStateFlow(
+            ComposeLog(
+                LogPriority.INFO,
+                null,
+                ""
+            )
+        )
+    }
+
     private fun printLog(message: String?, priority: LogPriority) {
         if (message != null) {
-            val compose = ComposeLog(priority, identity, message)
-            println(compose.consoleText)
-            ComposeLog.storage.add(compose)
-            Files.write(fileName, (message + "\n").toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND)
+            scope.launch {
+                storage.emit(ComposeLog(priority, identity, message))
+
+            }
         }
     }
 

@@ -6,6 +6,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Slider
+import androidx.compose.material.SliderColors
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -88,6 +91,30 @@ fun ColorPicker(
 
     }
 }
+
+@Composable
+private fun IntSlider(
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    valueRange: IntRange = 0..1,
+    /*@IntRange(from = 0)*/
+    steps: Int = 0,
+    onValueChangeFinished: (() -> Unit)? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    colors: SliderColors = SliderDefaults.colors()
+) = Slider(
+    value = value.toFloat(),
+    onValueChange = { onValueChange(it.toInt()) },
+    modifier,
+    enabled,
+    valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
+    steps,
+    onValueChangeFinished,
+    interactionSource,
+    colors
+)
 
 
 private fun DrawScope.drawBackground(x: Int, y: Int, color: Color, widthRate: Int, heightRate: Int) {

@@ -13,6 +13,7 @@ object MiraiComposeInput : ConsoleInput {
 
 object MiraiComposeSender : MiraiConsoleImplementation.ConsoleCommandSenderImpl {
     override suspend fun sendMessage(message: String) {
+
         MiraiCompose.logger.info(message)
     }
 

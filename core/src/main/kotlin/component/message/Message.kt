@@ -8,5 +8,5 @@ import net.mamoe.mirai.Bot
  *
  */
 interface Message {
-    val botList: List<Bot>
+//    val botList: List<Bot>
 }

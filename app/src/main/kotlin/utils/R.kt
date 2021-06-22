@@ -28,5 +28,8 @@ object R {
 
         const val saveLog = "保存日志"
         const val reportError = "报告错误"
+
+        const val editSuccess = "修改成功!"
+        const val editFailure = "修改失败!"
     }
 }

@@ -1,16 +1,40 @@
+
 package com.youngerhousea.miraicompose.core.component.impl.setting
 
 import com.arkivanov.decompose.ComponentContext
-import com.youngerhousea.miraicompose.core.component.setting.StringColor
 import com.youngerhousea.miraicompose.core.component.setting.Setting
+import com.youngerhousea.miraicompose.core.component.setting.StringColor
+import com.youngerhousea.miraicompose.core.console.LoggerConfig
+import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.theme.AppTheme
+import net.mamoe.mirai.console.data.AutoSavePluginDataHolder
+import net.mamoe.mirai.console.data.PluginConfig
+import net.mamoe.mirai.console.logging.AbstractLoggerController
+import kotlin.reflect.full.memberProperties
 
+@Suppress("INVISIBLE_MEMBER")
 internal class SettingImpl(
     componentContext: ComponentContext,
     private val theme: AppTheme
 ) : Setting, ComponentContext by componentContext {
 
-    override val debug  = theme.logColors.debug
+    private val consoleBuiltInPluginDataHolder =
+        Class.forName("net.mamoe.mirai.console.internal.data.builtins.ConsoleBuiltInPluginDataHolder").kotlin.objectInstance as AutoSavePluginDataHolder
+    private val consoleBuiltInPluginConfigHolder =
+        Class.forName("net.mamoe.mirai.console.internal.data.builtins.ConsoleBuiltInPluginConfigHolder").kotlin.objectInstance as AutoSavePluginDataHolder
+
+
+    override val config = MiraiCompose.instance.configStorageForBuiltIns[consoleBuiltInPluginConfigHolder]
+    override val data = MiraiCompose.instance.dataStorageForBuiltIns[consoleBuiltInPluginDataHolder]
+
+    override val logConfigLevel: AbstractLoggerController.LogPriority = LoggerConfig.defaultPriority
+
+    override fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority) {
+        LoggerConfig.defaultPriority = priority
+    }
+
+
+    override val debug = theme.logColors.debug
 
     override val verbose = theme.logColors.verbose
 
@@ -91,4 +115,6 @@ internal class SettingImpl(
 //    fun setIsLight(isLight: Boolean) {
 //        material = material.copy(isLight = isLight)
 //    }
+
+
 }

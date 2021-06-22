@@ -1,9 +1,8 @@
 package com.youngerhousea.miraicompose.core.component.impl.plugin
 
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.Router
-import com.arkivanov.decompose.push
-import com.arkivanov.decompose.router
+import com.arkivanov.decompose.*
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.DetailedCommandImpl
 import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.DetailedDataImpl
 import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.DetailedDescriptionImpl
@@ -17,37 +16,45 @@ internal class CKotlinPluginImpl(
     componentContext: ComponentContext,
     val plugin: KotlinPlugin,
 ) : CKotlinPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose.instance {
-    private val router: Router<CKotlinPlugin.Configuration, ComponentContext> = router(
-        initialConfiguration = CKotlinPlugin.Configuration.Description,
+    private sealed class Configuration : Parcelable {
+        object Description : Configuration()
+        object Command : Configuration()
+        object Data : Configuration()
+    }
+
+    private val router: Router<Configuration, CKotlinPlugin.Children> = router(
+        initialConfiguration = Configuration.Description,
         handleBackButton = true,
         key = "PluginDetailedRouter",
         childFactory = { configuration, componentContext ->
             when (configuration) {
-                is CKotlinPlugin.Configuration.Description ->
-                    DetailedDescriptionImpl(componentContext, plugin)
-                is CKotlinPlugin.Configuration.Data ->
-                    DetailedDataImpl(
-                        componentContext,
-                        data = plugin.data + plugin.config
+                is Configuration.Description ->
+                    CKotlinPlugin.Children.Description(DetailedDescriptionImpl(componentContext, plugin))
+                is Configuration.Data ->
+                    CKotlinPlugin.Children.Data(
+                        DetailedDataImpl(
+                            componentContext,
+                            data = plugin.data + plugin.config
+                        )
                     )
-                is CKotlinPlugin.Configuration.Command ->
-                    DetailedCommandImpl(componentContext, plugin.registeredCommands)
+                is Configuration.Command ->
+                    CKotlinPlugin.Children.Command(DetailedCommandImpl(componentContext, plugin.registeredCommands))
             }
         }
     )
 
-    override val state get() = router.state
+    override val state: Value<RouterState<*, CKotlinPlugin.Children>> get() = router.state
 
     override fun onDescriptionClick() {
-        router.push(CKotlinPlugin.Configuration.Description)
+        router.push(Configuration.Description)
     }
 
     override fun onDataClick() {
-        router.push(CKotlinPlugin.Configuration.Data)
+        router.push(Configuration.Data)
     }
 
     override fun onCommandClick() {
-        router.push(CKotlinPlugin.Configuration.Command)
+        router.push(Configuration.Command)
     }
 
 }

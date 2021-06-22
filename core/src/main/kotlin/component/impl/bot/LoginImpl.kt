@@ -5,7 +5,9 @@ import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.lifecycle.subscribe
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
+import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.core.component.bot.Login
+import com.youngerhousea.miraicompose.core.component.bot.ReturnException
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.utils.componentScope
 import kotlinx.coroutines.Dispatchers
@@ -28,38 +30,67 @@ internal class LoginImpl(
 ) : Login, LoginSolver(), ComponentContext by componentContext {
     val compose = composeFactory(this)
 
-    private val router: Router<Login.Configuration, ComponentContext> = router(
-        initialConfiguration = Login.Configuration.InitLogin,
+    sealed class Configuration : Parcelable {
+        object InitLogin : Configuration()
+        class SolvePicCaptcha(
+            val bot: Bot,
+            val data: ByteArray,
+            val onSuccess: (String?, ReturnException?) -> Unit
+        ) : Configuration()
+
+        class SolveSliderCaptcha(
+            val bot: Bot,
+            val url: String,
+            val result: (String?, ReturnException?) -> Unit
+        ) : Configuration()
+
+        class SolveUnsafeDeviceLoginVerify(
+            val bot: Bot,
+            val url: String,
+            val result: (String?, ReturnException?) -> Unit
+        ) : Configuration()
+    }
+
+    private val router: Router<Configuration, Login.Children> = router(
+        initialConfiguration = Configuration.InitLogin,
         key = "EmptyBot",
         handleBackButton = true,
-        childFactory = { configuration: Login.Configuration, componentContext ->
+        childFactory = { configuration: Configuration, componentContext ->
             when (configuration) {
-                is Login.Configuration.InitLogin ->
-                    InitLoginImpl(
-                        componentContext,
-                        onClick = ::startLogin
+                is Configuration.InitLogin ->
+                    Login.Children.CInitLogin(
+                        InitLoginImpl(
+                            componentContext,
+                            onClick = ::startLogin
+                        )
                     )
-                is Login.Configuration.SolvePicCaptcha ->
+                is Configuration.SolvePicCaptcha ->
                     //TODO:简化参数
-                    SolvePicCaptchaImpl(
-                        componentContext,
-                        configuration.bot,
-                        configuration.data,
-                        configuration.onSuccess
+                    Login.Children.CSolvePicCaptcha(
+                        SolvePicCaptchaImpl(
+                            componentContext,
+                            configuration.bot,
+                            configuration.data,
+                            configuration.onSuccess
+                        )
                     )
-                is Login.Configuration.SolveSliderCaptcha ->
-                    SolveSliderCaptchaImpl(
-                        componentContext,
-                        configuration.bot,
-                        configuration.url,
-                        configuration.result
+                is Configuration.SolveSliderCaptcha ->
+                    Login.Children.CSolveSliderCaptcha(
+                        SolveSliderCaptchaImpl(
+                            componentContext,
+                            configuration.bot,
+                            configuration.url,
+                            configuration.result
+                        )
                     )
-                is Login.Configuration.SolveUnsafeDeviceLoginVerify ->
-                    SolveUnsafeDeviceLoginVerifyImpl(
-                        componentContext,
-                        configuration.bot,
-                        configuration.url,
-                        configuration.result
+                is Configuration.SolveUnsafeDeviceLoginVerify ->
+                    Login.Children.CSolveUnsafeDeviceLoginVerify(
+                        SolveUnsafeDeviceLoginVerifyImpl(
+                            componentContext,
+                            configuration.bot,
+                            configuration.url,
+                            configuration.result
+                        )
                     )
             }
         }
@@ -84,14 +115,14 @@ internal class LoginImpl(
     override val state get() = router.state
 
     private fun onExitHappened() {
-        router.push(Login.Configuration.InitLogin)
+        router.push(Configuration.InitLogin)
     }
 
     override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? =
         suspendCoroutine { continuation ->
-            router.push(Login.Configuration.SolvePicCaptcha(bot, data) { string, exception ->
+            router.push(Configuration.SolvePicCaptcha(bot, data) { string, exception ->
                 if (exception != null) {
-                    router.push(Login.Configuration.InitLogin)
+                    router.push(Configuration.InitLogin)
                     continuation.resumeWithException(exception)
                 } else {
                     continuation.resume(string)
@@ -101,9 +132,9 @@ internal class LoginImpl(
 
     override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? =
         suspendCoroutine { continuation ->
-            router.push(Login.Configuration.SolveSliderCaptcha(bot, url) { string, exception ->
+            router.push(Configuration.SolveSliderCaptcha(bot, url) { string, exception ->
                 if (exception != null) {
-                    router.push(Login.Configuration.InitLogin)
+                    router.push(Configuration.InitLogin)
                     continuation.resumeWithException(exception)
                 } else {
                     continuation.resume(string)
@@ -114,9 +145,9 @@ internal class LoginImpl(
 
     override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? =
         suspendCoroutine { continuation ->
-            router.push(Login.Configuration.SolveUnsafeDeviceLoginVerify(bot, url) { string, exception ->
+            router.push(Configuration.SolveUnsafeDeviceLoginVerify(bot, url) { string, exception ->
                 if (exception != null) {
-                    router.push(Login.Configuration.InitLogin)
+                    router.push(Configuration.InitLogin)
 //                        continuation.resumeWithException(ReturnException(message =))
                     continuation.resumeWithException(exception)
                 } else {

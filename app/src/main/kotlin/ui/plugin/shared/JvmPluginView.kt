@@ -22,10 +22,10 @@ import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedDescr
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun JvmPluginUi(
-    state: Value<RouterState<*, ComponentContext>>,
     onDescriptionClick: () -> Unit,
     onDataClick:() -> Unit,
-    onCommandClick:() -> Unit
+    onCommandClick:() -> Unit,
+    childContent:@Composable () -> Unit
 ) {
     Column {
         var index by remember { mutableStateOf(0) }
@@ -59,12 +59,6 @@ fun JvmPluginUi(
             )
         }
 
-        Children(state, crossfade()) { child ->
-            when (val ch = child.instance) {
-                is DetailedDescription -> DetailedDescriptionUi(ch)
-                is DetailedCommand -> DetailedCommandUi(ch)
-                is DetailedData -> DetailedDataUi(ch)
-            }
-        }
+        childContent()
     }
 }

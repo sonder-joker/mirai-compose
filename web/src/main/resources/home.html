@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+</head>
+<body>
+
+</body>
+<script type="text/javascript">
+    let ws = new WebSocket("ws://localhost:9001/");
+    let body = document.body
+
+    ws.onopen = () => {
+        body.innerHTML = "Open"
+    };
+
+    ws.onmessage = (event) => {
+        body.innerHTML = event.data
+    };
+
+    ws.onclose = () => {
+        body.innerHTML = "Close"
+    };
+
+</script>
+</html>

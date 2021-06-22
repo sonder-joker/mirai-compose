@@ -2,10 +2,10 @@ package com.youngerhousea.miraicompose.core.component.impl.plugin
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
+import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.router
-import com.youngerhousea.miraicompose.core.component.impl.plugin.CJavaPluginImpl
-import com.youngerhousea.miraicompose.core.component.impl.plugin.CKotlinPluginImpl
-import com.youngerhousea.miraicompose.core.component.impl.plugin.CommonPluginImpl
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.plugin.SpecificPlugin
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
@@ -16,31 +16,43 @@ internal class SpecificPluginImpl(
     override val plugin: Plugin,
     override val onExitButtonClicked: () -> Unit,
 ) : SpecificPlugin, ComponentContext by component {
-    private val router: Router<SpecificPlugin.Configuration, ComponentContext> = router(
+    private sealed class Configuration : Parcelable {
+        class Common(val plugin: Plugin) : Configuration()
+        class Java(val javaPlugin: JavaPlugin) : Configuration()
+        class Kotlin(val kotlinPlugin: KotlinPlugin) : Configuration()
+    }
+
+    private val router: Router<Configuration, SpecificPlugin.Children> = router(
         initialConfiguration = when (plugin) {
-            is JavaPlugin -> SpecificPlugin.Configuration.Java(plugin)
-            is KotlinPlugin -> SpecificPlugin.Configuration.Kotlin(plugin)
-            else -> SpecificPlugin.Configuration.Common(plugin)
+            is JavaPlugin -> Configuration.Java(plugin)
+            is KotlinPlugin -> Configuration.Kotlin(plugin)
+            else -> Configuration.Common(plugin)
         },
         handleBackButton = true,
         key = "SpecificPluginRouter",
         childFactory = { configuration, componentContext ->
             when (configuration) {
-                is SpecificPlugin.Configuration.Common -> CommonPluginImpl(
-                    componentContext,
-                    configuration.plugin
+                is Configuration.Common -> SpecificPlugin.Children.Common(
+                    CommonPluginImpl(
+                        componentContext,
+                        configuration.plugin
+                    )
                 )
-                is SpecificPlugin.Configuration.Java -> CJavaPluginImpl(
-                    componentContext,
-                    plugin = configuration.javaPlugin,
+                is Configuration.Java -> SpecificPlugin.Children.Java(
+                    CJavaPluginImpl(
+                        componentContext,
+                        plugin = configuration.javaPlugin,
+                    )
                 )
-                is SpecificPlugin.Configuration.Kotlin -> CKotlinPluginImpl(
-                    componentContext,
-                    plugin = configuration.kotlinPlugin,
+                is Configuration.Kotlin -> SpecificPlugin.Children.Kotlin(
+                    CKotlinPluginImpl(
+                        componentContext,
+                        plugin = configuration.kotlinPlugin,
+                    )
                 )
             }
         }
     )
 
-    override val state get() = router.state
+    override val state: Value<RouterState<*, SpecificPlugin.Children>> get() = router.state
 }

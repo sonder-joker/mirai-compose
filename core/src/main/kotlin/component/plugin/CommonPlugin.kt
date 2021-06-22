@@ -1,9 +1,8 @@
 package com.youngerhousea.miraicompose.core.component.plugin
 
-import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
-import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
+import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedDescription
 
 
 /**
@@ -11,9 +10,9 @@ import com.arkivanov.decompose.value.Value
  *
  */
 interface CommonPlugin {
-    val state: Value<RouterState<Configuration, ComponentContext>>
+    val state: Value<RouterState<*, Children>>
 
-    sealed class Configuration : Parcelable {
-        object Description : Configuration()
+    sealed class Children {
+        class Description(val detailedDescription: DetailedDescription) : Children()
     }
 }

@@ -1,6 +1,8 @@
 package com.youngerhousea.miraicompose.core.component.impl.plugin
 
 import com.arkivanov.decompose.*
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.PluginManager
@@ -8,33 +10,43 @@ import net.mamoe.mirai.console.plugin.PluginManager
 internal class PluginsImpl(
     component: ComponentContext,
 ) : Plugins, ComponentContext by component {
-    private val router: Router<Plugins.Configuration, ComponentContext> = router(
-        initialConfiguration = Plugins.Configuration.List,
+
+    private sealed class Configuration : Parcelable {
+        object List : Configuration()
+        class Specific(val plugin: Plugin) : Configuration()
+    }
+
+    private val router: Router<Configuration, Plugins.Children> = router(
+        initialConfiguration = Configuration.List,
         key = "PluginRouter",
         handleBackButton = true,
-        childFactory = { configuration: Plugins.Configuration, componentContext ->
+        childFactory = { configuration: Configuration, componentContext ->
             when (configuration) {
-                is Plugins.Configuration.List ->
-                    PluginListImpl(
-                        componentContext,
-                        onPluginCardClick = ::routToSpecificPlugin,
-                        plugins = PluginManager.plugins
+                is Configuration.List ->
+                    Plugins.Children.List(
+                        PluginListImpl(
+                            componentContext,
+                            onPluginCardClick = ::routeToSpecificPlugin,
+                            plugins = PluginManager.plugins
+                        )
                     )
 
-                is Plugins.Configuration.Specific -> {
-                    SpecificPluginImpl(
-                        componentContext,
-                        plugin = configuration.plugin,
-                        onExitButtonClicked = ::popToPluginList
+                is Configuration.Specific -> {
+                    Plugins.Children.Specific(
+                        SpecificPluginImpl(
+                            componentContext,
+                            plugin = configuration.plugin,
+                            onExitButtonClicked = ::popToPluginList
+                        )
                     )
                 }
             }
         })
 
-    override val state get() = router.state
+    override val state: Value<RouterState<*, Plugins.Children>> get() = router.state
 
-    private fun routToSpecificPlugin(plugin: Plugin) {
-        router.push(Plugins.Configuration.Specific(plugin))
+    private fun routeToSpecificPlugin(plugin: Plugin) {
+        router.push(Configuration.Specific(plugin))
     }
 
     private fun popToPluginList() {

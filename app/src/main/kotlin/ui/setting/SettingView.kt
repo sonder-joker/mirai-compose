@@ -6,16 +6,22 @@ import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.rememberDialogState
+import com.youngerhousea.miraicompose.app.ui.plugin.DetailedDataUi
+import com.youngerhousea.miraicompose.app.ui.plugin.EditView
 import com.youngerhousea.miraicompose.core.component.setting.Setting
 import com.youngerhousea.miraicompose.core.component.setting.StringColor
+import net.mamoe.mirai.console.data.PluginData
+import net.mamoe.mirai.console.logging.AbstractLoggerController
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SettingUi(setting: Setting) {
     val (debug, setDebug) = remember { mutableStateOf(setting.debug) }
@@ -79,7 +85,47 @@ fun SettingUi(setting: Setting) {
 //            ColorSetSlider("OnBackground", setting.material.onBackground, onValueChange = setting::setOnBackground)
 //            ColorSetSlider("OnSurface", setting.material.onSurface, onValueChange = setting::setOnSurface)
 //            ColorSetSlider("OnError", setting.material.onError, onValueChange = setting::setOnError)
+
+            var state by remember { mutableStateOf(0) }
+
+            Row {
+                Text("Log level", Modifier.weight(4f))
+                TabRow(state, Modifier.weight(1f)) {
+                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.ALL, onClick = {
+                        state = 0
+                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.ALL)
+                    })
+                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.VERBOSE, onClick = {
+                        state = 1
+                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.VERBOSE)
+                    })
+                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.INFO, onClick = {
+                        state = 2
+                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.INFO)
+                    })
+                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.WARNING, onClick = {
+                        state = 3
+                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.WARNING)
+                    })
+                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.ERROR, onClick = {
+                        state = 4
+                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.ERROR)
+                    })
+                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.NONE, onClick = {
+                        state = 5
+                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.NONE)
+                    })
+                }
+            }
+
+//            setting.data.forEach {
+//                EditView(it, {}, {})
+//            }
+//            setting.config.forEach {
+//                EditView(it, {}, {})
+//            }
         }
+
         VerticalScrollbar(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
@@ -87,6 +133,14 @@ fun SettingUi(setting: Setting) {
             adapter = ScrollbarAdapter(scrollState)
         )
     }
+}
+
+inline fun <reified T> EnumTabRow() {
+    assert(T::class.java.isEnum) { "Not enum class!" }
+}
+
+fun AbstractLoggerController.LogPriority.all() {
+
 }
 
 

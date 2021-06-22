@@ -7,4 +7,6 @@ import net.mamoe.mirai.console.data.PluginData
 internal class DetailedDataImpl(
     componentContext: ComponentContext,
     override val data: List<PluginData>,
-) : DetailedData, ComponentContext by componentContext
+) : DetailedData, ComponentContext by componentContext {
+
+}

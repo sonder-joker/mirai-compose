@@ -9,9 +9,9 @@ import com.youngerhousea.miraicompose.core.component.message.Message
 @Composable
 fun MessageUi(message: Message) {
     Column {
-        message.botList.forEach {
+//        message.botList.forEach {
 //            Text("目前消息流量:${it.messageSpeed}")
-        }
+//        }
     }
 }
 

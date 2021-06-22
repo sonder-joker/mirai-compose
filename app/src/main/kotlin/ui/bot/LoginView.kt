@@ -9,10 +9,10 @@ import com.youngerhousea.miraicompose.core.component.bot.*
 fun LoginUi(login: Login) {
     Children(login.state) { child ->
         when(val ch = child.instance) {
-            is InitLogin -> InitLoginUi(ch)
-            is SolvePicCaptcha -> SolvePicCaptchaUi(ch)
-            is SolveSliderCaptcha -> SolveSliderCaptchaUi(ch)
-            is SolveUnsafeDeviceLoginVerify -> SolveUnsafeDeviceLoginVerifyUi(ch)
+            is Login.Children.CInitLogin -> InitLoginUi(ch.initLogin)
+            is Login.Children.CSolvePicCaptcha -> SolvePicCaptchaUi(ch.solvePicCaptcha)
+            is Login.Children.CSolveSliderCaptcha -> SolveSliderCaptchaUi(ch.solveSliderCaptcha)
+            is Login.Children.CSolveUnsafeDeviceLoginVerify -> SolveUnsafeDeviceLoginVerifyUi(ch.solveUnsafeDeviceLoginVerify)
         }
     }
 }

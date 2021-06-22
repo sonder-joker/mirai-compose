@@ -13,19 +13,32 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
 import com.youngerhousea.miraicompose.app.ui.shared.CommandSendBox
 import com.youngerhousea.miraicompose.app.ui.shared.LogBox
+import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
+import com.youngerhousea.miraicompose.core.console.ComposeLog
 
 @Composable
 fun ConsoleLogUi(consoleLog: ConsoleLog) {
     var isShowSearch by remember { mutableStateOf(true) }
 
-    val (searchText, setSearchText) = remember { mutableStateOf("") }
+    val state by consoleLog.loggerStorage.collectAsState()
+
+    val searchText by consoleLog.searchContent.collectAsState()
+
+    val log = rememberSaveable { mutableStateListOf<ComposeLog>() }
+
+    LaunchedEffect(state) {
+        log.add(state)
+    }
 
     Scaffold(
         modifier = Modifier.onPreviewKeyEvent {
@@ -39,7 +52,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
             if (isShowSearch)
                 TextField(
                     searchText,
-                    setSearchText,
+                    consoleLog::setSearchContent,
                     leadingIcon = { Icon(Icons.Default.Search, null) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -63,7 +76,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                     .fillMaxSize()
                     .weight(8f)
                     .padding(horizontal = 40.dp, vertical = 20.dp),
-                consoleLog.loggerStorage,
+                log,
                 searchText
             )
             CommandSendBox(

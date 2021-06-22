@@ -3,12 +3,17 @@ package com.youngerhousea.miraicompose.app.utils
 import androidx.compose.desktop.AppManager
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderColors
-import androidx.compose.material.SliderDefaults
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.rememberWindowState
+import net.mamoe.mirai.console.data.PluginData
+import net.mamoe.yamlkt.Yaml
 import org.jetbrains.skija.Image
 import java.awt.Desktop
 import java.io.File
@@ -17,30 +22,40 @@ import javax.swing.JFileChooser
 import javax.swing.UIManager
 import javax.swing.filechooser.FileFilter
 
-@Composable
-fun IntSlider(
-    value: Int,
-    onValueChange: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    valueRange: IntRange = 0..1,
-    /*@IntRange(from = 0)*/
-    steps: Int = 0,
-    onValueChangeFinished: (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: SliderColors = SliderDefaults.colors()
-) = Slider(
-    value = value.toFloat(),
-    onValueChange = { onValueChange(it.toInt()) },
-    modifier,
-    enabled,
-    valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
-    steps,
-    onValueChangeFinished,
-    interactionSource,
-    colors
-)
 
+//interface MenuScope : ColumnScope {
+//    var isExpand: Boolean
+//}
+//
+//class MenuImpl(columnScope: ColumnScope) : MenuScope, ColumnScope by columnScope {
+//    override var isExpand: Boolean by mutableStateOf(false)
+//}
+//
+//@Composable
+//fun ScopeDropdownMenu(
+//    expanded: Boolean,
+//    onDismissRequest: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    offset: DpOffset = DpOffset(0.dp, 0.dp),
+//    content: MenuScope.() -> Unit
+//) = DropdownMenu(expanded, onDismissRequest = onDismissRequest, modifier, offset) {
+//        content(MenuImpl(this))
+//    }
+//
+//
+//
+//@Composable
+//fun MenuScope.AutoCloseDropDownMenuItem(
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    enabled: Boolean = true,
+//    contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
+//    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+//    content: @Composable RowScope.() -> Unit
+//) = DropdownMenuItem(onClick = {
+//    onClick()
+//    isExpand = false
+//}, modifier, enabled, contentPadding, interactionSource, content)
 
 
 internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
@@ -48,30 +63,6 @@ internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
 
 internal fun Base64ImageDecode(data: String): ImageBitmap =
     SkiaImageDecode(Base64.getDecoder().decode(data.split(",").last()))
-
-
-@Composable
-inline fun <T> ColumnScope.items(
-    items: List<T>,
-    crossinline itemContent: @Composable ColumnScope.(item: T) -> Unit
-) {
-    for (item in items) {
-        itemContent(item)
-    }
-}
-
-
-@Composable
-inline fun <T> ColumnScope.itemsWithIndexed(
-    items: List<T>,
-    crossinline itemContent: @Composable ColumnScope.(item: T, index: Int) -> Unit
-) {
-    for ((index, item) in items.withIndex()) {
-        itemContent(item, index)
-    }
-}
-
-
 
 fun FileChooser(
     title: String,
@@ -101,4 +92,4 @@ fun FileChooser(
     return null
 }
 
-inline val Desktop: Desktop get()  = java.awt.Desktop.getDesktop()
+inline val Desktop: Desktop get() = java.awt.Desktop.getDesktop()

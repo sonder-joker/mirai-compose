@@ -2,6 +2,7 @@ package com.youngerhousea.miraicompose.core.utils
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Navigator
+import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import com.arkivanov.decompose.instancekeeper.getOrCreate
 import kotlinx.coroutines.CoroutineScope
@@ -33,3 +34,6 @@ private class ComponentScope(
 }
 
 internal fun ComponentContext.componentScope(): CoroutineScope = instanceKeeper.getOrCreate(::ComponentScope)
+
+
+inline val <C : Any, T : Any> RouterState<C, T>.activeConfiguration get() = this.activeChild.configuration

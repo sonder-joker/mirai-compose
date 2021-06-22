@@ -5,11 +5,10 @@ import kotlinx.coroutines.*
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
-import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
-import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.data.PluginDataHolder
+import net.mamoe.mirai.console.logging.LoggerController
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
@@ -47,19 +46,22 @@ class MiraiCompose(
 
     override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath / "data")
 
-    override val dataStorageForBuiltIns = MultiFilePluginDataStorage(rootPath / "data")
+    override val dataStorageForBuiltIns = ReadablePluginDataStorage(rootPath / "data")
 
     override val configStorageForJvmPluginLoader = ReadablePluginConfigStorage(rootPath / "config")
 
-    override val configStorageForBuiltIns = MultiFilePluginDataStorage(rootPath / "config")
+    override val configStorageForBuiltIns = ReadablePluginConfigStorage(rootPath / "config")
 
     override val consoleInput: ConsoleInput = MiraiComposeInput
 
     override val consoleCommandSender: MiraiComposeSender = MiraiComposeSender
 
+
+    override val loggerController: LoggerController
+        get() = ComposeLoggerController
+
     override fun createLogger(identity: String?): MiraiLogger = MiraiComposeLogger(identity)
 
-    // 一般不应该被使用
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
         loginSolver(requesterBot, configuration)
 
@@ -74,6 +76,11 @@ class MiraiCompose(
         when (phase) {
             "load configurations" ->
                 ComposeDataScope.reloadAll()
+            "setup logger controller" -> {
+                assert (loggerController === ComposeLoggerController) { "?" }
+                ComposeDataScope.addAndReloadConfig(LoggerConfig)
+                ComposeLoggerController.initialized = true
+            }
         }
     }
 
@@ -85,12 +92,12 @@ class MiraiCompose(
         instance = this
     }
 
+
     companion object {
         lateinit var instance: MiraiCompose
 
         val logger by lazy { MiraiConsole.createLogger("compose") }
     }
-
 }
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {

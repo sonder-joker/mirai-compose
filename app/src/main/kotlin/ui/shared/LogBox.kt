@@ -23,6 +23,7 @@ import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import com.youngerhousea.miraicompose.app.theme.AppTheme
 import com.youngerhousea.miraicompose.core.console.ComposeLog
 import com.youngerhousea.miraicompose.core.console.LogPriority
 import kotlinx.coroutines.launch
@@ -41,32 +42,25 @@ import java.util.regex.PatternSyntaxException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-//val ComposeLog.color: Color
-//    get() = when (priority) {
-//        LogPriority.VERBOSE -> ComposeSetting.AppTheme.logColors.verbose
-//        LogPriority.INFO -> ComposeSetting.AppTheme.logColors.info
-//        LogPriority.WARNING -> ComposeSetting.AppTheme.logColors.warning
-//        LogPriority.ERROR -> ComposeSetting.AppTheme.logColors.error
-//        LogPriority.DEBUG -> ComposeSetting.AppTheme.logColors.debug
-//    }
+val ComposeLog.color: Color
+    get() = when (priority) {
+        LogPriority.VERBOSE -> AppTheme.logColors.verbose
+        LogPriority.INFO -> AppTheme.logColors.info
+        LogPriority.WARNING -> AppTheme.logColors.warning
+        LogPriority.ERROR -> AppTheme.logColors.error
+        LogPriority.DEBUG -> AppTheme.logColors.debug
+    }
 
-//internal object Color {
-//    object AppTheme {
-//
-//    }
-//}
-//
-//val ComposeLog.composeLog
-//    get(): AnnotatedString =
-//        buildAnnotatedString {
-//        pushStyle(SpanStyle(color))
-//            append(original)
-//        }
-
+val ComposeLog.composeLog
+    get(): AnnotatedString =
+        buildAnnotatedString {
+        pushStyle(SpanStyle(color))
+            append(original)
+        }
 
 
 fun ComposeLog.parseInSearch(searchText: String): AnnotatedString {
-//    if (searchText.isEmpty()) return parseInCompose()
+    if (searchText.isEmpty()) return composeLog
     val builder = AnnotatedString.Builder()
     try {
         original.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
@@ -81,14 +75,14 @@ fun ComposeLog.parseInSearch(searchText: String): AnnotatedString {
                 builder.append(
                     AnnotatedString(
                         it,
-//                        spanStyle = SpanStyle(color),
+                        spanStyle = SpanStyle(color),
                     )
                 )
 
         }
     } catch (e: PatternSyntaxException) {
         //TODO:
-//        return parseInCompose()
+        return composeLog
     }
     return builder.toAnnotatedString()
 }
