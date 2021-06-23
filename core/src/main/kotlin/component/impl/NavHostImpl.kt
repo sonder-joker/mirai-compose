@@ -127,8 +127,8 @@ internal class NavHostImpl(
 
 class AvatarMenuImpl(
     component: ComponentContext,
-    private val _addNewBot: () -> Unit,
-    private val _onAvatarBoxClick: () -> Unit,
+    private inline val _addNewBot: () -> Unit,
+    private inline val _onAvatarBoxClick: () -> Unit,
 ) : AvatarMenu, ComponentContext by component {
 
     private val botList get() = magic()

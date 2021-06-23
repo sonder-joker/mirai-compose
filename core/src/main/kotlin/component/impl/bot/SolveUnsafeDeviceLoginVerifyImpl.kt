@@ -20,6 +20,14 @@ internal class SolveUnsafeDeviceLoginVerifyImpl(
     context: ComponentContext,
     override val bot: Bot,
     override val qrCodeUrl: String,
-    override val onFinish: (String?, ReturnException?) -> Unit,
-) : SolveUnsafeDeviceLoginVerify, ComponentContext by context
+    inline val onFinish: (String?, ReturnException?) -> Unit,
+) : SolveUnsafeDeviceLoginVerify, ComponentContext by context {
+    override fun onExcept() {
+        onFinish(null, ReturnException())
+    }
+
+    override fun onSuccess() {
+        onFinish(null, null)
+    }
+}
 

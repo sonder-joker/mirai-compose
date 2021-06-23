@@ -5,7 +5,9 @@ import net.mamoe.mirai.Bot
 interface SolveUnsafeDeviceLoginVerify {
     val bot: Bot
 
-    val onFinish: (String?, ReturnException?) -> Unit
+    fun onExcept()
+
+    fun onSuccess()
 
     val qrCodeUrl: String
 }

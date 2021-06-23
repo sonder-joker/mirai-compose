@@ -26,7 +26,7 @@ internal class PluginsImpl(
                     Plugins.Children.List(
                         PluginListImpl(
                             componentContext,
-                            onPluginCardClick = ::routeToSpecificPlugin,
+                            _onPluginCardClick = ::routeToSpecificPlugin,
                             plugins = PluginManager.plugins
                         )
                     )
@@ -36,7 +36,7 @@ internal class PluginsImpl(
                         SpecificPluginImpl(
                             componentContext,
                             plugin = configuration.plugin,
-                            onExitButtonClicked = ::popToPluginList
+                            _onExitButtonClicked = ::popToPluginList
                         )
                     )
                 }

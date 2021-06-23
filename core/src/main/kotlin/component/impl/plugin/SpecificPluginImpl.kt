@@ -14,7 +14,7 @@ import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 internal class SpecificPluginImpl(
     component: ComponentContext,
     override val plugin: Plugin,
-    override val onExitButtonClicked: () -> Unit,
+    private inline val _onExitButtonClicked: () -> Unit,
 ) : SpecificPlugin, ComponentContext by component {
     private sealed class Configuration : Parcelable {
         class Common(val plugin: Plugin) : Configuration()
@@ -55,4 +55,8 @@ internal class SpecificPluginImpl(
     )
 
     override val state: Value<RouterState<*, SpecificPlugin.Children>> get() = router.state
+
+    override fun onExitButtonClicked() {
+        _onExitButtonClicked()
+    }
 }

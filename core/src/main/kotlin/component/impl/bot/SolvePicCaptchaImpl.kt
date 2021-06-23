@@ -9,5 +9,13 @@ internal class SolvePicCaptchaImpl(
     context: ComponentContext,
     override val bot: Bot,
     override val data: ByteArray,
-    override val result: (String?, ReturnException?) -> Unit
-) : SolvePicCaptcha, ComponentContext by context
+    inline val result: (String?, ReturnException?) -> Unit
+) : SolvePicCaptcha, ComponentContext by context {
+    override fun onSuccess(data: String) {
+        result(data, null)
+    }
+
+    override fun onExcept() {
+        result(null, ReturnException())
+    }
+}

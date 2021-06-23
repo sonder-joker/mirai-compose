@@ -46,11 +46,8 @@ interface NavHost {
 /**
  * Avatar menu
  *
- * @property botList 目前的Console所登录的机器人List
- * @property currentBot 目前的显示的机器人
  */
 interface AvatarMenu {
-
     data class Model(
         val currentBot:BotItem?,
         val isExpand: Boolean,

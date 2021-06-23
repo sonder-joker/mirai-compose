@@ -30,7 +30,7 @@ fun SpecificPluginUi(specificPlugin: SpecificPlugin) {
             Icon(
                 Icons.Default.KeyboardArrowLeft,
                 null,
-                Modifier.clickable(onClick = specificPlugin.onExitButtonClicked)
+                Modifier.clickable(onClick = specificPlugin::onExitButtonClicked)
             )
         })
     }) {

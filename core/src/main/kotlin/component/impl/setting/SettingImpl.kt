@@ -24,8 +24,8 @@ internal class SettingImpl(
         Class.forName("net.mamoe.mirai.console.internal.data.builtins.ConsoleBuiltInPluginConfigHolder").kotlin.objectInstance as AutoSavePluginDataHolder
 
 
-    override val config = MiraiCompose.instance.configStorageForBuiltIns[consoleBuiltInPluginConfigHolder]
-    override val data = MiraiCompose.instance.dataStorageForBuiltIns[consoleBuiltInPluginDataHolder]
+//    override val config = MiraiCompose.instance.configStorageForBuiltIns[consoleBuiltInPluginConfigHolder]
+//    override val data = MiraiCompose.instance.dataStorageForBuiltIns[consoleBuiltInPluginDataHolder]
 
     override val logLevelSetting = LogLevelSettingImpl(childContext("logLevel"))
 
@@ -71,7 +71,7 @@ class LogColorSettingImpl(
 class LogLevelSettingImpl(
     componentContext: ComponentContext
 ) : LogLevelSetting, ComponentContext by componentContext {
-    override val logConfigLevel: AbstractLoggerController.LogPriority = LoggerConfig.defaultPriority
+    override val logConfigLevel: AbstractLoggerController.LogPriority get()  = LoggerConfig.defaultPriority
 
 
     override fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority) {

@@ -1,8 +1,5 @@
 package com.youngerhousea.miraicompose.core.component.setting
 
-import net.mamoe.mirai.console.data.PluginConfig
-import net.mamoe.mirai.console.data.PluginData
-import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.logging.AbstractLoggerController
 
 
@@ -13,8 +10,8 @@ import net.mamoe.mirai.console.logging.AbstractLoggerController
  */
 
 interface Setting {
-    val data: List<PluginData>
-    val config: List<PluginConfig>
+//    val data: List<PluginData>
+//    val config: List<PluginConfig>
 
     val logLevelSetting: LogLevelSetting
 

@@ -7,5 +7,8 @@ interface SolvePicCaptcha {
 
     val data: ByteArray
 
-    val result: (String?, ReturnException?) -> Unit
+    fun onSuccess(data:String)
+
+    fun onExcept()
+
 }

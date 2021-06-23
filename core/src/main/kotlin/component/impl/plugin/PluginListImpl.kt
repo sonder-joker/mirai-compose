@@ -8,13 +8,13 @@ import net.mamoe.mirai.console.plugin.PluginManager
 
 internal class PluginListImpl(
     componentContext: ComponentContext,
-    override val onPluginCardClick: (plugin: Plugin) -> Unit,
+    inline val _onPluginCardClick: (plugin: Plugin) -> Unit,
     override val plugins: List<Plugin>
 ) : PluginList, ComponentContext by componentContext {
 //    val scope = componentScope()
 
 
-//    val onAddPluginClick: (File) -> Unit = { file ->
+    //    val onAddPluginClick: (File) -> Unit = { file ->
 //        scope.launch {
 //            when {
 //                !file.exists() || !file.isFile -> {
@@ -40,4 +40,7 @@ internal class PluginListImpl(
 //            }
 //        }
 //    }
+    override fun onPluginCardClick(plugin: Plugin) {
+        _onPluginCardClick(plugin)
+    }
 }

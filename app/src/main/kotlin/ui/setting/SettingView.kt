@@ -51,60 +51,35 @@ fun LogColorSettingUi(setting: LogColorSetting) {
     val (warning, setWarning) = remember { mutableStateOf(setting.warning) }
     val (error, setError) = remember { mutableStateOf(setting.error) }
 
-    Box(Modifier.fillMaxSize()) {
-        val scrollState = rememberScrollState()
-        Column(
-            Modifier
-                .verticalScroll(scrollState)
-                .padding(20.dp)
-                .fillMaxSize()
-        ) {
-            Row(Modifier.fillMaxWidth()) {
-                Text("自定义日志配色")
-            }
-            ColorSetSlider("Debug", debug, onValueChange = {
-                setDebug(it)
-                setting.onDebugColorSet(debug)
-            })
-            ColorSetSlider("Verbose", verbose, onValueChange = {
-                setVerbose(it)
-                setting.onVerboseColorSet(verbose)
-            })
-            ColorSetSlider("Info", info, onValueChange = {
-                setInfo(it)
-                setting.onInfoColorSet(info)
-            })
-            ColorSetSlider("Warning", warning, onValueChange = {
-                setWarning(it)
-                setting.onWarningColorSet(warning)
-            })
-            ColorSetSlider("Error", error, onValueChange = {
-                setError(it)
-                setting.onErrorColorSet(error)
-            })
-
-
-//            setting.data.forEach {
-//                EditView(it, {}, {})
-//            }
-//            setting.config.forEach {
-//                EditView(it, {}, {})
-//            }
-        }
-
-        VerticalScrollbar(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight(),
-            adapter = ScrollbarAdapter(scrollState)
-        )
+    Row(Modifier.fillMaxWidth()) {
+        Text("自定义日志配色")
     }
+    ColorSetSlider("Debug", debug, onValueChange = {
+        setDebug(it)
+        setting.onDebugColorSet(debug)
+    })
+    ColorSetSlider("Verbose", verbose, onValueChange = {
+        setVerbose(it)
+        setting.onVerboseColorSet(verbose)
+    })
+    ColorSetSlider("Info", info, onValueChange = {
+        setInfo(it)
+        setting.onInfoColorSet(info)
+    })
+    ColorSetSlider("Warning", warning, onValueChange = {
+        setWarning(it)
+        setting.onWarningColorSet(warning)
+    })
+    ColorSetSlider("Error", error, onValueChange = {
+        setError(it)
+        setting.onErrorColorSet(error)
+    })
+
 }
 
 @Composable
 fun LoggerLevelSettingUi(setting: LogLevelSetting) {
     Row {
-
         Text("Log level", Modifier.weight(4f))
 
         TabRow(setting.logConfigLevel.indexFor(), Modifier.weight(1f)) {

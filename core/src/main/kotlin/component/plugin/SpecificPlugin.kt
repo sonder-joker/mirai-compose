@@ -15,7 +15,7 @@ interface SpecificPlugin {
 
     val plugin: Plugin
 
-    val onExitButtonClicked: () -> Unit
+    fun onExitButtonClicked()
 
     sealed class Children  {
         class Common(val plugin: CommonPlugin) : Children()

@@ -1,13 +1,11 @@
 package com.youngerhousea.miraicompose.core.console
 
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import com.youngerhousea.miraicompose.core.utils.getValue
+import kotlinx.coroutines.flow.MutableStateFlow
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.div
@@ -25,10 +23,10 @@ private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
  * @property message
  * @constructor Create empty Compose log
  */
-class ComposeLog(
+data class ComposeLog(
     val priority: LogPriority,
-    identity: String?,
-    message: String
+    val identity: String?,
+    val message: String
 ) {
 
     val original = "${LocalDateTime.now().format(format)} ${priority.simpleName}/$identity: $message"
@@ -62,7 +60,6 @@ private val fileName = (MiraiConsole.logPath / LocalDateTime.now().format(fileNa
 //println(compose.consoleText)
 //Files.write(fileName, (message + "\n").toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND)
 
-val scope = MainScope()
 
 /**
  * [MiraiCompose] 默认Logger实现
@@ -72,22 +69,24 @@ class MiraiComposeLogger(
 ) : MiraiLoggerPlatformBase() {
 
     companion object {
-
-        val storage = MutableStateFlow(
-            ComposeLog(
-                LogPriority.INFO,
-                null,
-                ""
+        private val _storage = MutableStateFlow(
+            mutableListOf(
+                ComposeLog(
+                    LogPriority.INFO,
+                    null,
+                    ""
+                )
             )
         )
+
+        val storage: List<ComposeLog> by _storage
     }
 
     private fun printLog(message: String?, priority: LogPriority) {
         if (message != null) {
-            scope.launch {
-                storage.emit(ComposeLog(priority, identity, message))
-
-            }
+            val list = _storage.value
+            list.add(ComposeLog(priority, identity, message))
+            _storage.value = list
         }
     }
 
