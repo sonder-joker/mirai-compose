@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
  */
 interface InitLogin {
     data class Model(
-        val account: String,
-        val password: String
+        val account: String = "",
+        val password: String = "",
+        val event:Event = Event.Normal
     )
 
     val data:StateFlow<Model>
@@ -19,4 +20,15 @@ interface InitLogin {
     fun onPasswordChange(password: String)
 
     fun onLogin(account: Long, password: String)
+
+    fun cancelLogin()
+
+}
+
+sealed class Event {
+    object Normal:Event()
+
+    class Loading(val message: String):Event()
+
+    class Error(val message:String):Event()
 }

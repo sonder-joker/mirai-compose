@@ -23,68 +23,31 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.app.utils.R
 import com.youngerhousea.miraicompose.app.utils.ResourceImage
+import com.youngerhousea.miraicompose.core.component.bot.Event
 import com.youngerhousea.miraicompose.core.component.bot.InitLogin
-import kotlinx.coroutines.*
-import net.mamoe.mirai.network.*
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InitLoginUi(initLogin: InitLogin) {
-    val scope = rememberCoroutineScope()
 
     val data by initLogin.data.collectAsState()
-
-    var isLoading by remember { mutableStateOf(false) }
-
     val state = remember { SnackbarHostState() }
 
-    val onLogin: () -> Unit = {
-        scope.launch {
-            runCatching {
-                withTimeout(20_000) {
-                    initLogin.onLogin(data.account.toLong(), data.password)
-                }
-                if (state.showSnackbar("Loading", "Cancel") == SnackbarResult.ActionPerformed)
-                    cancel()
-            }.onFailure {
-                val snackBarText = when (it) {
-                    is WrongPasswordException -> {
-                        R.String.wrongPassword
-                    }
-                    is RetryLaterException -> {
-                        R.String.retryLater
-                    }
-                    is UnsupportedSliderCaptchaException -> {
-                        R.String.unsupportedSliderCaptcha
-                    }
-                    is UnsupportedSMSLoginException -> {
-                        R.String.unsupportedSMSLogin
-                    }
-                    is NoStandardInputForCaptchaException -> {
-                        R.String.noStandardInputForCaptcha
-                    }
-                    is NoServerAvailableException -> {
-                        R.String.noServerAvailable
-                    }
-                    is IllegalArgumentException -> {
-                        R.String.passwordLengthMuch
-                    }
-                    is TimeoutCancellationException -> {
-                        R.String.loginTimeOut
-                    }
-                    is CancellationException -> {
-                        R.String.loginDismiss
-                    }
-                    else -> throw it
-                }
-                state.showSnackbar(snackBarText)
+    LaunchedEffect(initLogin) {
+        when (val event = data.event) {
+            is Event.Loading -> {
+                val result = state.showSnackbar(event.message, "Cancel")
+                if (result == SnackbarResult.ActionPerformed)
+                   initLogin.cancelLogin()
             }
-        }.invokeOnCompletion {
-            isLoading = false
+            is Event.Error -> {
+                state.showSnackbar(event.message)
+            }
         }
     }
+
+
 
     Scaffold(scaffoldState = rememberScaffoldState(snackbarHostState = state)) {
         Column(
@@ -101,16 +64,16 @@ fun InitLoginUi(initLogin: InitLogin) {
             AccountTextField(
                 account = data.account,
                 onAccountTextChange = initLogin::onAccountChange,
-                onKeyEnter = onLogin
+                onKeyEnter = { initLogin.onLogin(data.account.toLong(), data.password) }
             )
             PasswordTextField(
                 password = data.password,
                 onPasswordTextChange = initLogin::onPasswordChange,
-                onKeyEnter = onLogin
+                onKeyEnter = { initLogin.onLogin(data.account.toLong(), data.password) }
             )
             LoginButton(
-                onClick = onLogin,
-                isLoading = isLoading
+                onClick = { initLogin.onLogin(data.account.toLong(), data.password) },
+                isLoading = data.event is Event.Loading
             )
         }
     }
