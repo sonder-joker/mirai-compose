@@ -7,23 +7,44 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.rememberDialogState
-import com.youngerhousea.miraicompose.app.ui.plugin.DetailedDataUi
-import com.youngerhousea.miraicompose.app.ui.plugin.EditView
+import com.youngerhousea.miraicompose.core.component.setting.LogColorSetting
+import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
 import com.youngerhousea.miraicompose.core.component.setting.Setting
 import com.youngerhousea.miraicompose.core.component.setting.StringColor
-import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.logging.AbstractLoggerController
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SettingUi(setting: Setting) {
+    Box(Modifier.fillMaxSize()) {
+        val scrollState = rememberScrollState()
+        Column(
+            Modifier
+                .verticalScroll(scrollState)
+                .padding(20.dp)
+                .fillMaxSize()
+        ) {
+            LogColorSettingUi(setting.logColorSetting)
+            LoggerLevelSettingUi(setting.logLevelSetting)
+        }
+
+        VerticalScrollbar(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight(),
+            adapter = ScrollbarAdapter(scrollState)
+        )
+    }
+}
+
+@Composable
+fun LogColorSettingUi(setting: LogColorSetting) {
     val (debug, setDebug) = remember { mutableStateOf(setting.debug) }
     val (verbose, setVerbose) = remember { mutableStateOf(setting.verbose) }
     val (info, setInfo) = remember { mutableStateOf(setting.info) }
@@ -61,62 +82,7 @@ fun SettingUi(setting: Setting) {
                 setError(it)
                 setting.onErrorColorSet(error)
             })
-//            TODO:With a more good way
-//            Row(Modifier.fillMaxWidth()) {
-//                Text("自定义主题配色")
-//            }
-//            ColorSetSlider("Primary", setting.material.primary, onValueChange = setting::setPrimary)
-//            ColorSetSlider(
-//                "PrimaryVariant",
-//                setting.material.primaryVariant,
-//                onValueChange = setting::setPrimaryVariant
-//            )
-//            ColorSetSlider("Secondary", setting.material.secondary, onValueChange = setting::setSecondary)
-//            ColorSetSlider(
-//                "SecondaryVariant",
-//                setting.material.secondaryVariant,
-//                onValueChange = setting::setSecondaryVariant
-//            )
-//            ColorSetSlider("Background", setting.material.background, onValueChange = setting::setBackground)
-//            ColorSetSlider("Surface", setting.material.surface, onValueChange = setting::setSurface)
-//            ColorSetSlider("Error", setting.material.error, onValueChange = setting::setError)
-//            ColorSetSlider("OnPrimary", setting.material.onPrimary, onValueChange = setting::setOnPrimary)
-//            ColorSetSlider("OnSecondary", setting.material.onSecondary, onValueChange = setting::setOnSecondary)
-//            ColorSetSlider("OnBackground", setting.material.onBackground, onValueChange = setting::setOnBackground)
-//            ColorSetSlider("OnSurface", setting.material.onSurface, onValueChange = setting::setOnSurface)
-//            ColorSetSlider("OnError", setting.material.onError, onValueChange = setting::setOnError)
 
-            var state by remember { mutableStateOf(0) }
-
-            Row {
-                Text("Log level", Modifier.weight(4f))
-                TabRow(state, Modifier.weight(1f)) {
-                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.ALL, onClick = {
-                        state = 0
-                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.ALL)
-                    })
-                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.VERBOSE, onClick = {
-                        state = 1
-                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.VERBOSE)
-                    })
-                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.INFO, onClick = {
-                        state = 2
-                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.INFO)
-                    })
-                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.WARNING, onClick = {
-                        state = 3
-                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.WARNING)
-                    })
-                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.ERROR, onClick = {
-                        state = 4
-                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.ERROR)
-                    })
-                    Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.NONE, onClick = {
-                        state = 5
-                        setting.setLogConfigLevel(AbstractLoggerController.LogPriority.NONE)
-                    })
-                }
-            }
 
 //            setting.data.forEach {
 //                EditView(it, {}, {})
@@ -135,14 +101,47 @@ fun SettingUi(setting: Setting) {
     }
 }
 
-inline fun <reified T> EnumTabRow() {
-    assert(T::class.java.isEnum) { "Not enum class!" }
+@Composable
+fun LoggerLevelSettingUi(setting: LogLevelSetting) {
+    Row {
+
+        Text("Log level", Modifier.weight(4f))
+
+        TabRow(setting.logConfigLevel.indexFor(), Modifier.weight(1f)) {
+            Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.ALL, onClick = {
+                setting.setLogConfigLevel(AbstractLoggerController.LogPriority.ALL)
+            })
+            Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.VERBOSE, onClick = {
+                setting.setLogConfigLevel(AbstractLoggerController.LogPriority.VERBOSE)
+            })
+
+            Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.DEBUG, onClick = {
+                setting.setLogConfigLevel(AbstractLoggerController.LogPriority.DEBUG)
+            })
+            Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.INFO, onClick = {
+                setting.setLogConfigLevel(AbstractLoggerController.LogPriority.INFO)
+            })
+            Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.WARNING, onClick = {
+                setting.setLogConfigLevel(AbstractLoggerController.LogPriority.WARNING)
+            })
+            Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.ERROR, onClick = {
+                setting.setLogConfigLevel(AbstractLoggerController.LogPriority.ERROR)
+            })
+            Tab(setting.logConfigLevel == AbstractLoggerController.LogPriority.NONE, onClick = {
+                setting.setLogConfigLevel(AbstractLoggerController.LogPriority.NONE)
+            })
+        }
+    }
 }
 
-fun AbstractLoggerController.LogPriority.all() {
 
+inline fun <reified T : Enum<T>> T.indexFor(): Int {
+    enumValues<T>().forEachIndexed { index, t ->
+        if (this == t)
+            return index
+    }
+    error("Should not happened")
 }
-
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

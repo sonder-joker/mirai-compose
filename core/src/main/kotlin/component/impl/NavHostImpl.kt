@@ -1,6 +1,5 @@
 package com.youngerhousea.miraicompose.core.component.impl
 
-import com.arkivanov.decompose.router
 import com.arkivanov.decompose.*
 import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.arkivanov.decompose.statekeeper.Parcelable
@@ -17,7 +16,8 @@ import com.youngerhousea.miraicompose.core.component.impl.setting.SettingImpl
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.console.MiraiComposeLogger
 import com.youngerhousea.miraicompose.core.theme.ComposeSetting
-import com.youngerhousea.miraicompose.core.utils.componentScope
+import com.youngerhousea.miraicompose.core.utils.getValue
+import com.youngerhousea.miraicompose.core.utils.setValue
 import io.ktor.client.request.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -49,7 +49,7 @@ internal class NavHostImpl(
             is Configuration.Login -> {
                 NavHost.Child.CLogin(LoginImpl(
                     componentContext,
-                    onLoginSuccess = ::onLoginSuccess,
+                    onLoginSuccess = { onRouteMessage() },
                     composeFactory = { loginSolver ->
                         instanceKeeper.getOrCreate {
                             MiraiCompose { _: Long, _: BotConfiguration ->
@@ -91,47 +91,16 @@ internal class NavHostImpl(
         }
     }
 
-
-    private val scope = componentScope()
-
-    override fun onRouteToSpecificBot(bot: BotItem) {
-        scope.launch {
-            currentBot.emit(bot)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun magic(): ConcurrentHashMap<Long, Bot>? {
-        val instance = Bot.Companion::class.memberProperties.find { it.name == "_instances" }
-        instance?.let {
-            it.isAccessible = true
-            return it.get(Bot.Companion) as ConcurrentHashMap<Long, Bot>?
-        } ?: error("Reflect error")
-    }
-
-    private val map = magic()
-
-    override val botList: List<BotItem>
-        get() = map?.values?.toList()?.mapIndexed { indexed, bot ->
-            BotItemImpl(childContext("bot:${indexed}"), bot)
-        } ?: emptyList()
-
     override val state: Value<RouterState<*, NavHost.Child>> get() = router.state
-
-    override val currentBot = MutableStateFlow(botList.firstOrNull())
 
     override val avatarMenu: AvatarMenu = AvatarMenuImpl(
         childContext("avatarMenu"),
         _addNewBot = {
             router.push(Configuration.Login)
         },
-        _onRouteMessage = ::onRouteMessage,
-        currentBot = currentBot
+        _onAvatarBoxClick = ::onRouteMessage,
     )
 
-    private fun onLoginSuccess(bot: Bot) {
-        router.push(Configuration.Message)
-    }
 
     override fun onRouteMessage() {
         router.push(Configuration.Message)
@@ -159,39 +128,55 @@ internal class NavHostImpl(
 class AvatarMenuImpl(
     component: ComponentContext,
     private val _addNewBot: () -> Unit,
-    val _onRouteMessage: () -> Unit,
-    override val currentBot: MutableStateFlow<BotItem?>,
+    private val _onAvatarBoxClick: () -> Unit,
 ) : AvatarMenu, ComponentContext by component {
-    override val isExpand = MutableStateFlow(false)
-    override val botList: List<BotItem>
-        get() = emptyList()
 
-    private val scope = componentScope()
+    private val botList get() = magic()
+
+    override val model = MutableStateFlow(
+        AvatarMenu.Model(
+            currentBot = botList.firstOrNull(), isExpand = false, botList = botList
+        )
+    )
+
+    var delegateModel by model
+
+
+    @Suppress("UNCHECKED_CAST")
+    private fun magic(): List<BotItem> {
+        val instance = Bot.Companion::class.memberProperties.find { it.name == "_instances" }
+        val data = instance?.let {
+            it.isAccessible = true
+            it.get(Bot.Companion) as ConcurrentHashMap<Long, Bot>?
+        } ?: error("Reflect error")
+        return data.values.toList().mapIndexed { indexed, bot ->
+            BotItemImpl(childContext("bot:${indexed}"), bot)
+        }
+    }
 
     override fun addNewBot() {
         _addNewBot()
+        dismissExpandMenu()
     }
 
     override fun openExpandMenu() {
-//        TODO("Not yet implemented")
+        delegateModel = delegateModel.copy(isExpand = true)
     }
 
     override fun dismissExpandMenu() {
-//        TODO("Not yet implemented")
+        delegateModel = delegateModel.copy(isExpand = false)
     }
 
     override fun onAvatarBoxClick() {
-        if (currentBot.value != null)
-            _onRouteMessage()
+        if (model.value.currentBot != null)
+            _onAvatarBoxClick()
         else
             addNewBot()
     }
 
     override fun onItemClick(item: BotItem) {
-        scope.launch {
-            currentBot.emit(item)
-            isExpand.emit(false)
-        }
+        delegateModel = delegateModel.copy(currentBot = item)
+        dismissExpandMenu()
     }
 }
 

@@ -8,9 +8,11 @@ import com.arkivanov.decompose.instancekeeper.getOrCreate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.net.URL
 import java.net.URLDecoder
 import kotlin.collections.set
+import kotlin.reflect.KProperty
 
 internal fun URL.splitQuery(): Map<String, String> {
     val queryPairs: MutableMap<String, String> = LinkedHashMap()
@@ -36,4 +38,14 @@ private class ComponentScope(
 internal fun ComponentContext.componentScope(): CoroutineScope = instanceKeeper.getOrCreate(::ComponentScope)
 
 
+inline operator fun <reified T> MutableStateFlow<T>.setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    this.value = value
+}
+
+inline operator fun <reified T> MutableStateFlow<T>.getValue(thisRef: Any?, property: KProperty<*>):T{
+    return this.value
+}
+
 inline val <C : Any, T : Any> RouterState<C, T>.activeConfiguration get() = this.activeChild.configuration
+
+inline val <C : Any, T : Any> RouterState<C, T>.activeInstance get() = this.activeChild.instance

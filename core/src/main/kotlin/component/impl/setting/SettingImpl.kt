@@ -1,21 +1,21 @@
-
 package com.youngerhousea.miraicompose.core.component.impl.setting
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.childContext
+import com.youngerhousea.miraicompose.core.component.setting.LogColorSetting
+import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
 import com.youngerhousea.miraicompose.core.component.setting.Setting
 import com.youngerhousea.miraicompose.core.component.setting.StringColor
 import com.youngerhousea.miraicompose.core.console.LoggerConfig
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.theme.AppTheme
 import net.mamoe.mirai.console.data.AutoSavePluginDataHolder
-import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.logging.AbstractLoggerController
-import kotlin.reflect.full.memberProperties
 
 @Suppress("INVISIBLE_MEMBER")
 internal class SettingImpl(
     componentContext: ComponentContext,
-    private val theme: AppTheme
+    theme: AppTheme
 ) : Setting, ComponentContext by componentContext {
 
     private val consoleBuiltInPluginDataHolder =
@@ -27,12 +27,15 @@ internal class SettingImpl(
     override val config = MiraiCompose.instance.configStorageForBuiltIns[consoleBuiltInPluginConfigHolder]
     override val data = MiraiCompose.instance.dataStorageForBuiltIns[consoleBuiltInPluginDataHolder]
 
-    override val logConfigLevel: AbstractLoggerController.LogPriority = LoggerConfig.defaultPriority
+    override val logLevelSetting = LogLevelSettingImpl(childContext("logLevel"))
 
-    override fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority) {
-        LoggerConfig.defaultPriority = priority
-    }
+    override val logColorSetting = LogColorSettingImpl(childContext("logColor"), theme)
+}
 
+class LogColorSettingImpl(
+    componentContext: ComponentContext,
+    private val theme: AppTheme
+) : LogColorSetting, ComponentContext by componentContext {
 
     override val debug = theme.logColors.debug
 
@@ -63,6 +66,21 @@ internal class SettingImpl(
     override fun onErrorColorSet(stringColor: StringColor) {
         theme.logColors.error = stringColor
     }
+}
+
+class LogLevelSettingImpl(
+    componentContext: ComponentContext
+) : LogLevelSetting, ComponentContext by componentContext {
+    override val logConfigLevel: AbstractLoggerController.LogPriority = LoggerConfig.defaultPriority
+
+
+    override fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority) {
+        LoggerConfig.defaultPriority = priority
+    }
+}
+
+class ThemeColorImpl(
+) {
 
 //    fun setPrimary(color: Color) {
 //        theme.materialLight.primary = color
@@ -115,6 +133,4 @@ internal class SettingImpl(
 //    fun setIsLight(isLight: Boolean) {
 //        material = material.copy(isLight = isLight)
 //    }
-
-
 }

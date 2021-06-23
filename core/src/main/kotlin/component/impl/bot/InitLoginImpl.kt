@@ -3,6 +3,9 @@ package com.youngerhousea.miraicompose.core.component.impl.bot
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.core.component.bot.InitLogin
 import com.youngerhousea.miraicompose.core.utils.componentScope
+import com.youngerhousea.miraicompose.core.utils.getValue
+import com.youngerhousea.miraicompose.core.utils.setValue
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -10,27 +13,23 @@ import kotlinx.coroutines.launch
 internal class InitLoginImpl(
     componentContext: ComponentContext,
     private val onClick: suspend (account: Long, password: String) -> Unit,
-) : InitLogin, ComponentContext by componentContext {
-    private val scope = componentScope()
+) : InitLogin, ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
 
-    override val data  = MutableStateFlow(InitLogin.Model("", ""))
+    override val data = MutableStateFlow(InitLogin.Model("", ""))
+
+    var delegateModel by data
 
     override fun onAccountChange(account: String) {
-        scope.launch {
-            with(data) {
-                emit(value.copy(account = account))
-            }
-        }
+        delegateModel = delegateModel.copy(account = account)
+
     }
 
     override fun onPasswordChange(password: String) {
-        scope.launch {
-            data.emit(data.value.copy(password = password))
-        }
+        delegateModel = delegateModel.copy(password = password)
     }
 
     override fun onLogin(account: Long, password: String) {
-        scope.launch {
+        launch {
             onClick(account, password)
         }
     }

@@ -2,7 +2,6 @@ package com.youngerhousea.miraicompose.core.component.impl.bot
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
-import com.arkivanov.decompose.lifecycle.subscribe
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
@@ -10,6 +9,7 @@ import com.youngerhousea.miraicompose.core.component.bot.Login
 import com.youngerhousea.miraicompose.core.component.bot.ReturnException
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.utils.componentScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -27,7 +27,7 @@ internal class LoginImpl(
     componentContext: ComponentContext,
     private val onLoginSuccess: (bot: Bot) -> Unit,
     val composeFactory: (LoginSolver) -> MiraiCompose
-) : Login, LoginSolver(), ComponentContext by componentContext {
+) : Login, LoginSolver(), ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
     val compose = composeFactory(this)
 
     sealed class Configuration : Parcelable {
@@ -98,7 +98,7 @@ internal class LoginImpl(
 
     init {
         //NOT GOOD
-        componentScope().launch(Dispatchers.IO) {
+        launch(Dispatchers.IO) {
             while (true) {
                 @Suppress("SENSELESS_COMPARISON")
                 if (router != null) {

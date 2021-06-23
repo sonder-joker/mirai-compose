@@ -13,6 +13,16 @@ import net.mamoe.mirai.console.logging.AbstractLoggerController
  */
 
 interface Setting {
+    val data: List<PluginData>
+    val config: List<PluginConfig>
+
+    val logLevelSetting: LogLevelSetting
+
+    val logColorSetting: LogColorSetting
+}
+
+
+interface LogColorSetting {
     val debug: StringColor
 
     val verbose: StringColor
@@ -32,10 +42,9 @@ interface Setting {
     fun onErrorColorSet(stringColor: StringColor)
 
     fun onWarningColorSet(stringColor: StringColor)
+}
 
-    val data: List<PluginData>
-    val config: List<PluginConfig>
-
+interface LogLevelSetting {
     val logConfigLevel: AbstractLoggerController.LogPriority
 
     fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority)
