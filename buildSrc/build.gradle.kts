@@ -12,6 +12,8 @@ dependencies {
     implementation(libs.plugin.composejb)
     implementation(libs.plugin.jvm)
     implementation(libs.plugin.miraiconsole)
+    implementation(libs.plugin.vaadin)
+    implementation(libs.plugin.gretty)
 }
 
 kotlin {

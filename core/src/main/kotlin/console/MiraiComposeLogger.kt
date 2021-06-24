@@ -2,6 +2,7 @@ package com.youngerhousea.miraicompose.core.console
 
 import com.youngerhousea.miraicompose.core.utils.getValue
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import java.time.LocalDateTime

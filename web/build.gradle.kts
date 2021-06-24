@@ -1,18 +1,16 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("org.jetbrains.compose")
+    id("com.vaadin")
 }
 
 dependencies {
-    implementation(compose.runtime)
     implementation(projects.core)
-    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3")
-    implementation("io.netty:netty-all:4.1.65.Final")
-    implementation("io.vertx:vertx-core:4.1.0")
-    implementation("io.vertx:vertx-lang-kotlin:4.1.0")
+    implementation(libs.vaadin.core)
+    api(libs.decompose.main)
 }
 
 repositories {
-    maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
+    maven(url= "https://jitpack.io")
 }
+

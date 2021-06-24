@@ -8,12 +8,16 @@ yamlkt = "0.9.0"
 json = "1.2.1"
 junit = "4.13"
 zxing = "3.4.1"
+vaadin = "20.0.3"
+gretty = "3.0.4"
 
 [libraries]
 plugin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
 plugin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-composejb = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version.ref = "compose-jb" }
 plugin-miraiconsole = { group = "net.mamoe", name = "mirai-console-gradle", version.ref = "mirai"}
+plugin-vaadin= {group = "com.vaadin", name = "vaadin-gradle-plugin", version.ref = "vaadin"}
+plugin-gretty= {group = "org.gretty", name = "gretty", version.ref= "gretty"}
 decompose-main = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
 decompose-extension = { group = "com.arkivanov.decompose", name = "extensions-compose-jetbrains", version.ref = "decompose" }
 mirai-core = { group = "net.mamoe", name = "mirai-core", version.ref = "mirai" }
@@ -24,3 +28,4 @@ junit4-core = { group = "junit", name = "junit", version.ref = "junit" }
 junit4-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 zxing-core={group = "com.google.zxing", name = "core", version.ref = "zxing" }
+vaadin-core={group = "com.vaadin", name = "vaadin-core", version.ref = "vaadin"}
