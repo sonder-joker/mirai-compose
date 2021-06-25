@@ -27,7 +27,7 @@ dependencies {
     testImplementation(libs.kotlin.test)
 
     testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.20")
 }
 
 compose.desktop {
