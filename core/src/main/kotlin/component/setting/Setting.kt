@@ -1,6 +1,10 @@
 package com.youngerhousea.miraicompose.core.component.setting
 
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.Serializable
+import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.logging.AbstractLoggerController
+import net.mamoe.yamlkt.YamlDynamicSerializer
 
 
 /**
@@ -16,6 +20,8 @@ interface Setting {
     val logLevelSetting: LogLevelSetting
 
     val logColorSetting: LogColorSetting
+
+    val autoLoginSetting: AutoLoginSetting
 }
 
 
@@ -45,6 +51,17 @@ interface LogLevelSetting {
     val logConfigLevel: AbstractLoggerController.LogPriority
 
     fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority)
+}
+
+
+interface AutoLoginSetting {
+    data class Model(
+        val accountList: List<AutoLoginConfig.Account>
+    )
+
+    val model: StateFlow<Model>
+
+    fun addAutoLogin(account: String, password: AutoLoginConfig.Account.Password, configuration:Map<AutoLoginConfig.Account.ConfigurationKey, @Serializable(with = YamlDynamicSerializer::class) Any>)
 }
 
 typealias StringColor = String

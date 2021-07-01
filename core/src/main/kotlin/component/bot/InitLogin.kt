@@ -13,7 +13,7 @@ interface InitLogin {
         val event:Event = Event.Normal
     )
 
-    val data:StateFlow<Model>
+    val model:StateFlow<Model>
 
     fun onAccountChange(account: String)
 

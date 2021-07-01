@@ -2,6 +2,11 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     id("com.vaadin")
+    id("org.gretty")
+}
+
+gretty {
+    contextPath = "/"
 }
 
 dependencies {

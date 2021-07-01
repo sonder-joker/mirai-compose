@@ -17,9 +17,9 @@ internal class InitLoginImpl(
 ) : InitLogin, ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
     lateinit var job: Job
 
-    override val data = MutableStateFlow(InitLogin.Model())
+    override val model = MutableStateFlow(InitLogin.Model())
 
-    var delegateModel by data
+    var delegateModel by model
 
     override fun onAccountChange(account: String) {
         delegateModel = delegateModel.copy(account = account)
@@ -33,10 +33,10 @@ internal class InitLoginImpl(
     override fun onLogin(account: Long, password: String) {
         job = launch {
             runCatching {
+                delegateModel = delegateModel.copy(event = Event.Loading("Loading"))
                 withTimeout(20_000) {
                     onClick(account, password)
                 }
-                delegateModel.copy(event = Event.Loading("Loading"))
             }.onFailure {
                 when (it) {
                     is WrongPasswordException -> {

@@ -24,8 +24,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import com.youngerhousea.miraicompose.app.theme.AppTheme
-import com.youngerhousea.miraicompose.core.console.ComposeLog
+import com.youngerhousea.miraicompose.core.console.Log
 import com.youngerhousea.miraicompose.core.console.LogPriority
+import com.youngerhousea.miraicompose.core.console.original
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.descriptor.AbstractCommandValueParameter
@@ -42,8 +43,8 @@ import java.util.regex.PatternSyntaxException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-val ComposeLog.color: Color
-    get() = when (priority) {
+val Log.color: Color
+    get() = when (first) {
         LogPriority.VERBOSE -> AppTheme.logColors.verbose
         LogPriority.INFO -> AppTheme.logColors.info
         LogPriority.WARNING -> AppTheme.logColors.warning
@@ -51,15 +52,16 @@ val ComposeLog.color: Color
         LogPriority.DEBUG -> AppTheme.logColors.debug
     }
 
-val ComposeLog.composeLog
+
+val Log.composeLog
     get(): AnnotatedString =
         buildAnnotatedString {
-        pushStyle(SpanStyle(color))
+            pushStyle(SpanStyle(color))
             append(original)
         }
 
 
-fun ComposeLog.parseInSearch(searchText: String): AnnotatedString {
+fun Log.parseInSearch(searchText: String): AnnotatedString {
     if (searchText.isEmpty()) return composeLog
     val builder = AnnotatedString.Builder()
     try {
@@ -88,7 +90,7 @@ fun ComposeLog.parseInSearch(searchText: String): AnnotatedString {
 }
 
 @Composable
-internal fun LogBox(modifier: Modifier = Modifier, logs: List<ComposeLog>, searchText: String = "") {
+internal fun LogBox(modifier: Modifier = Modifier, logs: List<Log>, searchText: String = "") {
     val lazyListState = rememberLazyListState()
 
     Box(modifier) {

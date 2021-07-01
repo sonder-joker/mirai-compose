@@ -11,15 +11,16 @@ dependencies {
 
     implementation(libs.serialization.yaml)
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${libs.versions.kotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-common:${libs.versions.kotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${libs.versions.kotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libs.versions.kotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${libs.versions.kotlin}")
+    implementation(libs.kotlin.stdlib.main)
+    implementation(libs.kotlin.stdlib.common)
+    implementation(libs.kotlin.stdlib.jdk7)
+    implementation(libs.kotlin.stdlib.jdk8)
+    implementation(libs.kotlin.reflect)
 
     testImplementation(libs.junit4.core)
     testImplementation(libs.junit4.kotlin)
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlin.coroutinues.test)
 }
 
 kotlin {

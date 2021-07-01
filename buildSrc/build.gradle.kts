@@ -5,6 +5,7 @@ plugins {
 repositories {
     gradlePluginPortal()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -13,7 +14,9 @@ dependencies {
     implementation(libs.plugin.jvm)
     implementation(libs.plugin.miraiconsole)
     implementation(libs.plugin.vaadin)
-    implementation(libs.plugin.gretty)
+//    implementation(libs.plugin.gretty)
+    implementation(libs.plugin.grettyJ)
+
 }
 
 kotlin {

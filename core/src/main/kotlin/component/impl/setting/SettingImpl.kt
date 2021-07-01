@@ -2,15 +2,14 @@ package com.youngerhousea.miraicompose.core.component.impl.setting
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
-import com.youngerhousea.miraicompose.core.component.setting.LogColorSetting
-import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
-import com.youngerhousea.miraicompose.core.component.setting.Setting
-import com.youngerhousea.miraicompose.core.component.setting.StringColor
+import com.youngerhousea.miraicompose.core.component.setting.*
 import com.youngerhousea.miraicompose.core.console.LoggerConfig
-import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import com.youngerhousea.miraicompose.core.theme.AppTheme
-import net.mamoe.mirai.console.data.AutoSavePluginDataHolder
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.Serializable
+import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.logging.AbstractLoggerController
+import net.mamoe.yamlkt.YamlDynamicSerializer
 
 @Suppress("INVISIBLE_MEMBER")
 internal class SettingImpl(
@@ -18,18 +17,11 @@ internal class SettingImpl(
     theme: AppTheme
 ) : Setting, ComponentContext by componentContext {
 
-    private val consoleBuiltInPluginDataHolder =
-        Class.forName("net.mamoe.mirai.console.internal.data.builtins.ConsoleBuiltInPluginDataHolder").kotlin.objectInstance as AutoSavePluginDataHolder
-    private val consoleBuiltInPluginConfigHolder =
-        Class.forName("net.mamoe.mirai.console.internal.data.builtins.ConsoleBuiltInPluginConfigHolder").kotlin.objectInstance as AutoSavePluginDataHolder
-
-
-//    override val config = MiraiCompose.instance.configStorageForBuiltIns[consoleBuiltInPluginConfigHolder]
-//    override val data = MiraiCompose.instance.dataStorageForBuiltIns[consoleBuiltInPluginDataHolder]
-
-    override val logLevelSetting = LogLevelSettingImpl(childContext("logLevel"))
+    override val logLevelSetting = LogLevelSettingImpl(childContext("logLevel"), LoggerConfig.defaultPriority)
 
     override val logColorSetting = LogColorSettingImpl(childContext("logColor"), theme)
+
+    override val autoLoginSetting = AutoLoginImpl(childContext("autoLogin"), AutoLoginConfig.accounts)
 }
 
 class LogColorSettingImpl(
@@ -69,14 +61,29 @@ class LogColorSettingImpl(
 }
 
 class LogLevelSettingImpl(
-    componentContext: ComponentContext
+    componentContext: ComponentContext,
+    override val logConfigLevel: AbstractLoggerController.LogPriority,
 ) : LogLevelSetting, ComponentContext by componentContext {
-    override val logConfigLevel: AbstractLoggerController.LogPriority get()  = LoggerConfig.defaultPriority
-
 
     override fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority) {
         LoggerConfig.defaultPriority = priority
     }
+}
+
+class AutoLoginImpl(
+    componentContext: ComponentContext,
+    list: List<AutoLoginConfig.Account>,
+) : AutoLoginSetting, ComponentContext by componentContext {
+    override val model = MutableStateFlow(AutoLoginSetting.Model(list))
+
+    override fun addAutoLogin(
+        account: String,
+        password: AutoLoginConfig.Account.Password,
+        configuration: Map<AutoLoginConfig.Account.ConfigurationKey, @Serializable(with = YamlDynamicSerializer::class) Any>
+    ) {
+        AutoLoginConfig.accounts.add(AutoLoginConfig.Account(account, password, configuration))
+    }
+
 }
 
 class ThemeColorImpl(

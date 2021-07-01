@@ -2,7 +2,6 @@ package com.youngerhousea.miraicompose.app.ui
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
@@ -177,11 +175,11 @@ fun BotItem(
     botItem: BotItem?,
     modifier: Modifier = Modifier
 ) {
-    var avatar: ImageBitmap by remember(botItem) { mutableStateOf(ImageBitmap(200, 200)) }
-    LaunchedEffect(botItem) {
-        botItem?.avatar?.let {
-            avatar = SkiaImageDecode(it)
-        }
+
+    val avatarByteArray = botItem?.avatar?.collectAsState()
+
+    val avatar by derivedStateOf {
+        avatarByteArray?.value?.let { SkiaImageDecode(it) } ?: ImageBitmap(200, 200)
     }
 
     Row(

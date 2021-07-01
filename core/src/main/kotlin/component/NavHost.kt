@@ -68,9 +68,8 @@ interface AvatarMenu {
     fun onItemClick(item: BotItem)
 }
 
-interface BotItem {
-    val bot: Bot
+interface BotItem:Bot {
 
-    val avatar: ByteArray?
+    val avatar:StateFlow<ByteArray?>
 }
 

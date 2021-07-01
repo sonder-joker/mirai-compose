@@ -13,10 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.core.component.setting.LogColorSetting
-import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
-import com.youngerhousea.miraicompose.core.component.setting.Setting
-import com.youngerhousea.miraicompose.core.component.setting.StringColor
+import com.youngerhousea.miraicompose.core.component.setting.*
+import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.logging.AbstractLoggerController
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
@@ -32,6 +30,7 @@ fun SettingUi(setting: Setting) {
         ) {
             LogColorSettingUi(setting.logColorSetting)
             LoggerLevelSettingUi(setting.logLevelSetting)
+            AutoLoginSettingConfig(setting.autoLoginSetting)
         }
 
         VerticalScrollbar(
@@ -149,5 +148,25 @@ fun ColorSetSlider(text: String, value: StringColor, onValueChange: (StringColor
 //                onValueChange(Color(red, green, blue, alpha))
 //            }
 //        }
+    }
+}
+
+@Composable
+fun AutoLoginSettingConfig(autoLoginSetting: AutoLoginSetting) {
+    val model by autoLoginSetting.model.collectAsState()
+    Column {
+        model.accountList.forEach {
+            Row {
+                Text(it.account)
+                Text(it.password.value)
+
+                TabRow(it.password.kind.indexFor(), Modifier.weight(1f)) {
+                    Tab(it.password.kind == AutoLoginConfig.Account.PasswordKind.PLAIN, onClick = {
+                        it.password.kind
+                    })
+
+                }
+            }
+        }
     }
 }

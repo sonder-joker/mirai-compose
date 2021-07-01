@@ -31,7 +31,7 @@ import com.youngerhousea.miraicompose.core.component.bot.InitLogin
 @Composable
 fun InitLoginUi(initLogin: InitLogin) {
 
-    val data by initLogin.data.collectAsState()
+    val data by initLogin.model.collectAsState()
     val state = remember { SnackbarHostState() }
 
     LaunchedEffect(initLogin) {

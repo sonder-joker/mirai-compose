@@ -1,6 +1,6 @@
 package com.youngerhousea.miraicompose.core.component.log
 
-import com.youngerhousea.miraicompose.core.console.ComposeLog
+import com.youngerhousea.miraicompose.core.console.Log
 import kotlinx.coroutines.flow.StateFlow
 import net.mamoe.mirai.utils.MiraiLogger
 
@@ -11,8 +11,8 @@ import net.mamoe.mirai.utils.MiraiLogger
  */
 interface ConsoleLog {
     data class Model (
-        val loggerStorage: List<ComposeLog>,
-        val searchContent: String
+        val searchContent: String,
+        val log:List<Log>
     )
 
     val model:StateFlow<Model>

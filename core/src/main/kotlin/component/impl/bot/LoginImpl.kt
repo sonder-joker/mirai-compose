@@ -26,9 +26,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class LoginImpl(
     componentContext: ComponentContext,
     private val onLoginSuccess: (bot: Bot) -> Unit,
-    val composeFactory: (LoginSolver) -> MiraiCompose
 ) : Login, LoginSolver(), ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
-    val compose = composeFactory(this)
 
     sealed class Configuration : Parcelable {
         object InitLogin : Configuration()
@@ -96,21 +94,21 @@ internal class LoginImpl(
         }
     )
 
-    init {
-        //NOT GOOD
-        launch(Dispatchers.IO) {
-            while (true) {
-                @Suppress("SENSELESS_COMPARISON")
-                if (router != null) {
-                    compose.start()
-                }
-                if (compose.isActive) {
-                    break
-                }
-            }
-
-        }
-    }
+//    init {
+//        //NOT GOOD
+//        launch(Dispatchers.IO) {
+//            while (true) {
+//                @Suppress("SENSELESS_COMPARISON")
+//                if (router != null) {
+//                    compose.start()
+//                }
+//                if (compose.isActive) {
+//                    break
+//                }
+//            }
+//
+//        }
+//    }
 
     override val state get() = router.state
 

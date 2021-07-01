@@ -2,6 +2,8 @@ package com.youngerhousea.miraicompose.core.console
 
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.flow.channelFlow
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
@@ -56,7 +58,6 @@ class MiraiCompose(
 
     override val consoleCommandSender: MiraiComposeSender = MiraiComposeSender
 
-
     override val loggerController: LoggerController
         get() = ComposeLoggerController
 
@@ -77,7 +78,7 @@ class MiraiCompose(
             "load configurations" ->
                 ComposeDataScope.reloadAll()
             "setup logger controller" -> {
-                assert (loggerController === ComposeLoggerController) { "?" }
+                assert(loggerController === ComposeLoggerController) { "?" }
                 ComposeDataScope.addAndReloadConfig(LoggerConfig)
                 ComposeLoggerController.initialized = true
             }
@@ -91,7 +92,6 @@ class MiraiCompose(
     init {
         instance = this
     }
-
 
     companion object {
         lateinit var instance: MiraiCompose

@@ -13,7 +13,9 @@ import com.youngerhousea.miraicompose.core.component.impl.log.ConsoleLogImpl
 import com.youngerhousea.miraicompose.core.component.impl.message.MessageImpl
 import com.youngerhousea.miraicompose.core.component.impl.plugin.PluginsImpl
 import com.youngerhousea.miraicompose.core.component.impl.setting.SettingImpl
+import com.youngerhousea.miraicompose.core.console.AccessibleHolder
 import com.youngerhousea.miraicompose.core.console.MiraiCompose
+import com.youngerhousea.miraicompose.core.console.MiraiComposeDescription
 import com.youngerhousea.miraicompose.core.console.MiraiComposeLogger
 import com.youngerhousea.miraicompose.core.theme.ComposeSetting
 import com.youngerhousea.miraicompose.core.utils.getValue
@@ -23,14 +25,43 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.Mirai
+import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
+import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.data.PluginConfig
+import net.mamoe.mirai.console.data.PluginData
+import net.mamoe.mirai.console.data.PluginDataStorage
+import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
+import net.mamoe.mirai.console.plugin.loader.PluginLoader
+import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.LoginSolver
+import net.mamoe.mirai.utils.MiraiLogger
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
 internal class NavHostImpl(
     component: ComponentContext,
-) : NavHost, ComponentContext by component {
+    override val configStorageForBuiltIns: PluginDataStorage,
+    override val configStorageForJvmPluginLoader: PluginDataStorage,
+    override val consoleCommandSender: MiraiConsoleImplementation.ConsoleCommandSenderImpl,
+    override val consoleInput: ConsoleInput,
+    override val coroutineContext: CoroutineContext,
+    override val dataStorageForBuiltIns: PluginDataStorage,
+    override val dataStorageForJvmPluginLoader: PluginDataStorage,
+) : NavHost, ComponentContext by component, MiraiConsoleImplementation {
+    override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
+
+    override val builtInPluginLoaders = listOf(lazy { JvmPluginLoader })
+
+    override val frontEndDescription = MiraiComposeDescription
+
+
+
     private sealed class Configuration : Parcelable {
         object Message : Configuration()
         object Login : Configuration()
@@ -51,11 +82,12 @@ internal class NavHostImpl(
                     componentContext,
                     onLoginSuccess = { onRouteMessage() },
                     composeFactory = { loginSolver ->
-                        instanceKeeper.getOrCreate {
+                        val a = instanceKeeper.getOrCreate {
                             MiraiCompose { _: Long, _: BotConfiguration ->
                                 loginSolver
                             }
                         }
+                        return@LoginImpl a
                     }
                 ))
             }
@@ -123,6 +155,14 @@ internal class NavHostImpl(
 
     }
 
+    override fun createLogger(identity: String?): MiraiLogger {
+        TODO("Not yet implemented")
+    }
+
+    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginSolver {
+        TODO("Not yet implemented")
+    }
+
 }
 
 class AvatarMenuImpl(
@@ -183,14 +223,14 @@ class AvatarMenuImpl(
 
 class BotItemImpl(
     component: ComponentContext,
-    override val bot: Bot,
-) : BotItem, ComponentContext by component {
+    bot: Bot,
+) : BotItem, Bot by bot, ComponentContext by component {
 
-    override var avatar: ByteArray? = null
+    override val avatar: MutableStateFlow<ByteArray?> = MutableStateFlow(null)
 
     init {
         bot.launch {
-            avatar = Mirai.Http.get(bot.avatarUrl)
+            avatar.value = Mirai.Http.get(bot.avatarUrl)
         }
     }
 }
