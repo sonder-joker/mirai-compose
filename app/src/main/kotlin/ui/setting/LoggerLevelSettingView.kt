@@ -9,8 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
 import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
 
-
-
 @Composable
 fun LoggerLevelSettingUi(setting: LogLevelSetting) {
     Column {
