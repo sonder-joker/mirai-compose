@@ -49,9 +49,9 @@ fun AutoLoginSettingUi(autoLoginSetting: AutoLoginSetting) {
     val accounts by autoLoginSetting.loginCredentials.collectAsState()
 
     Column {
-        val (newAutoLoginCredential, setAutoLoginCredential) = remember { mutableStateOf(LoginCredential()) }
-        var isExpand by remember { mutableStateOf(false) }
-        Button({ isExpand = !isExpand }) {
+        Button({
+            autoLoginSetting.addAutoLogin(LoginCredential())
+        }) {
             Text("Create a auto login account")
         }
 
