@@ -20,31 +20,7 @@ internal inline fun <T> Iterable<T>.replace(index: Int, item: T): List<T> {
     return mapIndexed { i, t -> if (i == index) item else t }
 }
 
-fun <C : Any> Navigator<C>.insertIfNotExist(configuration: C) {
-
-}
-
-fun <T1, T2, R> CoroutineScope.combineState(
-    flow1: StateFlow<T1>,
-    flow2: StateFlow<T2>,
-    sharingStarted: SharingStarted = SharingStarted.Eagerly,
-    transform: (T1, T2) -> R
-): StateFlow<R> = combine(flow1, flow2) { o1, o2 ->
-    transform.invoke(o1, o2)
-}.stateIn(this, sharingStarted, transform.invoke(flow1.value, flow2.value))
-
-fun <T1, T2, T3, R> CoroutineScope.combineState(
-    flow1: StateFlow<T1>,
-    flow2: StateFlow<T2>,
-    flow3: StateFlow<T3>,
-    sharingStarted: SharingStarted = SharingStarted.Eagerly,
-    transform: (T1, T2, T3) -> R
-): StateFlow<R> = combine(flow1, flow2, flow3) { o1, o2, o3 ->
-    transform.invoke(o1, o2, o3)
-}.stateIn(this, sharingStarted, transform.invoke(flow1.value, flow2.value, flow3.value))
-
 inline val Bot.stringId get() = id.toString()
-
 
 internal fun URL.splitQuery(): Map<String, String> {
     val queryPairs: MutableMap<String, String> = LinkedHashMap()

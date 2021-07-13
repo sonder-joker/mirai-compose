@@ -25,17 +25,13 @@ import kotlin.reflect.full.isSubclassOf
 
 internal class ConsoleLogImpl(
     componentContext: ComponentContext,
-    log: StateFlow<List<Log>>,
+    override val log: StateFlow<List<Log>>,
     private val logger: MiraiLogger
 ) : ConsoleLog, ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
 
-    private val searchContent = MutableStateFlow("")
+    override val searchContent = MutableStateFlow("")
 
-    private val command = MutableStateFlow("")
-
-    override val model = combineState(searchContent, command, log) { searchContent, commandContent, log ->
-        ConsoleLog.Model(searchContent, log, commandContent)
-    }
+    override val command = MutableStateFlow("")
 
     override fun setSearchContent(content: String) {
         searchContent.value = content

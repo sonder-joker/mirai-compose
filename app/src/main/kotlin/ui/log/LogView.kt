@@ -27,20 +27,22 @@ import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
 fun ConsoleLogUi(consoleLog: ConsoleLog) {
     var isShowSearch by remember { mutableStateOf(true) }
 
-    val model by consoleLog.model.collectAsState()
+    val searchContent by consoleLog.searchContent.collectAsState()
+    val command by consoleLog.command.collectAsState()
+    val log by consoleLog.log.collectAsState()
 
     Scaffold(
         modifier = Modifier.onPreviewKeyEvent {
             if (it.isCtrlPressed && it.key == Key.F) {
                 isShowSearch = !isShowSearch
-                return@onPreviewKeyEvent    true
+                return@onPreviewKeyEvent true
             }
             false
         },
         topBar = {
             if (isShowSearch)
                 TextField(
-                    model.searchContent,
+                    searchContent,
                     consoleLog::setSearchContent,
                     leadingIcon = { Icon(Icons.Default.Search, null) },
                     modifier = Modifier
@@ -65,11 +67,11 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                     .fillMaxSize()
                     .weight(8f)
                     .padding(horizontal = 40.dp, vertical = 20.dp),
-                model.log,
-                model.searchContent
+                log,
+                searchContent
             )
             CommandSendBox(
-                command = model.command,
+                command = command,
                 onCommandChange = consoleLog::setCurrentCommand,
                 onClick = consoleLog::onSearchClick,
                 modifier = Modifier

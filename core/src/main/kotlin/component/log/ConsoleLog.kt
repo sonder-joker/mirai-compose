@@ -1,6 +1,7 @@
 package com.youngerhousea.miraicompose.core.component.log
 
 import com.youngerhousea.miraicompose.core.console.Log
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import net.mamoe.mirai.utils.MiraiLogger
 
@@ -10,17 +11,16 @@ import net.mamoe.mirai.utils.MiraiLogger
  *
  */
 interface ConsoleLog {
-    data class Model (
-        val searchContent: String,
-        val log:List<Log>,
-        val command:String
-    )
-
-    val model:StateFlow<Model>
 
     fun setSearchContent(content: String)
 
     fun setCurrentCommand(content: String)
 
     fun onSearchClick()
+
+    val log:StateFlow<List<Log>>
+
+    val searchContent: StateFlow<String>
+
+    val command: StateFlow<String>
 }

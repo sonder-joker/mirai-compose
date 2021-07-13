@@ -1,7 +1,6 @@
 package com.youngerhousea.miraicompose.app.ui
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -46,7 +45,11 @@ fun NavHostUi(navHost: NavHost) {
 
     val router by navHost.state.subscribeAsState()
 
-    val model by navHost.model.collectAsState()
+    val isExpand by navHost.isExpand.collectAsState()
+
+    val botList by navHost.botList.collectAsState()
+
+    val currentBot by navHost.currentBot.collectAsState()
 
     HorizontalSplitPane(splitPaneState = splitterState) {
         first(160.dp) {
@@ -65,10 +68,10 @@ fun NavHostUi(navHost: NavHost) {
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        BotItem(model.currentBot)
+                        BotItem(currentBot)
                     }
 
-                    DropdownMenu(model.isExpand, onDismissRequest = navHost::dismissExpandMenu) {
+                    DropdownMenu(isExpand, onDismissRequest = navHost::dismissExpandMenu) {
                         DropdownMenuItem(onClick = navHost::dismissExpandMenu) {
                             Text(R.String.botMenuExit)
                         }
@@ -77,7 +80,7 @@ fun NavHostUi(navHost: NavHost) {
                             Text(R.String.botMenuAdd)
                         }
 
-                        model.botList.forEach { item ->
+                        botList.forEach { item ->
                             DropdownMenuItem(onClick = {
                                 navHost.onItemClick(item)
                             }) {

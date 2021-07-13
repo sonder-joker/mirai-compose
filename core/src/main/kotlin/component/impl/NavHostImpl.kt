@@ -16,7 +16,6 @@ import com.youngerhousea.miraicompose.core.component.impl.setting.SettingImpl
 import com.youngerhousea.miraicompose.core.console.*
 import com.youngerhousea.miraicompose.core.root
 import com.youngerhousea.miraicompose.core.utils.activeInstance
-import com.youngerhousea.miraicompose.core.utils.combineState
 import com.youngerhousea.miraicompose.core.utils.stringId
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
@@ -139,7 +138,7 @@ internal class NavHostImpl(
                         componentContext,
                         onLoginSuccess = {
                             val botItemImpl = BotItemImpl(childContext(it.stringId), it)
-                            botItem.value += botItemImpl
+                            botList.value += botItemImpl
                             currentBot.value = botItemImpl
                             onRouteMessage()
                         },
@@ -177,19 +176,15 @@ internal class NavHostImpl(
                 )
         }
     }
-    private val botItem = MutableStateFlow(listOf<BotItem>())
+    override val botList = MutableStateFlow(listOf<BotItem>())
 
     private val storage = MutableStateFlow(listOf<Log>())
 
-    private val currentBot: MutableStateFlow<BotItem?> = MutableStateFlow(null)
+    override val currentBot: MutableStateFlow<BotItem?> = MutableStateFlow(null)
 
-    private val isExpand = MutableStateFlow(false)
+    override val isExpand = MutableStateFlow(false)
 
     override val state: Value<RouterState<*, NavHost.Child>> get() = router.state
-
-    override val model = combineState(isExpand, botItem, currentBot) { isExpand, botList, currentBot ->
-        NavHost.Model(currentBot, isExpand, botList)
-    }
 
     override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginImpl {
         router.push(Configuration.Login)
@@ -203,7 +198,7 @@ internal class NavHostImpl(
     }
 
     override fun onAutoLogin(instances: List<Bot>) {
-        botItem.value = instances.map { BotItemImpl(childContext(it.stringId), it) }
+        botList.value = instances.map { BotItemImpl(childContext(it.stringId), it) }
     }
 
     override fun onRouteMessage() {
@@ -241,7 +236,7 @@ internal class NavHostImpl(
     }
 
     override fun onAvatarBoxClick() {
-        if (model.value.currentBot != null)
+        if (currentBot.value != null)
             onRouteMessage()
         else
             addNewBot()

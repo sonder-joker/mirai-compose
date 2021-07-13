@@ -89,7 +89,20 @@ fun LogColorSettingUi(setting: LogColorSetting) {
 
 @Composable
 fun LoggerLevelSettingUi(setting: LogLevelSetting) {
+    Column {
+        Text("Log level", Modifier.weight(4f))
 
+        val node by setting.node.collectAsState()
+
+//        EnumTabRowWithContent(node,
+//            rowModifier = Modifier.width(400.dp),
+//            onClick = {
+//                setting.setLogConfigLevel(it)
+//            }) {
+//            Text(it.name)
+//
+//        }
+    }
 }
 
 @OptIn(ExperimentalAnimationApi::class)

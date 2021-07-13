@@ -20,13 +20,11 @@ interface NavHost {
 
     val state: Value<RouterState<*, Child>>
 
-    data class Model(
-        val currentBot: BotItem?,
-        val isExpand: Boolean,
-        val botList: List<BotItem>
-    )
+    val currentBot:StateFlow<BotItem?>
 
-    val model: StateFlow<Model>
+    val isExpand:StateFlow<Boolean>
+
+    val botList: StateFlow<List<BotItem>>
 
     fun onRouteMessage()
 
