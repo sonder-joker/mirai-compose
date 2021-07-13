@@ -8,14 +8,14 @@ import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.Detailed
 import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.DetailedDescriptionImpl
 import com.youngerhousea.miraicompose.core.component.plugin.CJavaPlugin
 import com.youngerhousea.miraicompose.core.console.AccessibleHolder
-import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 
 internal class CJavaPluginImpl(
     componentContext: ComponentContext,
     val plugin: JavaPlugin,
-) : CJavaPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose.instance {
+    accessibleHolder:AccessibleHolder
+) : CJavaPlugin, ComponentContext by componentContext, AccessibleHolder by accessibleHolder {
     private sealed class Configuration : Parcelable {
         object Description : Configuration()
         object Command : Configuration()

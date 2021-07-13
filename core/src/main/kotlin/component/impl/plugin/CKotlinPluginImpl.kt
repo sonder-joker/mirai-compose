@@ -8,14 +8,14 @@ import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.Detailed
 import com.youngerhousea.miraicompose.core.component.impl.plugin.shared.DetailedDescriptionImpl
 import com.youngerhousea.miraicompose.core.component.plugin.CKotlinPlugin
 import com.youngerhousea.miraicompose.core.console.AccessibleHolder
-import com.youngerhousea.miraicompose.core.console.MiraiCompose
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 
 internal class CKotlinPluginImpl(
     componentContext: ComponentContext,
     val plugin: KotlinPlugin,
-) : CKotlinPlugin, ComponentContext by componentContext, AccessibleHolder by MiraiCompose.instance {
+    accessibleHolder: AccessibleHolder
+) : CKotlinPlugin, ComponentContext by componentContext, AccessibleHolder by accessibleHolder {
     private sealed class Configuration : Parcelable {
         object Description : Configuration()
         object Command : Configuration()

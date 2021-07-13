@@ -19,8 +19,10 @@ dependencies {
 
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
+    implementation(compose.uiTooling)
 
     implementation(libs.zxing.core)
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4")
 
     implementation(libs.kotlin.stdlib.main)
     implementation(libs.kotlin.stdlib.common)

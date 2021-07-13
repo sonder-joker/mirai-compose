@@ -1,6 +1,5 @@
 package com.youngerhousea.miraicompose.core.console
 
-import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
 import java.time.LocalDateTime
@@ -49,24 +48,11 @@ val Log.original: String get() = "${first.simpleName} / $second${third?.let { "\
  */
 class MiraiComposeLogger(
     override val identity: String?,
+    val printLog:(message: String?, throwable: Throwable?, priority: LogPriority) -> Unit
 ) : MiraiLoggerPlatformBase() {
-
-    companion object {
-        var storage = listOf<Log>()
-            private set
-    }
-
-
-    private fun printLog(message: String?, throwable: Throwable?, priority: LogPriority) {
-        storage = storage + Log(priority, message, throwable)
-//        if (throwable != null) verbose((message ?: throwable.toString()) + "\n${throwable.stackTraceToString()}")
-//        else verbose(message.toString())
-//        }
-    }
 
     public override fun verbose0(message: String?, e: Throwable?) =
         printLog(message, e, LogPriority.VERBOSE)
-
 
     public override fun info0(message: String?, e: Throwable?) =
         printLog(message, e, LogPriority.INFO)

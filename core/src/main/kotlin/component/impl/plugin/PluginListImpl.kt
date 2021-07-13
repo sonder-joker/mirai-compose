@@ -2,9 +2,10 @@ package com.youngerhousea.miraicompose.core.component.impl.plugin
 
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.core.component.plugin.PluginList
-import com.youngerhousea.miraicompose.core.console.MiraiCompose
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.PluginManager
+import net.mamoe.mirai.event.events.MessageEvent
 
 internal class PluginListImpl(
     componentContext: ComponentContext,
@@ -12,7 +13,6 @@ internal class PluginListImpl(
     override val plugins: List<Plugin>
 ) : PluginList, ComponentContext by componentContext {
 //    val scope = componentScope()
-
 
     //    val onAddPluginClick: (File) -> Unit = { file ->
 //        scope.launch {

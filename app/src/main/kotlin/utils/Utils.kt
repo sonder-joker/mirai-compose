@@ -12,6 +12,12 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.yamlkt.Yaml
 import org.jetbrains.skija.Image
@@ -22,7 +28,17 @@ import javax.swing.JFileChooser
 import javax.swing.UIManager
 import javax.swing.filechooser.FileFilter
 
-
+infix fun ClosedRange<Float>.step(step: Float): Iterable<Float> {
+    require(start.isFinite())
+    require(endInclusive.isFinite())
+    require(step > 0.0) { "Step must be positive, was: $step." }
+    val sequence = generateSequence(start) { previous ->
+        if (previous == Float.POSITIVE_INFINITY) return@generateSequence null
+        val next = previous + step
+        if (next > endInclusive) null else next
+    }
+    return sequence.asIterable()
+}
 //interface MenuScope : ColumnScope {
 //    var isExpand: Boolean
 //}
@@ -57,6 +73,31 @@ import javax.swing.filechooser.FileFilter
 //    isExpand = false
 //}, modifier, enabled, contentPadding, interactionSource, content)
 
+
+
+@Composable
+inline fun <reified T : Enum<T>> EnumTabRowWithContent(
+    enum: T,
+    rowModifier: Modifier = Modifier,
+    crossinline onClick: (enumValue: T) -> Unit,
+    crossinline tabContent: @Composable ColumnScope.(enumValue: T) -> Unit
+) {
+    TabRow(enum.ordinal, modifier = rowModifier) {
+        for (current in enumValues<T>()) {
+            Tab(enum == current, onClick = {
+                onClick(current)
+            }, content = {
+                tabContent(current)
+            })
+        }
+    }
+}
+
+
+fun <T> derivedStateOfValue(calculation: () -> T): T {
+    val value by derivedStateOf(calculation)
+    return value
+}
 
 internal fun SkiaImageDecode(byteArray: ByteArray): ImageBitmap =
     Image.makeFromEncoded(byteArray).asImageBitmap()

@@ -20,7 +20,13 @@ interface NavHost {
 
     val state: Value<RouterState<*, Child>>
 
-    val avatarMenu: AvatarMenu
+    data class Model(
+        val currentBot: BotItem?,
+        val isExpand: Boolean,
+        val botList: List<BotItem>
+    )
+
+    val model: StateFlow<Model>
 
     fun onRouteMessage()
 
@@ -32,31 +38,6 @@ interface NavHost {
 
     fun onRouteAbout()
 
-    sealed class Child {
-        class CMessage(val message: Message) : Child()
-        class CLogin(val login: Login) : Child()
-        class CSetting(val setting: Setting) : Child()
-        class CAbout(val about: About) : Child()
-        class CConsoleLog(val log: ConsoleLog) : Child()
-        class CPlugins(val plugins: Plugins) : Child()
-    }
-
-}
-
-/**
- * Avatar menu
- *
- */
-interface AvatarMenu {
-    data class Model(
-        val currentBot:BotItem?,
-        val isExpand: Boolean,
-        val botList: List<BotItem>
-    )
-
-    val model:StateFlow<Model>
-
-    // 登录机器人
     fun addNewBot()
 
     fun openExpandMenu()
@@ -66,10 +47,19 @@ interface AvatarMenu {
     fun onAvatarBoxClick()
 
     fun onItemClick(item: BotItem)
+
+    sealed class Child {
+        class CMessage(val message: Message) : Child()
+        class CLogin(val login: Login) : Child()
+        class CSetting(val setting: Setting) : Child()
+        class CAbout(val about: About) : Child()
+        class CConsoleLog(val log: ConsoleLog) : Child()
+        class CPlugins(val plugins: Plugins) : Child()
+    }
 }
 
-interface BotItem:Bot {
+interface BotItem : Bot {
 
-    val avatar:StateFlow<ByteArray?>
+    val avatar: StateFlow<ByteArray?>
 }
 

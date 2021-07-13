@@ -19,10 +19,9 @@ interface InitLogin {
 
     fun onPasswordChange(password: String)
 
-    fun onLogin(account: Long, password: String)
+    fun onLogin(account: String, password: String)
 
     fun cancelLogin()
-
 }
 
 sealed class Event {

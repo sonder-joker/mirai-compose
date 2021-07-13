@@ -1,22 +1,24 @@
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
 package com.youngerhousea.miraicompose.core.component.impl.bot
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.youngerhousea.miraicompose.core.component.bot.Login
 import com.youngerhousea.miraicompose.core.component.bot.ReturnException
-import com.youngerhousea.miraicompose.core.console.MiraiCompose
+import com.youngerhousea.miraicompose.core.data.LoginCredential
 import com.youngerhousea.miraicompose.core.utils.componentScope
+import com.youngerhousea.miraicompose.core.viewmodel.AutoLoginViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
+import net.mamoe.mirai.console.internal.util.autoHexToBytes
 import net.mamoe.mirai.utils.LoginSolver
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -27,6 +29,7 @@ internal class LoginImpl(
     componentContext: ComponentContext,
     private val onLoginSuccess: (bot: Bot) -> Unit,
 ) : Login, LoginSolver(), ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
+    private val autoLoginViewModel = instanceKeeper.getOrCreate { AutoLoginViewModel() }
 
     sealed class Configuration : Parcelable {
         object InitLogin : Configuration()
@@ -94,22 +97,6 @@ internal class LoginImpl(
         }
     )
 
-//    init {
-//        //NOT GOOD
-//        launch(Dispatchers.IO) {
-//            while (true) {
-//                @Suppress("SENSELESS_COMPARISON")
-//                if (router != null) {
-//                    compose.start()
-//                }
-//                if (compose.isActive) {
-//                    break
-//                }
-//            }
-//
-//        }
-//    }
-
     override val state get() = router.state
 
     private fun onExitHappened() {
@@ -159,19 +146,35 @@ internal class LoginImpl(
             })
         }
 
-    private suspend fun startLogin(account: Long, password: String) {
+    private suspend fun startLogin(loginCredential: LoginCredential) {
         runCatching {
-            MiraiConsole.addBot(
-                id = account,
-                password = password
-            ) {
-                loginSolver = this@LoginImpl
-            }.alsoLogin()
+            if (loginCredential.passwordKind == LoginCredential.PasswordKind.PLAIN)
+                MiraiConsole.addBot(
+                    id = loginCredential.account.toLong(),
+                    password = loginCredential.password
+                ) {
+                    loginSolver = this@LoginImpl
+                }.alsoLogin()
+            else
+                MiraiConsole.addBot(
+                    id = loginCredential.account.toLong(),
+                    password = loginCredential.password.autoHexToBytes()
+                ) {
+                    loginSolver = this@LoginImpl
+                }.alsoLogin()
         }.onSuccess(
             onLoginSuccess
         ).onFailure {
             onExitHappened()
             throw it
+        }
+    }
+
+    init {
+        autoLoginViewModel.data.value.forEach {
+            launch {
+                startLogin(it)
+            }
         }
     }
 

@@ -2,89 +2,90 @@ package com.youngerhousea.miraicompose.core.component.impl.setting
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.youngerhousea.miraicompose.core.component.setting.*
-import com.youngerhousea.miraicompose.core.console.LoggerConfig
-import com.youngerhousea.miraicompose.core.theme.AppTheme
+import com.youngerhousea.miraicompose.core.console.LogPriority
+import com.youngerhousea.miraicompose.core.data.LoginCredential
+import com.youngerhousea.miraicompose.core.viewmodel.AutoLoginViewModel
+import com.youngerhousea.miraicompose.core.viewmodel.LogPriorityViewModel
+import com.youngerhousea.miraicompose.core.viewmodel.Node
+import com.youngerhousea.miraicompose.core.viewmodel.ThemeViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.Serializable
-import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
-import net.mamoe.mirai.console.logging.AbstractLoggerController
-import net.mamoe.yamlkt.YamlDynamicSerializer
+import kotlinx.coroutines.flow.StateFlow
 
-@Suppress("INVISIBLE_MEMBER")
 internal class SettingImpl(
     componentContext: ComponentContext,
-    theme: AppTheme
 ) : Setting, ComponentContext by componentContext {
 
-    override val logLevelSetting = LogLevelSettingImpl(childContext("logLevel"), LoggerConfig.defaultPriority)
+    override val logLevelSetting = LogLevelSettingImpl(childContext("logLevel"))
 
-    override val logColorSetting = LogColorSettingImpl(childContext("logColor"), theme)
+    override val logColorSetting = LogColorSettingImpl(childContext("logColor"))
 
-    override val autoLoginSetting = AutoLoginImpl(childContext("autoLogin"), AutoLoginConfig.accounts)
+    override val autoLoginSetting = AutoLoginImpl(childContext("autoLogin"))
 }
 
 class LogColorSettingImpl(
     componentContext: ComponentContext,
-    private val theme: AppTheme
+    private val themeViewModel: ThemeViewModel = componentContext.instanceKeeper.getOrCreate { ThemeViewModel() }
 ) : LogColorSetting, ComponentContext by componentContext {
 
-    override val debug = theme.logColors.debug
+    override val logColor = themeViewModel.data
 
-    override val verbose = theme.logColors.verbose
-
-    override val info get() = theme.logColors.info
-
-    override val warning get() = theme.logColors.warning
-
-    override val error get() = theme.logColors.error
-
-    override fun onDebugColorSet(stringColor: StringColor) {
-        theme.logColors.debug = stringColor
+    override fun setDebugColor(debug: String) {
+        themeViewModel.setDebugColor(debug)
     }
 
-    override fun onVerboseColorSet(stringColor: StringColor) {
-        theme.logColors.verbose = stringColor
+    override fun setVerboseColor(verbose: String) {
+        themeViewModel.setVerboseColor(verbose)
     }
 
-    override fun onInfoColorSet(stringColor: StringColor) {
-        theme.logColors.info = stringColor
+    override fun setInfoColor(info: String) {
+        themeViewModel.setInfoColor(info)
     }
 
-    override fun onWarningColorSet(stringColor: StringColor) {
-        theme.logColors.warning = stringColor
+    override fun setWarningColor(warning: String) {
+        themeViewModel.setWarningColor(warning)
     }
 
-    override fun onErrorColorSet(stringColor: StringColor) {
-        theme.logColors.error = stringColor
+    override fun setErrorColor(error: String) {
+        themeViewModel.setErrorColor(error)
     }
 }
 
 class LogLevelSettingImpl(
     componentContext: ComponentContext,
-    override val logConfigLevel: AbstractLoggerController.LogPriority,
+    private val logPriorityViewModel: LogPriorityViewModel = componentContext.instanceKeeper.getOrCreate { LogPriorityViewModel() }
 ) : LogLevelSetting, ComponentContext by componentContext {
 
-    override fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority) {
-        LoggerConfig.defaultPriority = priority
+    override val node: StateFlow<Node> get() = logPriorityViewModel.data
+
+    override fun setLogConfigLevel(priority: LogPriority) {
+
     }
 }
+
 
 class AutoLoginImpl(
     componentContext: ComponentContext,
-    list: List<AutoLoginConfig.Account>,
+    private val autoLoginViewModel: AutoLoginViewModel = componentContext.instanceKeeper.getOrCreate { AutoLoginViewModel() }
 ) : AutoLoginSetting, ComponentContext by componentContext {
-    override val model = MutableStateFlow(AutoLoginSetting.Model(list))
 
-    override fun addAutoLogin(
-        account: String,
-        password: AutoLoginConfig.Account.Password,
-        configuration: Map<AutoLoginConfig.Account.ConfigurationKey, @Serializable(with = YamlDynamicSerializer::class) Any>
-    ) {
-        AutoLoginConfig.accounts.add(AutoLoginConfig.Account(account, password, configuration))
+    override val model: StateFlow<List<LoginCredential>> get() = autoLoginViewModel.data
+
+    override fun addAutoLogin(config: LoginCredential) {
+        autoLoginViewModel.addAutoLoginAccount(config)
+    }
+
+    override fun updateLoginCredential(index: Int, loginCredential: LoginCredential) {
+        autoLoginViewModel.updateLoginCredential(index, loginCredential)
+    }
+
+    override fun addLoginCredential(loginCredential: LoginCredential) {
+        autoLoginViewModel.addAutoLoginAccount(loginCredential)
     }
 
 }
+
 
 class ThemeColorImpl(
 ) {

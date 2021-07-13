@@ -4,11 +4,13 @@ import com.arkivanov.decompose.*
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
+import com.youngerhousea.miraicompose.core.console.AccessibleHolder
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.PluginManager
 
 internal class PluginsImpl(
     component: ComponentContext,
+    accessibleHolder: AccessibleHolder
 ) : Plugins, ComponentContext by component {
 
     private sealed class Configuration : Parcelable {
@@ -36,7 +38,8 @@ internal class PluginsImpl(
                         SpecificPluginImpl(
                             componentContext,
                             plugin = configuration.plugin,
-                            _onExitButtonClicked = ::popToPluginList
+                            _onExitButtonClicked = ::popToPluginList,
+                            accessibleHolder = accessibleHolder
                         )
                     )
                 }

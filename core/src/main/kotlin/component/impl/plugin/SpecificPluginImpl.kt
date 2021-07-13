@@ -7,6 +7,7 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.plugin.SpecificPlugin
+import com.youngerhousea.miraicompose.core.console.AccessibleHolder
 import net.mamoe.mirai.console.plugin.Plugin
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -15,6 +16,7 @@ internal class SpecificPluginImpl(
     component: ComponentContext,
     override val plugin: Plugin,
     private inline val _onExitButtonClicked: () -> Unit,
+    accessibleHolder:AccessibleHolder
 ) : SpecificPlugin, ComponentContext by component {
     private sealed class Configuration : Parcelable {
         class Common(val plugin: Plugin) : Configuration()
@@ -42,12 +44,14 @@ internal class SpecificPluginImpl(
                     CJavaPluginImpl(
                         componentContext,
                         plugin = configuration.javaPlugin,
+                        accessibleHolder = accessibleHolder
                     )
                 )
                 is Configuration.Kotlin -> SpecificPlugin.Children.Kotlin(
                     CKotlinPluginImpl(
                         componentContext,
                         plugin = configuration.kotlinPlugin,
+                        accessibleHolder = accessibleHolder
                     )
                 )
             }

@@ -3,6 +3,7 @@ package com.youngerhousea.miraicompose.core.component.impl.bot
 import com.arkivanov.decompose.ComponentContext
 import com.youngerhousea.miraicompose.core.component.bot.Event
 import com.youngerhousea.miraicompose.core.component.bot.InitLogin
+import com.youngerhousea.miraicompose.core.data.LoginCredential
 import com.youngerhousea.miraicompose.core.utils.componentScope
 import com.youngerhousea.miraicompose.core.utils.getValue
 import com.youngerhousea.miraicompose.core.utils.setValue
@@ -13,7 +14,7 @@ import net.mamoe.mirai.network.*
 
 internal class InitLoginImpl(
     componentContext: ComponentContext,
-    private val onClick: suspend (account: Long, password: String) -> Unit,
+    private inline val onClick: suspend (loginCredential: LoginCredential) -> Unit,
 ) : InitLogin, ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
     lateinit var job: Job
 
@@ -23,20 +24,20 @@ internal class InitLoginImpl(
 
     override fun onAccountChange(account: String) {
         delegateModel = delegateModel.copy(account = account)
-
     }
 
     override fun onPasswordChange(password: String) {
         delegateModel = delegateModel.copy(password = password)
     }
 
-    override fun onLogin(account: Long, password: String) {
+    override fun onLogin(account: String, password: String) {
         job = launch {
             runCatching {
                 delegateModel = delegateModel.copy(event = Event.Loading("Loading"))
-                withTimeout(20_000) {
-                    onClick(account, password)
-                }
+//                need a better way
+//                withTimeout(20_000) {
+                    onClick(LoginCredential(account, password))
+//                }
             }.onFailure {
                 when (it) {
                     is WrongPasswordException -> {

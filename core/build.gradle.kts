@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(libs.kotlin.reflect)
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4")
 
     testImplementation(libs.junit4.core)
     testImplementation(libs.junit4.kotlin)

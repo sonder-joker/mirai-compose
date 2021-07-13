@@ -7,8 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Slider
-import androidx.compose.material.SliderColors
-import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -19,71 +17,69 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.miraicompose.app.utils.*
 
+//need more optimization
 @Composable
 fun ColorPicker(
-    initialColor: Color,
-    firstCanvasWidth: Int = 20,
-    firstCanvasHeight: Int = 1,
-    secondCanvasSingleElementSize: Int = 1,
-    result: (red: Int, green: Int, blue: Int, alpha: Int) -> Unit
+    color: Color,
+    firstCanvasWidth: Float = 20f,
+    firstCanvasHeight: Float = 1f,
+    secondCanvasSingleElementSize: Float = 1f,
+    onColorChange: (color: Color) -> Unit
 ) {
-    var red by remember { mutableStateOf(initialColor.r) }
-    var green by remember { mutableStateOf(initialColor.g) }
-    var blue by remember { mutableStateOf(initialColor.b) }
-
-    var trueRed by remember { mutableStateOf(initialColor.r) }
-    var trueGreen by remember { mutableStateOf(initialColor.g) }
-    var trueBlue by remember { mutableStateOf(initialColor.b) }
-    var trueAlpha by remember { mutableStateOf(initialColor.a) }
+    // pointer move rgb
+    var red by remember { mutableStateOf(color.red) }
+    var green by remember { mutableStateOf(color.green) }
+    var blue by remember { mutableStateOf(color.blue) }
+    var alpha by remember { mutableStateOf(color.alpha) }
 
     Row(Modifier.fillMaxSize().animateContentSize(), horizontalArrangement = Arrangement.SpaceEvenly) {
+
         Canvas(modifier = Modifier.pointerMoveFilter(onMove = { position ->
-            red = position.y.toInt() / firstCanvasHeight
+            red = (position.y / firstCanvasHeight) / 255f
             true
         }).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-            trueRed = red
-            result(trueRed, trueGreen, trueBlue, trueAlpha)
+            Color(red, green, blue, alpha)
         }.size(firstCanvasWidth.dp, (256 * firstCanvasHeight).dp)) {
             for (x in 0..255) {
-                drawBackground(0, x, Color(x, 0, 0, trueAlpha), firstCanvasWidth, firstCanvasHeight)
+                drawBackground(0f, x.toFloat(), Color(x / 255f, 0f, 0f, alpha), firstCanvasWidth, firstCanvasHeight)
             }
         }
+
         Canvas(modifier = Modifier.pointerMoveFilter(onMove = { position ->
-            blue = position.x.toInt() / secondCanvasSingleElementSize
-            green = position.y.toInt() / secondCanvasSingleElementSize
+            blue = position.x / secondCanvasSingleElementSize / 255f
+            green = position.y / secondCanvasSingleElementSize / 255f
             true
         }).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-            trueRed = red
-            trueGreen = green
-            trueBlue = blue
-            result(trueRed, trueGreen, trueBlue, trueAlpha)
+            onColorChange(Color(red, green, blue, alpha))
         }.size((secondCanvasSingleElementSize * 256).dp)) {
             for (x in 0..255) {
                 for (y in 0..255) {
                     drawBackground(
-                        x,
-                        y,
-                        Color(red, y, x, trueAlpha),
+                        x / 255f,
+                        y / 255f,
+                        Color(red, y / 255f, x / 255f, alpha),
                         secondCanvasSingleElementSize,
                         secondCanvasSingleElementSize
                     )
                 }
             }
         }
-        IntSlider(trueAlpha, {
-            trueAlpha = it
-            result(trueRed, trueGreen, trueBlue, trueAlpha)
-        }, valueRange = 0..0xff, modifier = Modifier.width(100.dp))
+
+        Slider(alpha, {
+            alpha = it
+            onColorChange(Color(red, green, blue, alpha))
+        }, valueRange = 0f..1f, modifier = Modifier.width(100.dp))
+
         Row {
             Text("Pointer color")
-            Image(ColorPainter(Color(red, green, blue, trueAlpha)), null, Modifier.width(20.dp).height(20.dp))
+            Image(ColorPainter(Color(red, green, blue, alpha)), null, Modifier.width(20.dp).height(20.dp))
         }
+
         Row {
             Text("Now color")
             Image(
-                ColorPainter(Color(trueRed, trueGreen, trueBlue, trueAlpha)),
+                ColorPainter(color),
                 null,
                 Modifier.width(20.dp).height(20.dp)
             )
@@ -92,35 +88,36 @@ fun ColorPicker(
     }
 }
 
-@Composable
-private fun IntSlider(
-    value: Int,
-    onValueChange: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    valueRange: IntRange = 0..1,
-    /*@IntRange(from = 0)*/
-    steps: Int = 0,
-    onValueChangeFinished: (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: SliderColors = SliderDefaults.colors()
-) = Slider(
-    value = value.toFloat(),
-    onValueChange = { onValueChange(it.toInt()) },
-    modifier,
-    enabled,
-    valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
-    steps,
-    onValueChangeFinished,
-    interactionSource,
-    colors
-)
 
-
-private fun DrawScope.drawBackground(x: Int, y: Int, color: Color, widthRate: Int, heightRate: Int) {
+private fun DrawScope.drawBackground(x: Float, y: Float, color: Color, widthRate: Float, heightRate: Float) {
     drawRect(
         color = color,
-        topLeft = Offset(x = x * widthRate.toFloat(), y = y * heightRate.toFloat()),
-        size = Size(widthRate.toFloat(), heightRate.toFloat())
+        topLeft = Offset(x = x * widthRate, y = y * heightRate),
+        size = Size(widthRate, heightRate)
     )
+}
+
+@Composable
+@Suppress("DuplicatedCode")
+fun ColorPicker(
+    color: Color,
+    onColorChange: (color: Color) -> Unit
+) {
+    Column {
+        Slider(color.alpha, {
+            onColorChange(color.copy(alpha = it))
+        }, valueRange = 0f..1f)
+
+        Slider(color.red, {
+            onColorChange(color.copy(red = it))
+        }, valueRange = 0f..1f)
+
+        Slider(color.green, {
+            onColorChange(color.copy(green = it))
+        }, valueRange = 0f..1f)
+
+        Slider(color.blue, {
+            onColorChange(color.copy(blue = it))
+        }, valueRange = 0f..1f)
+    }
 }

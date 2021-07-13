@@ -21,7 +21,7 @@ class CustomSerializerTest {
 
     @Test
     fun long() {
-        val color = Color(0xffffffff)
+        val color = Color(0xFF00FFFF)
         assertEquals(color, serialize(color), "Long Color Serializer")
     }
 

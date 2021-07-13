@@ -1,7 +1,6 @@
 package com.youngerhousea.miraicompose.app
 
 import androidx.compose.desktop.DesktopMaterialTheme
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -12,7 +11,6 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.youngerhousea.miraicompose.app.ui.NavHostUi
 import com.youngerhousea.miraicompose.app.utils.ResourceImage
 import com.youngerhousea.miraicompose.core.navHost
-import kotlin.system.exitProcess
 
 object MiraiComposeLoader {
     // Compose Entry Point
@@ -33,7 +31,7 @@ fun MiraiComposeView() = application {
 
 @ExperimentalComposeUiApi
 @Composable
-fun ExceptionWindows(
+fun ApplicationScope.ExceptionWindows(
     onException: (throwable: Throwable) -> Unit = { println(it.stackTraceToString()) },
     state: WindowState = rememberWindowState(size = WindowSize(1280.dp, 768.dp))
 ) {
@@ -51,10 +49,7 @@ fun ExceptionWindows(
     if (showException)
         Window(
             state = state,
-            onCloseRequest = {
-                showException = false
-                exitProcess(1)
-            }
+            onCloseRequest = ::exitApplication
         ) {
             exception?.let {
                 SelectionContainer {
@@ -67,19 +62,19 @@ fun ExceptionWindows(
 
 @ExperimentalComposeUiApi
 @Composable
-private fun MiraiComposeWindow(
+private fun ApplicationScope.MiraiComposeWindow(
     state: WindowState = rememberWindowState(size = WindowSize(1280.dp, 768.dp))
 ) {
+    val navHost = rememberRootComponent(factory = ::navHost)
+
     Window(
-        onCloseRequest = {},
+        onCloseRequest = ::exitApplication,
         state = state,
         title = "Mirai compose",
         icon = ResourceImage.icon,
     ) {
-        DesktopMaterialTheme() {
-            NavHostUi(rememberRootComponent { componentContext ->
-                navHost(componentContext)
-            })
+        DesktopMaterialTheme {
+            NavHostUi(navHost)
         }
     }
 }

@@ -13,11 +13,13 @@ import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.shortcuts
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -27,7 +29,7 @@ import com.youngerhousea.miraicompose.app.utils.ResourceImage
 import com.youngerhousea.miraicompose.core.component.bot.Event
 import com.youngerhousea.miraicompose.core.component.bot.InitLogin
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun InitLoginUi(initLogin: InitLogin) {
 
@@ -39,7 +41,7 @@ fun InitLoginUi(initLogin: InitLogin) {
             is Event.Loading -> {
                 val result = state.showSnackbar(event.message, "Cancel")
                 if (result == SnackbarResult.ActionPerformed)
-                   initLogin.cancelLogin()
+                    initLogin.cancelLogin()
             }
             is Event.Error -> {
                 state.showSnackbar(event.message)
@@ -47,9 +49,13 @@ fun InitLoginUi(initLogin: InitLogin) {
         }
     }
 
-
-
-    Scaffold(scaffoldState = rememberScaffoldState(snackbarHostState = state)) {
+    Scaffold(scaffoldState = rememberScaffoldState(snackbarHostState = state), modifier = Modifier.onPreviewKeyEvent {
+        if (it.key == Key.Enter) {
+            initLogin.onLogin(data.account, data.password)
+            return@onPreviewKeyEvent true
+        }
+        false
+    }) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,15 +70,13 @@ fun InitLoginUi(initLogin: InitLogin) {
             AccountTextField(
                 account = data.account,
                 onAccountTextChange = initLogin::onAccountChange,
-                onKeyEnter = { initLogin.onLogin(data.account.toLong(), data.password) }
             )
             PasswordTextField(
                 password = data.password,
                 onPasswordTextChange = initLogin::onPasswordChange,
-                onKeyEnter = { initLogin.onLogin(data.account.toLong(), data.password) }
             )
             LoginButton(
-                onClick = { initLogin.onLogin(data.account.toLong(), data.password) },
+                onClick = { initLogin.onLogin(data.account, data.password) },
                 isLoading = data.event is Event.Loading
             )
         }
@@ -81,11 +85,11 @@ fun InitLoginUi(initLogin: InitLogin) {
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun AccountTextField(
     account: String,
     onAccountTextChange: (String) -> Unit,
-    onKeyEnter: () -> Unit
 ) {
     var isError by remember { mutableStateOf(false) }
     OutlinedTextField(
@@ -95,10 +99,7 @@ private fun AccountTextField(
             onAccountTextChange(it)
         },
         modifier = Modifier
-            .padding(40.dp)
-            .shortcuts {
-                on(Key.Enter, callback = onKeyEnter)
-            },
+            .padding(40.dp),
         label = { Text("Account") },
         leadingIcon = { Icon(Icons.Default.AccountCircle, null) },
         isError = isError,
@@ -110,11 +111,11 @@ private fun AccountTextField(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PasswordTextField(
     password: String,
     onPasswordTextChange: (String) -> Unit,
-    onKeyEnter: () -> Unit
 ) {
     var passwordVisualTransformation: VisualTransformation by remember { mutableStateOf(PasswordVisualTransformation()) }
 
@@ -124,10 +125,7 @@ private fun PasswordTextField(
             onPasswordTextChange(it)
         },
         modifier = Modifier
-            .padding(40.dp)
-            .shortcuts {
-                on(Key.Enter, callback = onKeyEnter)
-            },
+            .padding(40.dp),
         label = { Text("Password") },
         leadingIcon = {
             Icon(

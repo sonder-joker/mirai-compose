@@ -1,10 +1,10 @@
 package com.youngerhousea.miraicompose.core.component.setting
 
+import com.youngerhousea.miraicompose.core.console.LogPriority
+import com.youngerhousea.miraicompose.core.data.LogColor
+import com.youngerhousea.miraicompose.core.data.LoginCredential
+import com.youngerhousea.miraicompose.core.viewmodel.Node
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.Serializable
-import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
-import net.mamoe.mirai.console.logging.AbstractLoggerController
-import net.mamoe.yamlkt.YamlDynamicSerializer
 
 
 /**
@@ -26,42 +26,38 @@ interface Setting {
 
 
 interface LogColorSetting {
-    val debug: StringColor
 
-    val verbose: StringColor
+    val logColor:StateFlow<LogColor>
 
-    val info: StringColor
+    fun setDebugColor(debug: String)
 
-    val warning: StringColor
+    fun setVerboseColor(verbose: String)
 
-    val error: StringColor
+    fun setInfoColor(info: String)
 
-    fun onDebugColorSet(stringColor: StringColor)
+    fun setErrorColor(error: String)
 
-    fun onVerboseColorSet(stringColor: StringColor)
-
-    fun onInfoColorSet(stringColor: StringColor)
-
-    fun onErrorColorSet(stringColor: StringColor)
-
-    fun onWarningColorSet(stringColor: StringColor)
+    fun setWarningColor(warning: String)
 }
 
 interface LogLevelSetting {
-    val logConfigLevel: AbstractLoggerController.LogPriority
 
-    fun setLogConfigLevel(priority: AbstractLoggerController.LogPriority)
+    val node: StateFlow<Node>
+
+    fun setLogConfigLevel(priority: LogPriority)
 }
 
 
 interface AutoLoginSetting {
-    data class Model(
-        val accountList: List<AutoLoginConfig.Account>
-    )
 
-    val model: StateFlow<Model>
+    val model: StateFlow<List<LoginCredential>>
 
-    fun addAutoLogin(account: String, password: AutoLoginConfig.Account.Password, configuration:Map<AutoLoginConfig.Account.ConfigurationKey, @Serializable(with = YamlDynamicSerializer::class) Any>)
+    fun addAutoLogin(config: LoginCredential)
+
+    fun updateLoginCredential(index: Int, loginCredential: LoginCredential)
+
+    fun addLoginCredential(loginCredential: LoginCredential)
 }
 
-typealias StringColor = String
+
+

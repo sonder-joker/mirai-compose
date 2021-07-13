@@ -1,6 +1,7 @@
 package com.youngerhousea.miraicompose.app.ui
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -32,13 +33,11 @@ import com.youngerhousea.miraicompose.app.ui.plugin.PluginsUi
 import com.youngerhousea.miraicompose.app.ui.setting.SettingUi
 import com.youngerhousea.miraicompose.app.utils.R
 import com.youngerhousea.miraicompose.app.utils.SkiaImageDecode
-import com.youngerhousea.miraicompose.core.component.AvatarMenu
 import com.youngerhousea.miraicompose.core.component.BotItem
 import com.youngerhousea.miraicompose.core.component.NavHost
 import com.youngerhousea.miraicompose.core.utils.activeInstance
 
 private val RailTabHeight = 80.dp
-
 
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalSplitPaneApi::class)
 @Composable
@@ -47,13 +46,46 @@ fun NavHostUi(navHost: NavHost) {
 
     val router by navHost.state.subscribeAsState()
 
+    val model by navHost.model.collectAsState()
+
     HorizontalSplitPane(splitPaneState = splitterState) {
         first(160.dp) {
             Column(
                 Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Top,
             ) {
-                AvatarWithMenu(navHost.avatarMenu)
+                Box(Modifier.height(RailTabHeight).fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .combinedClickable(
+                                onLongClick = navHost::openExpandMenu,
+                                onClick = navHost::onAvatarBoxClick
+                            ),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        BotItem(model.currentBot)
+                    }
+
+                    DropdownMenu(model.isExpand, onDismissRequest = navHost::dismissExpandMenu) {
+                        DropdownMenuItem(onClick = navHost::dismissExpandMenu) {
+                            Text(R.String.botMenuExit)
+                        }
+
+                        DropdownMenuItem(onClick = navHost::addNewBot) {
+                            Text(R.String.botMenuAdd)
+                        }
+
+                        model.botList.forEach { item ->
+                            DropdownMenuItem(onClick = {
+                                navHost.onItemClick(item)
+                            }) {
+                                BotItem(item)
+                            }
+                        }
+                    }
+                }
                 RailTab(
                     onClick = navHost::onRouteMessage,
                     selected = router.activeInstance is NavHost.Child.CMessage
@@ -104,7 +136,7 @@ fun NavHostUi(navHost: NavHost) {
             handle {
                 Box(
                     Modifier
-//                        .markAsHandle()
+//                         .markAsHandle()
 //                        .background(SolidColor(Color.Gray), alpha = 0.5f)
 //                        .width(10.dp)
 //                        .fillMaxHeight()
@@ -129,46 +161,6 @@ fun NavHostUi(navHost: NavHost) {
     }
 }
 
-@Composable
-fun AvatarWithMenu(
-    avatarMenu: AvatarMenu,
-    modifier: Modifier = Modifier,
-) {
-    val model by avatarMenu.model.collectAsState()
-
-    Box(modifier.height(RailTabHeight).fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .combinedClickable(
-                    onLongClick = avatarMenu::openExpandMenu,
-                    onClick = avatarMenu::onAvatarBoxClick
-                ),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BotItem(model.currentBot)
-        }
-
-        DropdownMenu(model.isExpand, onDismissRequest = avatarMenu::dismissExpandMenu) {
-            DropdownMenuItem(onClick = avatarMenu::dismissExpandMenu) {
-                Text(R.String.botMenuExit)
-            }
-
-            DropdownMenuItem(onClick = avatarMenu::addNewBot) {
-                Text(R.String.botMenuAdd)
-            }
-
-            model.botList.forEach { item ->
-                DropdownMenuItem(onClick = {
-                    avatarMenu.onItemClick(item)
-                }) {
-                    BotItem(item)
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun BotItem(
@@ -221,7 +213,7 @@ fun BotItem(
 private fun RailTab(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    selected: Boolean,
+    selected: Boolean = false,
     content: @Composable RowScope.() -> Unit,
 ) {
     val color by animateColorAsState(if (selected) Color.Green else MaterialTheme.colors.primary)

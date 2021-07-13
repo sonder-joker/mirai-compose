@@ -10,15 +10,3 @@ object MiraiComposeInput : ConsoleInput {
         error("Not implementation!")
     }
 }
-
-object MiraiComposeSender : MiraiConsoleImplementation.ConsoleCommandSenderImpl {
-    override suspend fun sendMessage(message: String) {
-
-        MiraiCompose.logger.info(message)
-    }
-
-    override suspend fun sendMessage(message: Message) {
-        sendMessage(message.toString())
-    }
-}
-

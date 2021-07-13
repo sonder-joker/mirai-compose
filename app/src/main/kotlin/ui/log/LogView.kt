@@ -13,17 +13,16 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.miraicompose.app.ui.shared.CommandSendBox
 import com.youngerhousea.miraicompose.app.ui.shared.LogBox
 import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ConsoleLogUi(consoleLog: ConsoleLog) {
     var isShowSearch by remember { mutableStateOf(true) }
@@ -34,7 +33,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
         modifier = Modifier.onPreviewKeyEvent {
             if (it.isCtrlPressed && it.key == Key.F) {
                 isShowSearch = !isShowSearch
-                return@onPreviewKeyEvent true
+                return@onPreviewKeyEvent    true
             }
             false
         },
@@ -70,8 +69,10 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                 model.searchContent
             )
             CommandSendBox(
-                consoleLog.logger,
-                Modifier
+                command = model.command,
+                onCommandChange = consoleLog::setCurrentCommand,
+                onClick = consoleLog::onSearchClick,
+                modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 40.dp),
             )

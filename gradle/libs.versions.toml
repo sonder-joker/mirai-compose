@@ -1,7 +1,7 @@
 [versions]
 app = "1.0.0"
 kotlin = "1.5.10"
-compose-jb = "0.4.0"
+compose-jb = "0.5.0-build235"
 decompose = "0.2.6"
 mirai = "2.7-M1"
 yamlkt = "0.9.0"

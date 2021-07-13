@@ -23,7 +23,7 @@ internal object ColorSerializer : KSerializer<Color> {
         encoder.encodeString(value.toArgb().toHexString())
 
     override fun deserialize(decoder: Decoder): Color =
-        Color(decoder.decodeString().toLong(16))
+        Color(decoder.decodeString().removePrefix("0x").toLong(16))
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -138,11 +138,3 @@ internal object ColorsSerializer : KSerializer<Colors> {
             )
         }
 }
-
-val Color.r get() = toArgb() and 0xff000000.toInt() ushr 24
-
-val Color.g get() = toArgb() and 0x00ff0000 ushr 16
-
-val Color.b get() = toArgb() and 0x0000ff00 ushr 8
-
-val Color.a get() = toArgb() and 0x000000ff

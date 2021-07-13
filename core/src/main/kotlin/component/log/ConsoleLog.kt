@@ -12,12 +12,15 @@ import net.mamoe.mirai.utils.MiraiLogger
 interface ConsoleLog {
     data class Model (
         val searchContent: String,
-        val log:List<Log>
+        val log:List<Log>,
+        val command:String
     )
 
     val model:StateFlow<Model>
 
-    val logger: MiraiLogger
-
     fun setSearchContent(content: String)
+
+    fun setCurrentCommand(content: String)
+
+    fun onSearchClick()
 }
