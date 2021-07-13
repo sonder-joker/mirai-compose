@@ -1,10 +1,11 @@
 package com.youngerhousea.miraicompose.core.component.impl.log
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
 import com.youngerhousea.miraicompose.core.console.Log
-import com.youngerhousea.miraicompose.core.utils.combineState
 import com.youngerhousea.miraicompose.core.utils.componentScope
+import com.youngerhousea.miraicompose.core.viewmodel.ThemeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,12 +27,15 @@ import kotlin.reflect.full.isSubclassOf
 internal class ConsoleLogImpl(
     componentContext: ComponentContext,
     override val log: StateFlow<List<Log>>,
-    private val logger: MiraiLogger
+    private val logger: MiraiLogger,
+    themeViewModel: ThemeViewModel = componentContext.instanceKeeper.getOrCreate { ThemeViewModel() }
 ) : ConsoleLog, ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
 
     override val searchContent = MutableStateFlow("")
 
     override val command = MutableStateFlow("")
+
+    override val logColor = themeViewModel.data
 
     override fun setSearchContent(content: String) {
         searchContent.value = content

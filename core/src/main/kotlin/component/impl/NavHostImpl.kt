@@ -80,8 +80,17 @@ internal abstract class ConsoleImpl :
 
     override fun createLogger(identity: String?): MiraiLogger =
         MiraiComposeLogger(identity) { message: String?, throwable: Throwable?, priority: LogPriority ->
-            val log = Log(priority, "${identity ?: "Default"}:$message", throwable)
-            println(log.original)
+            val log = Log(priority, "${identity ?: "Default"}:$message", throwable, identity)
+            println(
+                "${
+                    when (priority) {
+                        LogPriority.VERBOSE -> ANSI.GREEN
+                        LogPriority.INFO -> ANSI.GREEN
+                        LogPriority.WARNING -> ANSI.YELLOW
+                        LogPriority.ERROR -> ANSI.RED
+                        LogPriority.DEBUG -> ANSI.PURPLE
+                    }.value
+                }${log.compositionLog}${ANSI.RESET.value}")
             onLoggerLog(log)
         }
 
@@ -115,7 +124,6 @@ internal abstract class ConsoleImpl :
 internal class NavHostImpl(
     component: ComponentContext,
 ) : ConsoleImpl(), NavHost, ComponentContext by component {
-
 
     private sealed class Configuration : Parcelable {
         object Message : Configuration()

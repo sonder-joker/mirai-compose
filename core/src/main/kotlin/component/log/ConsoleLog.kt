@@ -1,6 +1,7 @@
 package com.youngerhousea.miraicompose.core.component.log
 
 import com.youngerhousea.miraicompose.core.console.Log
+import com.youngerhousea.miraicompose.core.data.LogColor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import net.mamoe.mirai.utils.MiraiLogger
@@ -23,4 +24,6 @@ interface ConsoleLog {
     val searchContent: StateFlow<String>
 
     val command: StateFlow<String>
+
+    val logColor: StateFlow<LogColor>
 }

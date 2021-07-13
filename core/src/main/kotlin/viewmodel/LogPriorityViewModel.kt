@@ -29,6 +29,6 @@ class LogPriorityViewModel(
     val data: StateFlow<Node> get() = _data
 
     override fun onDestroy() {
-        path.writeText(Yaml.encodeToString(_data))
+        path.writeText(Yaml.encodeToString(_data.value))
     }
 }

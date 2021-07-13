@@ -3,14 +3,16 @@ package com.youngerhousea.miraicompose.core.component.impl.setting
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.instancekeeper.getOrCreate
-import com.youngerhousea.miraicompose.core.component.setting.*
+import com.youngerhousea.miraicompose.core.component.setting.AutoLoginSetting
+import com.youngerhousea.miraicompose.core.component.setting.LogColorSetting
+import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
+import com.youngerhousea.miraicompose.core.component.setting.Setting
 import com.youngerhousea.miraicompose.core.console.LogPriority
 import com.youngerhousea.miraicompose.core.data.LoginCredential
 import com.youngerhousea.miraicompose.core.viewmodel.AutoLoginViewModel
 import com.youngerhousea.miraicompose.core.viewmodel.LogPriorityViewModel
 import com.youngerhousea.miraicompose.core.viewmodel.Node
 import com.youngerhousea.miraicompose.core.viewmodel.ThemeViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 internal class SettingImpl(

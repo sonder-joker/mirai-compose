@@ -109,7 +109,6 @@ operator fun PluginData.setValue(thisRef: Any?, property: KProperty<*>, value: S
 @Composable
 fun DetailedCommandUi(detailedCommand: DetailedCommand) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) {
         LazyColumn {

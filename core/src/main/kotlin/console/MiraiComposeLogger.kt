@@ -1,54 +1,50 @@
 package com.youngerhousea.miraicompose.core.console
 
-import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.MiraiLoggerPlatformBase
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import kotlin.io.path.createDirectories
-import kotlin.io.path.createFile
-import kotlin.io.path.div
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
+enum class ANSI(
+    val value:String
+) {
+    RESET("\u001B[0m"),
+    BLACK ("\u001B[30m"),
+    RED ("\u001B[31m"),
+    GREEN ("\u001B[32m"),
+    YELLOW ( "\u001B[33m"),
+    BLUE ("\u001B[34m"),
+    PURPLE ("\u001B[35m"),
+    CYAN ("\u001B[36m"),
+    WHITE("\u001B[37m")
+}
 
-private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+data class Log(
+    val logPriority: LogPriority,
+    val message: String?,
+    val throwable: Throwable?,
+    val identity: String?
+)
 
+val Log.compositionLog: String
+    get() {
+        val message = if (throwable != null)
+            message ?: throwable.toString() + "\n${throwable.stackTraceToString()}"
+        else
+            message.toString()
+        return "$currentTimeFormatted ${logPriority.simpleName}/$identity: $message"
+    }
 
-private const val ANSI_RESET = "\u001B[0m"
-private const val ANSI_BLACK = "\u001B[30m"
-private const val ANSI_RED = "\u001B[31m"
-private const val ANSI_GREEN = "\u001B[32m"
-private const val ANSI_YELLOW = "\u001B[33m"
-private const val ANSI_BLUE = "\u001B[34m"
-private const val ANSI_PURPLE = "\u001B[35m"
-private const val ANSI_CYAN = "\u001B[36m"
-private const val ANSI_WHITE = "\u001B[37m"
+private val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
 
-typealias Log = Triple<LogPriority, String?, Throwable?>
-
-//val ComposeLog.consoleText
-//    get(): String = when (priority) {
-//        LogPriority.VERBOSE -> original
-//        LogPriority.DEBUG -> original
-//        LogPriority.INFO -> ANSI_GREEN + original + ANSI_RESET
-//        LogPriority.WARNING -> ANSI_YELLOW + original + ANSI_RESET
-//        LogPriority.ERROR -> ANSI_RED + original + ANSI_RESET
-//    }
-
-internal val MiraiConsole.logPath get() = (rootPath / "log").createDirectories()
-
-private val fileNameFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
-private val fileName = (MiraiConsole.logPath / LocalDateTime.now().format(fileNameFormat)).createFile()
-
-//println(compose.consoleText)
-//Files.write(fileName, (message + "\n").toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND)
-
-val Log.original: String get() = "${first.simpleName} / $second${third?.let { "\n${it.message}" }}"
+private val currentTimeFormatted get() = timeFormat.format(Date())
 
 /**
- * [MiraiCompose] 默认Logger实现
+ *  默认Logger实现
  */
 class MiraiComposeLogger(
     override val identity: String?,
-    val printLog:(message: String?, throwable: Throwable?, priority: LogPriority) -> Unit
+    val printLog: (message: String?, throwable: Throwable?, priority: LogPriority) -> Unit
 ) : MiraiLoggerPlatformBase() {
 
     public override fun verbose0(message: String?, e: Throwable?) =

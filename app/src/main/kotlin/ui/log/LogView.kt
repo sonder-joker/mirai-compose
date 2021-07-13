@@ -28,8 +28,12 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
     var isShowSearch by remember { mutableStateOf(true) }
 
     val searchContent by consoleLog.searchContent.collectAsState()
+
     val command by consoleLog.command.collectAsState()
+
     val log by consoleLog.log.collectAsState()
+
+    val logColor by consoleLog.logColor.collectAsState()
 
     Scaffold(
         modifier = Modifier.onPreviewKeyEvent {
@@ -68,7 +72,8 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
                     .weight(8f)
                     .padding(horizontal = 40.dp, vertical = 20.dp),
                 log,
-                searchContent
+                searchContent,
+                logColor
             )
             CommandSendBox(
                 command = command,

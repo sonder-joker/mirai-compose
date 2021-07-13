@@ -18,75 +18,37 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import com.youngerhousea.miraicompose.app.theme.AppTheme
+import com.youngerhousea.miraicompose.app.utils.ColorSerializer
 import com.youngerhousea.miraicompose.core.console.Log
 import com.youngerhousea.miraicompose.core.console.LogPriority
-import com.youngerhousea.miraicompose.core.console.original
+import com.youngerhousea.miraicompose.core.console.compositionLog
+import com.youngerhousea.miraicompose.core.data.LogColor
+import net.mamoe.yamlkt.Yaml
 import java.util.regex.PatternSyntaxException
 
-val Log.color: Color
-    get() = when (first) {
-        LogPriority.VERBOSE -> AppTheme.logColors.verbose
-        LogPriority.INFO -> AppTheme.logColors.info
-        LogPriority.WARNING -> AppTheme.logColors.warning
-        LogPriority.ERROR -> AppTheme.logColors.error
-        LogPriority.DEBUG -> AppTheme.logColors.debug
-    }
-
-
-val Log.composeLog
-    get(): AnnotatedString =
-        buildAnnotatedString {
-            pushStyle(SpanStyle(color))
-            append(original)
-        }
-
-
-fun Log.parseInSearch(searchText: String): AnnotatedString {
-    if (searchText.isEmpty()) return composeLog
-    val builder = AnnotatedString.Builder()
-    try {
-        original.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
-            if (it == searchText)
-                builder.append(
-                    AnnotatedString(
-                        it,
-                        spanStyle = SpanStyle(background = Color.Yellow),
-                    )
-                )
-            else
-                builder.append(
-                    AnnotatedString(
-                        it,
-                        spanStyle = SpanStyle(color),
-                    )
-                )
-
-        }
-    } catch (e: PatternSyntaxException) {
-        //TODO:
-        return composeLog
-    }
-    return builder.toAnnotatedString()
-}
 
 @Composable
-internal fun LogBox(modifier: Modifier = Modifier, logs: List<Log>, searchText: String = "") {
+internal fun LogBox(
+    modifier: Modifier = Modifier,
+    logs: List<Log>,
+    searchText: String,
+    logColor: LogColor
+) {
     val lazyListState = rememberLazyListState()
 
+    val renderLog by remember(logs, searchText) { derivedStateOf { logs.map { it.annotatedString(searchText, logColor) } } }
 
     Box(modifier) {
         LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
-            items(logs) { adaptiveLog ->
+            items(renderLog) { adaptiveLog ->
                 SelectionContainer {
-                    Text(adaptiveLog.parseInSearch(searchText))
+                    Text(adaptiveLog)
                 }
             }
         }
@@ -103,13 +65,84 @@ internal fun LogBox(modifier: Modifier = Modifier, logs: List<Log>, searchText: 
     }
 }
 
+
+private fun Log.color(logColor: LogColor): String = when (logPriority) {
+    LogPriority.VERBOSE -> logColor.verbose
+    LogPriority.INFO -> logColor.info
+    LogPriority.WARNING -> logColor.warning
+    LogPriority.ERROR -> logColor.error
+    LogPriority.DEBUG -> logColor.debug
+}
+
+private fun Log.annotatedString(
+    searchText: String,
+    logColor: LogColor
+): AnnotatedString {
+    val builder = AnnotatedString.Builder()
+    if (searchText == "")
+        builder.append(
+            AnnotatedString(
+                compositionLog,
+                spanStyle = SpanStyle(
+                    Yaml.decodeFromString(
+                        ColorSerializer,
+                        color(logColor)
+                    )
+                ),
+            )
+        )
+    else
+        try {
+            compositionLog.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
+                if (it == searchText)
+                    builder.append(
+                        AnnotatedString(
+                            it,
+                            spanStyle = SpanStyle(
+                                background = Yaml.decodeFromString(
+                                    ColorSerializer,
+                                    logColor.highLight
+                                )
+                            ),
+                        )
+                    )
+                else
+                    builder.append(
+                        AnnotatedString(
+                            it,
+                            spanStyle = SpanStyle(
+                                Yaml.decodeFromString(
+                                    ColorSerializer,
+                                    color(logColor)
+                                )
+                            ),
+                        )
+                    )
+            }
+        } catch (e: PatternSyntaxException) {
+            builder.append(
+                AnnotatedString(
+                    compositionLog,
+                    spanStyle = SpanStyle(
+                        Yaml.decodeFromString(
+                            ColorSerializer,
+                            color(logColor)
+                        )
+                    ),
+                )
+            )
+        }
+
+    return builder.toAnnotatedString()
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CommandSendBox(
     command: String,
     onCommandChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onClick:() -> Unit
+    onClick: () -> Unit
 ) {
 
     Row(
