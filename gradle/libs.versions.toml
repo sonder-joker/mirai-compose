@@ -1,18 +1,25 @@
 [versions]
 app = "1.0.0"
 kotlin = "1.5.10"
-compose-jb = "0.4.0"
-decompose = "0.2.5"
-mirai = "2.6.5"
+compose-jb = "0.5.0-build235"
+decompose = "0.2.6"
+mirai = "2.7-M1"
 yamlkt = "0.9.0"
 json = "1.2.1"
 junit = "4.13"
+zxing = "3.4.1"
+vaadin = "20.0.3"
+gretty = "3.0.4"
 
 [libraries]
 plugin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
 plugin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-composejb = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version.ref = "compose-jb" }
-plugin-miraiconsole = { group = "net.mamoe", name = "mirai-console-gradle", version.ref = "mirai"}
+plugin-miraiconsole = { group = "net.mamoe", name = "mirai-console-gradle", version.ref = "mirai" }
+plugin-vaadin = { group = "com.vaadin", name = "vaadin-gradle-plugin", version.ref = "vaadin" }
+plugin-gretty = { group = "org.gretty", name = "gretty", version.ref = "gretty" }
+plugin-grettyJ = { group = "com.github.gretty-gradle-plugin.gretty", name = "gretty", version = "7c54189dff" }
+
 decompose-main = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
 decompose-extension = { group = "com.arkivanov.decompose", name = "extensions-compose-jetbrains", version.ref = "decompose" }
 mirai-core = { group = "net.mamoe", name = "mirai-core", version.ref = "mirai" }
@@ -22,4 +29,13 @@ serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serializ
 junit4-core = { group = "junit", name = "junit", version.ref = "junit" }
 junit4-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+vaadin-core = { group = "com.vaadin", name = "vaadin-core", version.ref = "vaadin" }
 
+kotlin-stdlib-main = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+kotlin-stdlib-common = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-common", version.ref = "kotlin" }
+kotlin-stdlib-jdk7 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlin" }
+kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+
+kotlin-coroutinues-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.5.0" }

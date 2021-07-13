@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -8,14 +6,11 @@ version = libs.versions.app.get()
 
 allprojects {
     repositories {
-        google()
-        mavenLocal()
         mavenCentral()
+        google()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        gradlePluginPortal()
     }
     afterEvaluate {
-        configureJvmTarget()
         configureEncoding()
         configureKotlinExperimentalUsages()
         configureKotlinCompilerSettings()
@@ -31,17 +26,6 @@ val experimentalAnnotations = arrayOf(
     "kotlin.experimental.ExperimentalTypeInference",
 )
 
-fun Project.configureJvmTarget() {
-    tasks.withType<KotlinJvmCompile>().configureEach {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-
-    extensions.findByType<JavaPluginExtension>()?.run {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-}
 
 fun Project.configureEncoding() {
     tasks.withType<JavaCompile>() {
