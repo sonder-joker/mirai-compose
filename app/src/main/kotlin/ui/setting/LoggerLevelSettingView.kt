@@ -3,14 +3,34 @@ package com.youngerhousea.miraicompose.app.ui.setting
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
+import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
 
+
+
+@Composable
+fun LoggerLevelSettingUi(setting: LogLevelSetting) {
+    Column {
+        Text("Log level", Modifier.weight(4f))
+
+        val node by setting.priorityNode.collectAsState()
+
+//        EnumTabRowWithContent(node,
+//            rowModifier = Modifier.width(400.dp),
+//            onClick = {
+//                setting.setLogConfigLevel(it)
+//            }) {
+//            Text(it.name)
+//
+//        }
+    }
+}
+
+
+//----------------------------------------------------------------------------
 //     *                             *
 //    / \                           / \
 // 'a'   'c'                     'a'   'c'
@@ -97,8 +117,4 @@ private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
         !event.changes.all { it.changedToDown() }
     )
     return event
-}
-
-@Composable
-fun LogControllerNode() {
 }

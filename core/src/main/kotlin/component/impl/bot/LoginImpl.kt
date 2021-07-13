@@ -28,8 +28,8 @@ import kotlin.coroutines.suspendCoroutine
 internal class LoginImpl(
     componentContext: ComponentContext,
     private val onLoginSuccess: (bot: Bot) -> Unit,
+    autoLoginViewModel:AutoLoginViewModel = componentContext.instanceKeeper.getOrCreate { AutoLoginViewModel() }
 ) : Login, LoginSolver(), ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
-    private val autoLoginViewModel = instanceKeeper.getOrCreate { AutoLoginViewModel() }
 
     sealed class Configuration : Parcelable {
         object InitLogin : Configuration()
