@@ -9,4 +9,6 @@ interface LogLevelSetting {
     val priorityNode: StateFlow<PriorityNode>
 
     fun setLogConfigLevel(priority: LogPriority)
+    
+    fun onExitButtonClicked()
 }

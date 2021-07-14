@@ -16,4 +16,6 @@ interface LogColorSetting {
     fun setErrorColor(error: String)
 
     fun setWarningColor(warning: String)
+
+    fun onExitButtonClicked()
 }

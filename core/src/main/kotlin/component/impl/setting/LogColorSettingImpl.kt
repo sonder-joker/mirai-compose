@@ -4,10 +4,12 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.youngerhousea.miraicompose.core.component.setting.LogColorSetting
 import com.youngerhousea.miraicompose.core.viewmodel.ThemeViewModel
+import kotlin.reflect.KFunction0
 
 internal class LogColorSettingImpl(
     componentContext: ComponentContext,
-    private val themeViewModel: ThemeViewModel = componentContext.instanceKeeper.getOrCreate { ThemeViewModel() }
+    private inline val _onExitButtonClicked: () -> Unit,
+    private val themeViewModel: ThemeViewModel = componentContext.instanceKeeper.getOrCreate { ThemeViewModel() },
 ) : LogColorSetting, ComponentContext by componentContext {
 
     override val logColor = themeViewModel.data
@@ -30,5 +32,9 @@ internal class LogColorSettingImpl(
 
     override fun setErrorColor(error: String) {
         themeViewModel.setErrorColor(error)
+    }
+
+    override fun onExitButtonClicked() {
+        _onExitButtonClicked()
     }
 }

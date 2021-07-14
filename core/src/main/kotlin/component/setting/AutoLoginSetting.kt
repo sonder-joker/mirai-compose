@@ -12,4 +12,6 @@ interface AutoLoginSetting {
     fun updateLoginCredential(index: Int, loginCredential: LoginCredential)
 
     fun addLoginCredential(loginCredential: LoginCredential)
+
+    fun onExitButtonClicked()
 }

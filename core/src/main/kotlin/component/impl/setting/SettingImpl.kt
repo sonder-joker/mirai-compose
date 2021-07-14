@@ -26,9 +26,9 @@ internal class SettingImpl(
         handleBackButton = true,
         childFactory = { configuration, componentContext ->
             when (configuration) {
-                Configuration.AutoLogin -> Setting.Child.AutoLogin(AutoLoginImpl(componentContext))
-                Configuration.LogColor -> Setting.Child.LogColor(LogColorSettingImpl(componentContext))
-                Configuration.LogLevel -> Setting.Child.LogLevel(LogLevelSettingImpl(componentContext))
+                Configuration.AutoLogin -> Setting.Child.AutoLogin(AutoLoginImpl(componentContext, _onExitButtonClicked = ::routeMain))
+                Configuration.LogColor -> Setting.Child.LogColor(LogColorSettingImpl(componentContext, _onExitButtonClicked = ::routeMain))
+                Configuration.LogLevel -> Setting.Child.LogLevel(LogLevelSettingImpl(componentContext, _onExitButtonClicked = ::routeMain))
                 Configuration.Main -> Setting.Child.Main(
                     MainSettingImpl(
                         componentContext,
@@ -40,6 +40,10 @@ internal class SettingImpl(
             }
         }
     )
+
+    private fun routeMain() {
+        router.push(Configuration.Main)
+    }
 
     private fun routeAutoLogin() {
         router.push(Configuration.AutoLogin)
@@ -111,3 +115,4 @@ class ThemeColorImpl(
 //        material = material.copy(isLight = isLight)
 //    }
 }
+

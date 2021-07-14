@@ -10,6 +10,7 @@ import androidx.compose.ui.window.*
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.youngerhousea.miraicompose.app.ui.NavHostUi
 import com.youngerhousea.miraicompose.app.utils.ResourceImage
+import com.youngerhousea.miraicompose.core.console.ANSI
 import com.youngerhousea.miraicompose.core.navHost
 
 object MiraiComposeLoader {
@@ -32,7 +33,7 @@ fun MiraiComposeView() = application {
 @ExperimentalComposeUiApi
 @Composable
 fun ApplicationScope.ExceptionWindows(
-    onException: (throwable: Throwable) -> Unit = { println(it.stackTraceToString()) },
+    onException: (throwable: Throwable) -> Unit = { println(ANSI.RED.value + it.stackTraceToString() + ANSI.RESET.value) },
     state: WindowState = rememberWindowState(size = WindowSize(1280.dp, 768.dp))
 ) {
     var exception: Throwable? by remember { mutableStateOf(null) }

@@ -2,7 +2,7 @@ package com.youngerhousea.miraicompose.core.viewmodel
 
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import com.youngerhousea.miraicompose.core.data.PriorityNode
-import com.youngerhousea.miraicompose.core.loginPriorityPath
+import com.youngerhousea.miraicompose.core.loginPriorityFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.decodeFromString
@@ -13,7 +13,7 @@ import kotlin.io.path.writeText
 
 
 class LogPriorityViewModel(
-    val path: Path = loginPriorityPath
+    val path: Path = loginPriorityFile
 ) : InstanceKeeper.Instance {
 
     private val _data = MutableStateFlow(Yaml.decodeFromString(path.readText()) ?: PriorityNode("."))

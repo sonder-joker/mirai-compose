@@ -7,4 +7,6 @@ interface MainSetting {
     fun routeLoginColor()
 
     fun routeLoginLevel()
+
+    val pluginControlSetting:PluginControlSetting
 }

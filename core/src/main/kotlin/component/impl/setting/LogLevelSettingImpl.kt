@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 internal class LogLevelSettingImpl(
     componentContext: ComponentContext,
+    private inline val _onExitButtonClicked: () -> Unit,
     private val logPriorityViewModel: LogPriorityViewModel = componentContext.instanceKeeper.getOrCreate { LogPriorityViewModel() }
 ) : LogLevelSetting, ComponentContext by componentContext {
 
@@ -17,5 +18,9 @@ internal class LogLevelSettingImpl(
 
     override fun setLogConfigLevel(priority: LogPriority) {
 
+    }
+
+    override fun onExitButtonClicked() {
+        _onExitButtonClicked()
     }
 }

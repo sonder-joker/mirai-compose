@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 internal class AutoLoginImpl(
     componentContext: ComponentContext,
+    private inline val _onExitButtonClicked:() -> Unit,
     private val autoLoginViewModel: AutoLoginViewModel = componentContext.instanceKeeper.getOrCreate { AutoLoginViewModel() }
 ) : AutoLoginSetting, ComponentContext by componentContext {
 
@@ -24,6 +25,10 @@ internal class AutoLoginImpl(
 
     override fun addLoginCredential(loginCredential: LoginCredential) {
         autoLoginViewModel.addAutoLoginAccount(loginCredential)
+    }
+
+    override fun onExitButtonClicked() {
+        _onExitButtonClicked()
     }
 
 }

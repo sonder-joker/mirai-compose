@@ -1,7 +1,9 @@
 package com.youngerhousea.miraicompose.core.component.impl.setting
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.childContext
 import com.youngerhousea.miraicompose.core.component.setting.MainSetting
+import com.youngerhousea.miraicompose.core.component.setting.PluginControlSetting
 
 internal class MainSettingImpl(
     componentContext: ComponentContext,
@@ -20,5 +22,7 @@ internal class MainSettingImpl(
     override fun routeLoginLevel() {
         _routeLoginLevel()
     }
+
+    override val pluginControlSetting: PluginControlSetting = PluginControlSettingImpl(childContext("pluginControl"))
 
 }

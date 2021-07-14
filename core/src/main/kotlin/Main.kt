@@ -19,15 +19,21 @@ fun navHost(componentContext: ComponentContext = DefaultComponentContext(Lifecyc
 
 val root: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath().createDirectories()
 
-val configFile = (root / "compose").createDirectories()
+val dataPath = (root / "data").createDirectories()
 
-val autoLogin = (configFile / "autoLogin.yml").createFiles()
+val configPath = (root / "config").createDirectories()
 
-val themePath = (configFile / "theme.yml").createFiles()
+val composePath = (root / "compose").createDirectories()
 
-val loginPriorityPath = (configFile / "loginPriority.yml").createFiles()
+val pluginPath = (root / "plugins").createDirectories()
 
-private val fileNameFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+val autoLoginFile = (composePath / "autoLogin.yml").createFiles()
+
+val themeFile = (composePath / "theme.yml").createFiles()
+
+val loginPriorityFile = (composePath / "loginPriority.yml").createFiles()
+
+private val fileNameFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
 val logFileName = (root / "log" / LocalDateTime.now().format(fileNameFormat)).createFiles()
 
@@ -37,3 +43,4 @@ inline fun Path.createFiles(): Path =
         Files.createFile(this)
     else
         this
+

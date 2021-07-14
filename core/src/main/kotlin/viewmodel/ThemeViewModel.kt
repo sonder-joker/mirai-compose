@@ -2,7 +2,7 @@ package com.youngerhousea.miraicompose.core.viewmodel
 
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import com.youngerhousea.miraicompose.core.data.LogColor
-import com.youngerhousea.miraicompose.core.themePath
+import com.youngerhousea.miraicompose.core.themeFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.decodeFromString
@@ -12,7 +12,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 class ThemeViewModel(
-    val path: Path = themePath
+    val path: Path = themeFile
 ) : InstanceKeeper.Instance {
     val data: StateFlow<LogColor> get() = _data
 

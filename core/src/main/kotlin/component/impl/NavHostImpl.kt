@@ -13,7 +13,9 @@ import com.youngerhousea.miraicompose.core.component.impl.log.ConsoleLogImpl
 import com.youngerhousea.miraicompose.core.component.impl.message.MessageImpl
 import com.youngerhousea.miraicompose.core.component.impl.plugin.PluginsImpl
 import com.youngerhousea.miraicompose.core.component.impl.setting.SettingImpl
+import com.youngerhousea.miraicompose.core.configPath
 import com.youngerhousea.miraicompose.core.console.*
+import com.youngerhousea.miraicompose.core.dataPath
 import com.youngerhousea.miraicompose.core.root
 import com.youngerhousea.miraicompose.core.utils.activeInstance
 import com.youngerhousea.miraicompose.core.utils.stringId
@@ -55,13 +57,13 @@ internal abstract class ConsoleImpl :
 
     override val frontEndDescription = MiraiComposeDescription
 
-    override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath / "data")
+    override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(dataPath)
 
-    override val dataStorageForBuiltIns = ReadablePluginDataStorage(rootPath / "data")
+    override val dataStorageForBuiltIns = ReadablePluginDataStorage(dataPath)
 
-    override val configStorageForJvmPluginLoader = ReadablePluginConfigStorage(rootPath / "config")
+    override val configStorageForJvmPluginLoader = ReadablePluginConfigStorage(configPath)
 
-    override val configStorageForBuiltIns = ReadablePluginConfigStorage(rootPath / "config")
+    override val configStorageForBuiltIns = ReadablePluginConfigStorage(configPath)
 
     override val consoleInput: ConsoleInput = MiraiComposeInput
 
