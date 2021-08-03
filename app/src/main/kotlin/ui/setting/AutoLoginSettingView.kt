@@ -18,39 +18,6 @@ import com.youngerhousea.miraicompose.core.data.LoginCredential
 
 
 @Composable
-private inline fun AutoLoginPage(
-    loginCredential: LoginCredential,
-    modifier: Modifier = Modifier,
-    crossinline onSubmit: (loginCredential: LoginCredential) -> Unit
-) {
-    with(loginCredential) {
-        Column(modifier.fillMaxSize().padding(horizontal = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                TextField(account, onValueChange = {
-                    onSubmit(loginCredential.copy(account = it))
-                })
-
-                TextField(password, onValueChange = {
-                    onSubmit(loginCredential.copy(password = it))
-                })
-            }
-            EnumTabRowWithContent(passwordKind, onClick = {
-                onSubmit(loginCredential.copy(passwordKind = it))
-            }) {
-                Text(it.name)
-            }
-
-            EnumTabRowWithContent(protocolKind, onClick = {
-                onSubmit(loginCredential.copy(protocolKind = it))
-            }) {
-                Text(it.name)
-            }
-        }
-
-    }
-}
-
-@Composable
 fun AutoLoginSettingUi(autoLoginSetting: AutoLoginSetting) {
     val accounts by autoLoginSetting.loginCredentials.collectAsState()
     AutoLoginSetting(
@@ -69,14 +36,21 @@ fun AutoLoginSetting(
     onEditLoginCredential: (index: Int, loginCredential: LoginCredential) -> Unit,
     onAddAutoLoginCredential: (LoginCredential) -> Unit
 ) {
-    Scaffold(topBar = {
-        Icon(
-            Icons.Default.KeyboardArrowLeft,
-            null,
-            Modifier.clickable(onClick = onExit)
-        )
-    }) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Icon(
+                Icons.Default.KeyboardArrowLeft,
+                null,
+                Modifier.clickable(onClick = onExit)
+            )
+        }) {
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
             Text("Now Accounts")
             AnimatedVisibility(accounts.isEmpty()) {
                 Text("Not have Auto Login Accounts")
@@ -99,13 +73,47 @@ fun AutoLoginSetting(
 }
 
 @Composable
+private inline fun AutoLoginPage(
+    loginCredential: LoginCredential,
+    modifier: Modifier = Modifier,
+    crossinline onSubmit: (loginCredential: LoginCredential) -> Unit
+) {
+    with(loginCredential) {
+        Column(modifier.fillMaxSize().padding(horizontal = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                TextField(account, onValueChange = {
+                    onSubmit(loginCredential.copy(account = it))
+                })
+
+                TextField(password, onValueChange = {
+                    onSubmit(loginCredential.copy(password = it))
+                })
+            }
+
+            EnumTabRowWithContent(passwordKind, onClick = {
+                onSubmit(loginCredential.copy(passwordKind = it))
+            }) {
+                Text(it.name)
+            }
+
+            EnumTabRowWithContent(protocolKind, onClick = {
+                onSubmit(loginCredential.copy(protocolKind = it))
+            }) {
+                Text(it.name)
+            }
+        }
+
+    }
+}
+
+@Composable
 @Preview
 fun AutoLoginSettingPreview() {
     val loginCredentials = remember { mutableStateListOf<LoginCredential>() }
     AutoLoginSetting(
         loginCredentials,
         onExit = {},
-        onEditLoginCredential = {index, loginCredential ->
+        onEditLoginCredential = { index, loginCredential ->
             loginCredentials[index] = loginCredential
         },
         onAddAutoLoginCredential = loginCredentials::add

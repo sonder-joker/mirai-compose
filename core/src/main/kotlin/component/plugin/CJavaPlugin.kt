@@ -5,6 +5,7 @@ import com.arkivanov.decompose.value.Value
 import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedCommand
 import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedData
 import com.youngerhousea.miraicompose.core.component.plugin.shared.DetailedDescription
+import net.mamoe.mirai.console.plugin.jvm.JavaPlugin
 
 /**
  * Java插件的页面

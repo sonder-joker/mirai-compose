@@ -2,6 +2,8 @@ package com.youngerhousea.miraicompose.core.component.impl.setting
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
+import com.arkivanov.decompose.lifecycle.doOnCreate
+import com.arkivanov.decompose.lifecycle.subscribe
 import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
@@ -26,9 +28,24 @@ internal class SettingImpl(
         handleBackButton = true,
         childFactory = { configuration, componentContext ->
             when (configuration) {
-                Configuration.AutoLogin -> Setting.Child.AutoLogin(AutoLoginImpl(componentContext, _onExitButtonClicked = ::routeMain))
-                Configuration.LogColor -> Setting.Child.LogColor(LogColorSettingImpl(componentContext, _onExitButtonClicked = ::routeMain))
-                Configuration.LogLevel -> Setting.Child.LogLevel(LogLevelSettingImpl(componentContext, _onExitButtonClicked = ::routeMain))
+                Configuration.AutoLogin -> Setting.Child.AutoLogin(
+                    AutoLoginImpl(
+                        componentContext,
+                        _onExitButtonClicked = ::routeMain
+                    )
+                )
+                Configuration.LogColor -> Setting.Child.LogColor(
+                    LogColorSettingImpl(
+                        componentContext,
+                        _onExitButtonClicked = ::routeMain
+                    )
+                )
+                Configuration.LogLevel -> Setting.Child.LogLevel(
+                    LogLevelSettingImpl(
+                        componentContext,
+                        _onExitButtonClicked = ::routeMain
+                    )
+                )
                 Configuration.Main -> Setting.Child.Main(
                     MainSettingImpl(
                         componentContext,
@@ -57,6 +74,21 @@ internal class SettingImpl(
         router.push(Configuration.LogLevel)
     }
 
+    init {
+        lifecycle.subscribe(onCreate = {
+            println(1)
+        }, onDestroy = {
+            println(2)
+        }, onPause = {
+            println(3)
+        }, onResume = {
+            println(4)
+        }, onStart = {
+            println(5)
+        }, onStop = {
+            println(6)
+        })
+    }
 }
 
 

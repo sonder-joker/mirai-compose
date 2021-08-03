@@ -8,8 +8,8 @@ import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
 import com.youngerhousea.miraicompose.core.component.message.Message
 import com.youngerhousea.miraicompose.core.component.plugin.Plugins
 import com.youngerhousea.miraicompose.core.component.setting.Setting
+import com.youngerhousea.miraicompose.core.data.BotItem
 import kotlinx.coroutines.flow.StateFlow
-import net.mamoe.mirai.Bot
 
 /**
  * 主界面
@@ -54,10 +54,5 @@ interface NavHost {
         class CConsoleLog(val log: ConsoleLog) : Child()
         class CPlugins(val plugins: Plugins) : Child()
     }
-}
-
-interface BotItem : Bot {
-
-    val avatar: StateFlow<ByteArray?>
 }
 

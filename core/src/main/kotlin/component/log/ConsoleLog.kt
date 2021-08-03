@@ -27,3 +27,5 @@ interface ConsoleLog {
 
     val logColor: StateFlow<LogColor>
 }
+
+

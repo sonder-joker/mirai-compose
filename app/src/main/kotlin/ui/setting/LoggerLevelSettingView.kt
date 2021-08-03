@@ -1,9 +1,14 @@
 package com.youngerhousea.miraicompose.app.ui.setting
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
@@ -11,10 +16,15 @@ import com.youngerhousea.miraicompose.core.component.setting.LogLevelSetting
 
 @Composable
 fun LoggerLevelSettingUi(setting: LogLevelSetting) {
-    Column {
-        Text("Log level", Modifier.weight(4f))
+    Scaffold(
+        topBar = {
+            Icon(Icons.Default.KeyboardArrowLeft, null, Modifier.clickable(onClick = setting::onExitButtonClicked))
+        }
+    ) {
+        Column {
+            Text("Log level", Modifier.weight(4f))
 
-        val node by setting.priorityNode.collectAsState()
+            val node by setting.priorityNode.collectAsState()
 
 //        EnumTabRowWithContent(node,
 //            rowModifier = Modifier.width(400.dp),
@@ -24,6 +34,7 @@ fun LoggerLevelSettingUi(setting: LogLevelSetting) {
 //            Text(it.name)
 //
 //        }
+        }
     }
 }
 
@@ -90,7 +101,7 @@ fun SingleNode() {
         viewConfiguration
         forEachGesture {
             awaitPointerEventScope {
-                val a  = awaitEventFirstDown().also {
+                val a = awaitEventFirstDown().also {
                     it.changes.forEach { it.consumeDownChange() }
                 }.mouseEvent
                 a?.let {

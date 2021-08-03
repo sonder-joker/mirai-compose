@@ -9,4 +9,5 @@ interface MainSetting {
     fun routeLoginLevel()
 
     val pluginControlSetting:PluginControlSetting
+
 }

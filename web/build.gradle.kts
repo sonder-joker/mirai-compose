@@ -1,17 +1,17 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("com.vaadin")
-    id("org.gretty")
+//    id("com.vaadin")
+//    id("org.gretty")
 }
 
-gretty {
-    contextPath = "/"
-}
+//gretty {
+//    contextPath = "/"
+//}
 
 dependencies {
     implementation(projects.core)
-    implementation(libs.vaadin.core)
+//    implementation(libs.vaadin.core)
     api(libs.decompose.main)
 }
 

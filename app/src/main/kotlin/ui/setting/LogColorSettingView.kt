@@ -8,10 +8,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,32 +39,37 @@ fun LogColorSettingUi(setting: LogColorSetting) {
 
     val error by derivedStateOf { Yaml.decodeFromString(ColorSerializer, logColor.error) }
 
-    Column {
-        Row(Modifier.fillMaxWidth()) {
-            Text("自定义日志配色")
+    Scaffold(
+        topBar = {
+            Icon(Icons.Default.KeyboardArrowLeft, null, Modifier.clickable(onClick = setting::onExitButtonClicked))
         }
-        ColorSetSlider("Debug", debug, onValueChange = {
-            setting.setDebugColor(Yaml.encodeToString(ColorSerializer, it))
-        })
-        ColorSetSlider("Verbose", verbose, onValueChange = {
-            setting.setVerboseColor(Yaml.encodeToString(ColorSerializer, it))
-        })
-        ColorSetSlider("Info", info, onValueChange = {
-            setting.setInfoColor(Yaml.encodeToString(ColorSerializer, it))
-        })
-        ColorSetSlider("Warning", warning, onValueChange = {
-            setting.setWarningColor(Yaml.encodeToString(ColorSerializer, it))
-        })
-        ColorSetSlider("Error", error, onValueChange = {
-            setting.setErrorColor(Yaml.encodeToString(ColorSerializer, it))
-        })
+    ) {
+        Column(Modifier.fillMaxSize()) {
+            Row {
+                Text("自定义日志配色")
+            }
+            ColorSetSlider("Debug", debug, onValueChange = {
+                setting.setDebugColor(Yaml.encodeToString(ColorSerializer, it))
+            })
+            ColorSetSlider("Verbose", verbose, onValueChange = {
+                setting.setVerboseColor(Yaml.encodeToString(ColorSerializer, it))
+            })
+            ColorSetSlider("Info", info, onValueChange = {
+                setting.setInfoColor(Yaml.encodeToString(ColorSerializer, it))
+            })
+            ColorSetSlider("Warning", warning, onValueChange = {
+                setting.setWarningColor(Yaml.encodeToString(ColorSerializer, it))
+            })
+            ColorSetSlider("Error", error, onValueChange = {
+                setting.setErrorColor(Yaml.encodeToString(ColorSerializer, it))
+            })
+        }
     }
-
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ColorSetSlider(text: String, color: Color, onValueChange: (Color) -> Unit) {
+private fun ColorSetSlider(text: String, color: Color, onValueChange: (Color) -> Unit) {
     var isExpand by remember(text) { mutableStateOf(false) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -94,6 +98,32 @@ fun ColorSetSlider(text: String, color: Color, onValueChange: (Color) -> Unit) {
         }
     }
 }
+
+@Composable
+@Suppress("DuplicatedCode")
+fun ColorPicker(
+    color: Color,
+    onColorChange: (color: Color) -> Unit
+) {
+    Column {
+        Slider(color.alpha, {
+            onColorChange(color.copy(alpha = it))
+        }, valueRange = 0f..1f)
+
+        Slider(color.red, {
+            onColorChange(color.copy(red = it))
+        }, valueRange = 0f..1f)
+
+        Slider(color.green, {
+            onColorChange(color.copy(green = it))
+        }, valueRange = 0f..1f)
+
+        Slider(color.blue, {
+            onColorChange(color.copy(blue = it))
+        }, valueRange = 0f..1f)
+    }
+}
+
 //need more optimization
 @Composable
 fun ColorPicker(
@@ -173,27 +203,3 @@ private fun DrawScope.drawBackground(x: Float, y: Float, color: Color, widthRate
     )
 }
 
-@Composable
-@Suppress("DuplicatedCode")
-fun ColorPicker(
-    color: Color,
-    onColorChange: (color: Color) -> Unit
-) {
-    Column {
-        Slider(color.alpha, {
-            onColorChange(color.copy(alpha = it))
-        }, valueRange = 0f..1f)
-
-        Slider(color.red, {
-            onColorChange(color.copy(red = it))
-        }, valueRange = 0f..1f)
-
-        Slider(color.green, {
-            onColorChange(color.copy(green = it))
-        }, valueRange = 0f..1f)
-
-        Slider(color.blue, {
-            onColorChange(color.copy(blue = it))
-        }, valueRange = 0f..1f)
-    }
-}

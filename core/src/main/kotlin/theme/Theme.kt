@@ -1,11 +1,5 @@
 package com.youngerhousea.miraicompose.core.theme
 
-import kotlinx.serialization.Serializable
-import net.mamoe.mirai.console.data.AutoSavePluginConfig
-import net.mamoe.mirai.console.data.value
-
-
-
 
 //@Serializable
 //class AppTheme {
@@ -13,7 +7,7 @@ import net.mamoe.mirai.console.data.value
 //
 //    val materialLight = Colors(
 //        primary = "0xff979595",
-//        onPrimary = "0xffffffff"
+//        onPrimary  = "0xffffffff"
 //    )
 //}
 //

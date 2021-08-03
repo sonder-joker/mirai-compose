@@ -32,7 +32,7 @@ import com.youngerhousea.miraicompose.app.ui.plugin.PluginsUi
 import com.youngerhousea.miraicompose.app.ui.setting.SettingUi
 import com.youngerhousea.miraicompose.app.utils.R
 import com.youngerhousea.miraicompose.app.utils.SkiaImageDecode
-import com.youngerhousea.miraicompose.core.component.BotItem
+import com.youngerhousea.miraicompose.core.data.BotItem
 import com.youngerhousea.miraicompose.core.component.NavHost
 import com.youngerhousea.miraicompose.core.utils.activeInstance
 

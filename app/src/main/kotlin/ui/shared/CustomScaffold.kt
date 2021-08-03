@@ -7,7 +7,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 
-private enum class ScaffoldLayoutContent { TopBar, MainContent, Snackbar }
+@Composable
+fun Scaffold(
+    modifier: Modifier = Modifier,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
+    backgroundColor: Color = MaterialTheme.colors.background,
+    contentColor: Color = contentColorFor(backgroundColor),
+    content: @Composable (PaddingValues) -> Unit
+) {
+    Scaffold(
+        modifier,
+        scaffoldState,
+        topBar = { },
+        bottomBar = {},
+        snackbarHost,
+        floatingActionButton = {},
+        floatingActionButtonPosition = FabPosition.End,
+        isFloatingActionButtonDocked = false,
+        drawerContent = null,
+        drawerGesturesEnabled = true,
+        drawerShape = MaterialTheme.shapes.large,
+        drawerElevation = DrawerDefaults.Elevation,
+        drawerBackgroundColor = MaterialTheme.colors.surface,
+        drawerContentColor = contentColorFor(MaterialTheme.colors.surface),
+        drawerScrimColor = DrawerDefaults.scrimColor,
+        backgroundColor = backgroundColor,
+        contentColor,
+        content
+    )
+}
 
 @Composable
 fun CustomScaffold(
@@ -83,3 +112,5 @@ private fun ScaffoldLayout(
         }
     }
 }
+
+private enum class ScaffoldLayoutContent { TopBar, MainContent, Snackbar }

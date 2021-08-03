@@ -5,10 +5,12 @@ import com.arkivanov.decompose.instancekeeper.getOrCreate
 import com.youngerhousea.miraicompose.core.component.log.ConsoleLog
 import com.youngerhousea.miraicompose.core.console.Log
 import com.youngerhousea.miraicompose.core.utils.componentScope
+import com.youngerhousea.miraicompose.core.viewmodel.LogViewModel
 import com.youngerhousea.miraicompose.core.viewmodel.ThemeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.descriptor.AbstractCommandValueParameter
@@ -26,8 +28,8 @@ import kotlin.reflect.full.isSubclassOf
 
 internal class ConsoleLogImpl(
     componentContext: ComponentContext,
-    override val log: StateFlow<List<Log>>,
     private val logger: MiraiLogger,
+    logViewModel: LogViewModel = componentContext.instanceKeeper.getOrCreate { LogViewModel() },
     themeViewModel: ThemeViewModel = componentContext.instanceKeeper.getOrCreate { ThemeViewModel() }
 ) : ConsoleLog, ComponentContext by componentContext, CoroutineScope by componentContext.componentScope() {
 
@@ -52,6 +54,8 @@ internal class ConsoleLogImpl(
             command.value = ""
         }
     }
+
+    override val log: StateFlow<List<Log>> = logViewModel.logs
 }
 
 @OptIn(ExperimentalCommandDescriptors::class)

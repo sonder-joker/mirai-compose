@@ -65,7 +65,7 @@ fun ConsoleLogUi(consoleLog: ConsoleLog) {
 //        }) {
 //        }
         }) {
-        Column {
+        Column(Modifier.padding(it)) {
             LogBox(
                 Modifier
                     .fillMaxSize()
