@@ -1,0 +1,123 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'need rewrite'
+    paths-ignore:
+      - README.md
+      - icons/*
+      - LICENSE
+
+jobs:
+  job_create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Mirai compose ${{ github.ref }}
+          body: |
+            Auto release
+          draft: false
+          prerelease: false
+
+  job_upload_release:
+    name: Build
+    needs: job_create_release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest, macOS-latest ]
+        include:
+          - os: windows-latest
+            package_path: tar -a -c -f mirai-compose-windows-x64.zip ./mirai-compose/build/compose/binaries/main/app/*
+            install_path: tar -a -c -f mirai-compose-msi-x64.zip ./mirai-compose/build/compose/binaries/main/msi/*
+            jar_path: tar -zcvf mirai-compose-windows-jar-x64.zip ./mirai-compose/build/compose/jars/*
+            assert_p: mirai-compose-windows-x64.zip
+            assert_i: mirai-compose-msi-x64.zip
+            assert_j: mirai-compose-windows-jar-x64.zip
+
+          - os: ubuntu-latest
+            package_path: tar -zcvf mirai-compose-linux-x64.tar.gz ./mirai-compose/build/compose/binaries/main/app/*
+            install_path: tar -zcvf mirai-compose-deb-x64.tar.gz ./mirai-compose/build/compose/binaries/main/deb/*
+            jar_path: tar -zcvf mirai-compose-linux-jar-x64.tar.gz ./mirai-compose/build/compose/jars/*
+            assert_p: mirai-compose-linux-x64.tar.gz
+            assert_i: mirai-compose-deb-x64.tar.gz
+            assert_j: mirai-compose-linux-jar-x64.tar.gz
+
+          - os: macOS-latest
+            package_path: zip -r mirai-compose-macos-x64.zip ./mirai-compose/build/compose/binaries/main/app/* -x "*.DS_Store"
+            install_path: zip -r mirai-compose-dmg-x64.zip ./mirai-compose/build/compose/binaries/main/dmg/* -x "*.DS_Store"
+            jar_path: zip -r mirai-compose-macos-jar-x64.tar.gz ./mirai-compose/build/compose/jars/*
+            assert_p: mirai-compose-macos-x64.zip
+            assert_i: mirai-compose-dmg-x64.zip
+            assert_j: mirai-compose-macos-jar-x64.tar.gz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 15
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      - name: Init gradle project
+        run: ./gradlew clean
+
+      - name: Build Package
+        run: ./gradlew package
+
+      - name: Build Distributable
+        run: ./gradlew createDistributable
+
+      - name: Build Uberjar
+        run: ./gradlew packageUberJarForCurrentOS
+
+      - name: Package Distributable
+        run: |
+          ${{ matrix.package_path }}
+          ${{ matrix.install_path }}
+          ${{ matrix.jar_path }}
+
+      - name: Upload package
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.job_create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.assert_p }}
+          asset_name: ${{ matrix.os }}-${{ matrix.assert_p }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload Install
+        id: upload-release-install
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.job_create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.assert_i }}
+          asset_name: ${{ matrix.assert_i }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload Jar
+        id: upload-release-jar
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.job_create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.assert_j }}
+          asset_name: ${{ matrix.assert_j }}
+          asset_content_type: application/octet-stream

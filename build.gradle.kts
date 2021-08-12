@@ -1,51 +1,71 @@
-import org.jetbrains.compose.compose
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.*
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-plugins {
-    kotlin("jvm") version "1.4.21-2"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("org.jetbrains.compose") version "0.3.0-build148"
-    id("net.mamoe.mirai-console") version "2.0.0"
-}
+group = "com.youngerhousea.mirai"
+version = libs.versions.app.get()
 
-group = "com.younger"
-version = "1.0"
-
-repositories {
-    jcenter()
-    mavenCentral()
-    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
-}
-
-dependencies {
-    implementation(compose.desktop.currentOs)
-    runtimeOnly("net.mamoe:mirai-login-solver-selenium:1.0-dev-15")
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "15"
-        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+allprojects {
+    repositories {
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        google()
+    }
+    afterEvaluate {
+        configureEncoding()
+        configureKotlinExperimentalUsages()
+        configureKotlinCompilerSettings()
     }
 }
 
-kotlin.sourceSets.all {
-    languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
+
+val experimentalAnnotations = arrayOf(
+    "kotlin.Experimental",
+    "kotlin.RequiresOptIn",
+    "kotlin.ExperimentalUnsignedTypes",
+    "kotlin.ExperimentalStdlibApi",
+    "kotlin.experimental.ExperimentalTypeInference",
+)
+
+
+fun Project.configureEncoding() {
+    tasks.withType<JavaCompile>() {
+        options.encoding = "UTF8"
+    }
 }
 
-compose.desktop {
-    application {
-        mainClass = "MainKt"
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = "MiraiCompose"
-            version = "0.1.0"
-            vendor = "Noire"
+fun Project.configureKotlinExperimentalUsages() {
+    val sourceSets = kotlinSourceSets ?: return
+
+    for (target in sourceSets)
+        target.languageSettings.run {
+            progressiveMode = true
+            experimentalAnnotations.forEach { a ->
+                useExperimentalAnnotation(a)
+            }
         }
+}
+
+fun Project.configureKotlinCompilerSettings() {
+    val kotlinCompilations = kotlinCompilations ?: return
+    for (kotlinCompilation in kotlinCompilations) with(kotlinCompilation) {
+        if (isKotlinJvmProject) {
+            @Suppress("UNCHECKED_CAST")
+            this as org.jetbrains.kotlin.gradle.plugin.KotlinCompilation<KotlinJvmOptions>
+        }
+        kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
     }
 }
+
+val Project.kotlinSourceSets get() = extensions.findByName("kotlin").safeAs<KotlinProjectExtension>()?.sourceSets
+
+val Project.isKotlinJvmProject: Boolean get() = extensions.findByName("kotlin") is KotlinJvmProjectExtension
+
+
+val Project.kotlinTargets
+    get() =
+        extensions.findByName("kotlin").safeAs<KotlinSingleTargetExtension>()?.target?.let { listOf(it) }
+            ?: extensions.findByName("kotlin").safeAs<KotlinMultiplatformExtension>()?.targets
+
+val Project.kotlinCompilations
+    get() = kotlinTargets?.flatMap { it.compilations }
+
