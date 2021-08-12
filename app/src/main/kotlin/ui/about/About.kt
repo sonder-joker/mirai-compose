@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -32,7 +31,7 @@ fun About(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(painterResource(R.Image.mirai), "mirai")
+        Image(R.Image.Mirai, "mirai")
         Column {
             ClickableUrlText(frontendAnnotatedString(frontend))
             ClickableUrlText(backendAnnotatedString(backend))

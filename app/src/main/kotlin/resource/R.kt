@@ -36,9 +36,9 @@ object R {
     }
 
     object Image {
-        const val mirai = "ic_mirai.xml"
-        const val java = "ic_java.xml"
-        const val kotlin = "ic_kotlin.xml"
+        val Java = loadImageBitmap(File("ic_java.xml"))
+        val Kotlin = loadImageBitmap(File("ic_kotlin.xml"))
+        val Mirai = loadImageBitmap(File("ic_mirai.xml"))
     }
 
     object Icon {

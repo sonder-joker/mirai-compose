@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -70,17 +70,17 @@ private inline val Plugin.annotatedKind: AnnotatedString
         toAnnotatedString()
     }
 
-@Composable
-private fun Plugin.languageIcon(): Painter =
-    when (this) {
-        is JavaPlugin -> {
-            painterResource(R.Image.java)
+private val Plugin.languageIcon: Painter
+    get() =
+        when (this) {
+            is JavaPlugin -> {
+                BitmapPainter(R.Image.Java)
+            }
+            is KotlinPlugin -> {
+                BitmapPainter(R.Image.Kotlin)
+            }
+            else -> error("No icon current")
         }
-        is KotlinPlugin -> {
-            painterResource(R.Image.kotlin)
-        }
-        else -> error("No icon current")
-    }
 
 val Plugin.annotatedDescription: AnnotatedString
     get() = buildAnnotatedString {
@@ -105,39 +105,37 @@ internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
         Text(plugin.annotatedInfo, overflow = TextOverflow.Ellipsis, maxLines = 1)
         Spacer(Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(plugin.languageIcon(), null)
+            Icon(plugin.languageIcon, null)
             Text(plugin.annotatedKind)
         }
     }
 }
 
-
 internal inline val PluginData.annotatedExplain: AnnotatedString
     get() = buildAnnotatedString {
-        pushStyle(SpanStyle(fontSize = 20.sp))
-        append(
-            when (this@annotatedExplain) {
-                is AutoSavePluginConfig -> "自动保存配置"
-                is ReadOnlyPluginConfig -> "只读配置"
-                is AutoSavePluginData -> "自动保存数据"
-                is ReadOnlyPluginData -> "只读数据"
-                else -> "未知"
-            }
-        )
-        append(':')
-        append(this@annotatedExplain.saveName)
-        toAnnotatedString()
-    }
+            pushStyle(SpanStyle(fontSize = 20.sp))
+            append(
+                when (this@annotatedExplain) {
+                    is AutoSavePluginConfig -> "自动保存配置"
+                    is ReadOnlyPluginConfig -> "只读配置"
+                    is AutoSavePluginData -> "自动保存数据"
+                    is ReadOnlyPluginData -> "只读数据"
+                    else -> "未知"
+                }
+            )
+            append(':')
+            append(this@annotatedExplain.saveName)
+            toAnnotatedString()
+        }
 
 
 internal inline val Command.simpleDescription: AnnotatedString
-    get() =
-        buildAnnotatedString {
-            append(allNames.joinToString { " " })
-            append('\n')
-            append(usage)
-            append('\n')
-            append(description)
-            toAnnotatedString()
-        }
+    get() = buildAnnotatedString {
+        append(allNames.joinToString { " " })
+        append('\n')
+        append(usage)
+        append('\n')
+        append(description)
+        toAnnotatedString()
+    }
 
