@@ -19,6 +19,8 @@ mirai-console = { group = "net.mamoe", name = "mirai-console", version.ref = "mi
 serialization-yaml = { group = "net.mamoe.yamlkt", name = "yamlkt", version.ref = "yamlkt" }
 serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit" }
-zxing = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+zxing-se = { group = "com.google.zxing", name = "javase", version.ref = "zxing" }
+
 
 kotlin-coroutinues-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.5.0" }

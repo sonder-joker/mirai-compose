@@ -19,7 +19,8 @@ dependencies {
     implementation(compose.uiTooling)
     implementation(compose.desktop.components.splitPane)
 
-    implementation(libs.zxing)
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.se)
 
     implementation(kotlin("stdlib"))
     implementation(kotlin("stdlib-common"))

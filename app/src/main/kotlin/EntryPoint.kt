@@ -61,16 +61,16 @@ private fun LoginSolverDialog() {
         is LoginSolverState.Nothing -> {
         }
         is LoginSolverState.PicCaptcha ->
-            PicCaptchaDialog(loginSolverState.data, loginSolverState.bot.id) {
+            PicCaptchaDialog(loginSolverState) {
                 LocalMiraiCompose.current.dispatch(Login.PicCaptcha(it))
             }
         is LoginSolverState.SliderCaptcha -> {
-            SliderCaptchaDialog(loginSolverState.url, loginSolverState.bot.id) {
+            SliderCaptchaDialog(loginSolverState) {
                 LocalMiraiCompose.current.dispatch(Login.SliderCaptcha(it))
             }
         }
         is LoginSolverState.UnsafeDevice -> {
-            UnsafeDeviceLoginVerifyDialog(loginSolverState.url, loginSolverState.bot.id) {
+            UnsafeDeviceLoginVerifyDialog(loginSolverState) {
                 LocalMiraiCompose.current.dispatch(Login.UnsafeDevice(it))
             }
         }
