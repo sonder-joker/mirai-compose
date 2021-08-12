@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-group = "com.youngerhousea.mirai"
-version = libs.versions.app.get()
+group = MiraiCompose.group
+version = MiraiCompose.version
 
 allprojects {
     repositories {

@@ -35,24 +35,24 @@ dependencies {
 }
 
 buildConfig {
-    buildConfigField("String", "projectName", "\"${rootProject.name}\"")
-    buildConfigField("String", "projectGroup", "\"${rootProject.group}\"")
-    buildConfigField("String", "projectVersion", "\"${rootProject.version}\"")
+    buildConfigField("String", "projectName", "\"${MiraiCompose.name}\"")
+    buildConfigField("String", "projectGroup", "\"${MiraiCompose.group}\"")
+    buildConfigField("String", "projectVersion", "\"${MiraiCompose.version}\"")
 }
 
 compose.desktop {
     application {
-        mainClass = "com.youngerhousea.mirai.compose.EntryPointKt"
+        mainClass = MiraiCompose.mainClass
         nativeDistributions {
             modules(*jdkModules)
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
 
-            packageName = rootProject.group as String
-            packageVersion = rootProject.version.toString()
-            vendor = rootProject.group as String
+            packageName = MiraiCompose.name
+            packageVersion = MiraiCompose.version
+            vendor = MiraiCompose.group
 
             macOS {
-                bundleID = "com.youngerhousea.mirai.compose"
+                bundleID = MiraiCompose.group
             }
 
             linux {
@@ -60,11 +60,12 @@ compose.desktop {
 
             windows {
                 dirChooser = true
-                upgradeUuid = "01BBD7BE-A84F-314A-FA84-67B63728A416"
+                upgradeUuid = MiraiCompose.windowsUUID
             }
         }
     }
 }
+
 
 
 kotlin {
@@ -75,3 +76,5 @@ kotlin {
         languageSettings.useExperimentalAnnotation("androidx.compose.foundation.ExperimentalFoundationApi")
     }
 }
+
+
