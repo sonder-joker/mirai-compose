@@ -12,12 +12,14 @@ import net.mamoe.mirai.console.plugin.PluginManager
 fun Plugins() {
     var pluginsRoute by rememberSaveable { mutableStateOf<PluginsRoute>(PluginsRoute.List) }
 
-    when(pluginsRoute) {
+    when(val route = pluginsRoute) {
         PluginsRoute.List -> PluginList(PluginManager.plugins) {
             pluginsRoute = PluginsRoute.Single(it)
         }
         is PluginsRoute.Single -> {
-
+            SinglePlugin(route.plugin) {
+                pluginsRoute = PluginsRoute.List
+            }
         }
     }
 }
@@ -25,5 +27,5 @@ fun Plugins() {
 
 sealed class PluginsRoute {
     object List : PluginsRoute()
-    class Single(plugin:Plugin) : PluginsRoute()
+    class Single(val plugin:Plugin) : PluginsRoute()
 }

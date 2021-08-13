@@ -7,15 +7,16 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.about.About
+import com.youngerhousea.mirai.compose.ui.message.BotMessage
 import com.youngerhousea.mirai.compose.ui.message.Message
 import com.youngerhousea.mirai.compose.ui.plugins.Plugins
 import com.youngerhousea.mirai.compose.ui.setting.Setting
+import com.youngerhousea.mirai.compose.viewmodel.HostRoute
+import com.youngerhousea.mirai.compose.viewmodel.HostViewModel
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 
@@ -27,22 +28,23 @@ fun HostPage() {
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 fun NavHost(
+    hostViewModel: HostViewModel = viewModel { HostViewModel() }
 ) {
-    var navigate by rememberSaveable { mutableStateOf<HostRoute>(HostRoute.Message) }
+    val state by hostViewModel.hostState
 
     HorizontalSplitPane {
         first {
             NavHostFirst(
-                navigate = HostRoute.Message,
-                onRouteLogin = { navigate = HostRoute.Message },
-                onRoutePlugins = { navigate = HostRoute.Plugins },
-                onRouteSetting = { navigate = HostRoute.Setting },
-                onRouteAbout = { navigate = HostRoute.About }
+                navigate = state.navigate,
+                onRouteMessage = { hostViewModel.dispatch(HostRoute.Message) },
+                onRoutePlugins = { hostViewModel.dispatch(HostRoute.Plugins) },
+                onRouteSetting = { hostViewModel.dispatch(HostRoute.Setting) },
+                onRouteAbout = { hostViewModel.dispatch(HostRoute.About) }
             )
         }
 
         second {
-            NavHostSecond(navigate)
+            NavHostSecond(state.navigate)
         }
     }
 }
@@ -54,13 +56,14 @@ fun NavHostSecond(hostRoute: HostRoute) {
         HostRoute.Message -> Message()
         HostRoute.Plugins -> Plugins()
         HostRoute.Setting -> Setting()
+        is HostRoute.BotMessage -> BotMessage()
     }
 }
 
 @Composable
 fun NavHostFirst(
     navigate: HostRoute,
-    onRouteLogin: () -> Unit,
+    onRouteMessage: () -> Unit,
     onRoutePlugins: () -> Unit,
     onRouteSetting: () -> Unit,
     onRouteAbout: () -> Unit,
@@ -71,7 +74,7 @@ fun NavHostFirst(
     ) {
         NavHostFirstBotMenu()
         RailTab(
-            onClick = onRouteLogin,
+            onClick = onRouteMessage,
             selected = navigate == HostRoute.Message
         ) {
             Icon(R.Icon.Message, null)
@@ -101,10 +104,3 @@ fun NavHostFirst(
     }
 }
 
-
-sealed class HostRoute {
-    object Message : HostRoute()
-    object Setting : HostRoute()
-    object About : HostRoute()
-    object Plugins : HostRoute()
-}

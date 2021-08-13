@@ -1,4 +1,4 @@
-package com.youngerhousea.mirai.compose.console
+package com.youngerhousea.mirai.compose.console.impl
 
 interface Lifecycle {
 
@@ -20,7 +20,7 @@ interface Lifecycle {
     interface Observer {
         fun onEnterLoading() {}
 
-        fun onFinshAutoLogin() {}
+        fun onFinishAutoLogin() {}
 
         fun onFinishLoading() {}
 
@@ -33,7 +33,7 @@ interface LifecycleOwner {
 }
 
 inline fun Lifecycle.doOnLoading(crossinline action: () -> Unit) {
-    subscribe(object :Lifecycle .Observer {
+    subscribe(object : Lifecycle.Observer {
         override fun onEnterLoading() {
             action()
         }
@@ -42,7 +42,7 @@ inline fun Lifecycle.doOnLoading(crossinline action: () -> Unit) {
 
 
 inline fun Lifecycle.doOnFinishLoading(crossinline action: () -> Unit) {
-    subscribe(object :Lifecycle .Observer {
+    subscribe(object : Lifecycle.Observer {
         override fun onFinishLoading() {
             action()
         }
@@ -50,8 +50,8 @@ inline fun Lifecycle.doOnFinishLoading(crossinline action: () -> Unit) {
 }
 
 inline fun Lifecycle.doOnFinishAutoLogin(crossinline action: () -> Unit) {
-    subscribe(object :Lifecycle.Observer{
-        override fun onFinshAutoLogin() {
+    subscribe(object : Lifecycle.Observer {
+        override fun onFinishAutoLogin() {
             action()
         }
     })

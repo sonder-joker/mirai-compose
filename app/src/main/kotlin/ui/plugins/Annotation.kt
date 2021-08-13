@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -70,14 +71,14 @@ private inline val Plugin.annotatedKind: AnnotatedString
         toAnnotatedString()
     }
 
-private val Plugin.languageIcon: Painter
+private val Plugin.languageIcon: ImageVector
     get() =
         when (this) {
             is JavaPlugin -> {
-                BitmapPainter(R.Image.Java)
+                R.Image.Java
             }
             is KotlinPlugin -> {
-                BitmapPainter(R.Image.Kotlin)
+                R.Image.Kotlin
             }
             else -> error("No icon current")
         }

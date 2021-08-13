@@ -1,4 +1,4 @@
-package com.youngerhousea.mirai.compose.ui.loginsolver
+package com.youngerhousea.mirai.compose.ui.login
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image

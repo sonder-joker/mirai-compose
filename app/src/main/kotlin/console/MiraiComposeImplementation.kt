@@ -1,6 +1,10 @@
 package com.youngerhousea.mirai.compose.console
 
 import androidx.compose.runtime.State
+import com.youngerhousea.mirai.compose.console.impl.Lifecycle
+import com.youngerhousea.mirai.compose.console.impl.LifecycleOwner
+import com.youngerhousea.mirai.compose.console.impl.ReadablePluginConfigStorage
+import com.youngerhousea.mirai.compose.console.impl.ReadablePluginDataStorage
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation
@@ -19,7 +23,12 @@ interface MiraiComposeImplementation :
     MiraiComposeInternal,
     MiraiConsoleImplementation,
     ViewModelStoreOwner,
-    LifecycleOwner
+    LifecycleOwner {
+    override val configStorageForBuiltIns: ReadablePluginConfigStorage
+    override val configStorageForJvmPluginLoader: ReadablePluginConfigStorage
+    override val dataStorageForBuiltIns: ReadablePluginDataStorage
+    override val dataStorageForJvmPluginLoader: ReadablePluginDataStorage
+}
 
 
 private object MiraiComposeBridge : MiraiCompose,

@@ -28,7 +28,7 @@ import kotlin.io.path.div
  * Abstract mirai compose, this implementation for [MiraiConsoleImplementation] and [MiraiComposeInternal]
  *
  */
-abstract class AbstractMiraiComposeImpl : MiraiConsoleImplementation, MiraiComposeInternal {
+abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation, MiraiComposeInternal {
 
     private val logger by lazy { createLogger("compose") }
 
@@ -124,7 +124,7 @@ internal class MiraiComposeImpl(
     override fun postPhase(phase: String) {
         when (phase) {
             "auto-login bots" -> {
-                lifecycle.onFinshAutoLogin()
+                lifecycle.onFinishAutoLogin()
             }
             "finally post" -> {
                 lifecycle.onFinishLoading()

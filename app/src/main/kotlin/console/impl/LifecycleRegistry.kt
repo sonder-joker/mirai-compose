@@ -1,7 +1,5 @@
 package com.youngerhousea.mirai.compose.console.impl
 
-import com.youngerhousea.mirai.compose.console.Lifecycle
-import com.youngerhousea.mirai.compose.console.LifecycleOwner
 import java.lang.ref.WeakReference
 
 internal interface LifecycleRegistry : Lifecycle, Lifecycle.Observer {
@@ -23,7 +21,7 @@ internal class LifecycleRegistryImpl(override val owner: WeakReference<Lifecycle
             observer.onEnterLoading()
         }
         if (state >= Lifecycle.State.AutoLogin) {
-            observer.onFinshAutoLogin()
+            observer.onFinishAutoLogin()
         }
         if (state >= Lifecycle.State.Live) {
             observer.onFinishLoading()
@@ -41,9 +39,9 @@ internal class LifecycleRegistryImpl(override val owner: WeakReference<Lifecycle
         state = Lifecycle.State.Loading
     }
 
-    override fun onFinshAutoLogin() {
+    override fun onFinishAutoLogin() {
         checkState(Lifecycle.State.Loading)
-        callbacks.forEach(Lifecycle.Observer::onFinshAutoLogin)
+        callbacks.forEach(Lifecycle.Observer::onFinishAutoLogin)
         state = Lifecycle.State.AutoLogin
     }
 

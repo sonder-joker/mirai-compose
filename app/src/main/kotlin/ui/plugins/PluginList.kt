@@ -67,7 +67,7 @@ fun PluginList(
     }
 }
 
-object FakePlugin:Plugin{
+object FakePlugin : Plugin {
     override val isEnabled: Boolean = true
     override val loader: PluginLoader<*, *>
         get() = error("Not yet implemented")

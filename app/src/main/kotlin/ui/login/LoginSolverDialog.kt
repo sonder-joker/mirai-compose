@@ -1,4 +1,4 @@
-package com.youngerhousea.mirai.compose.ui.loginsolver
+package com.youngerhousea.mirai.compose.ui.login
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf

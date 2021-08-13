@@ -1,5 +1,6 @@
 package com.youngerhousea.mirai.compose.console
 
+import com.youngerhousea.mirai.compose.console.impl.Lifecycle
 import com.youngerhousea.mirai.compose.console.impl.MiraiComposeImpl
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import kotlin.test.Test

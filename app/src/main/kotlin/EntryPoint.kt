@@ -25,9 +25,9 @@ import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
 import com.youngerhousea.mirai.compose.console.impl.MiraiComposeImpl
 import com.youngerhousea.mirai.compose.ui.ExceptionWindow
 import com.youngerhousea.mirai.compose.ui.HostPage
-import com.youngerhousea.mirai.compose.ui.loginsolver.PicCaptchaDialog
-import com.youngerhousea.mirai.compose.ui.loginsolver.SliderCaptchaDialog
-import com.youngerhousea.mirai.compose.ui.loginsolver.UnsafeDeviceLoginVerifyDialog
+import com.youngerhousea.mirai.compose.ui.login.PicCaptchaDialog
+import com.youngerhousea.mirai.compose.ui.login.SliderCaptchaDialog
+import com.youngerhousea.mirai.compose.ui.login.UnsafeDeviceLoginVerifyDialog
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import net.mamoe.mirai.console.MiraiConsole
