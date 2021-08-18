@@ -2,30 +2,54 @@ package com.youngerhousea.mirai.compose.ui.plugins
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import net.mamoe.mirai.console.plugin.Plugin
+import androidx.compose.ui.window.AwtWindow
+import com.youngerhousea.mirai.compose.console.viewModel
+import com.youngerhousea.mirai.compose.viewmodel.PluginsRoute
+import com.youngerhousea.mirai.compose.viewmodel.PluginsViewModel
 import net.mamoe.mirai.console.plugin.PluginManager
+import java.awt.FileDialog
+import java.awt.Frame
 
 @Composable
-fun Plugins() {
-    var pluginsRoute by rememberSaveable { mutableStateOf<PluginsRoute>(PluginsRoute.List) }
+fun Plugins(pluginsViewModel: PluginsViewModel = viewModel { PluginsViewModel() }) {
+    val state by pluginsViewModel.state
 
-    when(val route = pluginsRoute) {
-        PluginsRoute.List -> PluginList(PluginManager.plugins) {
-            pluginsRoute = PluginsRoute.Single(it)
+    if(state.isFileChooserVisible) {
+        FileDialog {
+
         }
-        is PluginsRoute.Single -> {
-            SinglePlugin(route.plugin) {
-                pluginsRoute = PluginsRoute.List
-            }
-        }
+    }
+
+    when (val route = state.navigate) {
+        PluginsRoute.List ->
+            PluginList(
+                plugins = PluginManager.plugins,
+                onPluginClick = { pluginsViewModel.dispatch(PluginsRoute.Single(it)) },
+            )
+        is PluginsRoute.Single ->
+            SinglePlugin(
+                plugin = route.plugin,
+                onExit = { pluginsViewModel.dispatch(PluginsRoute.List) }
+            )
+
     }
 }
 
 
-sealed class PluginsRoute {
-    object List : PluginsRoute()
-    class Single(val plugin:Plugin) : PluginsRoute()
-}
+@Composable
+private fun FileDialog(
+    parent: Frame? = null,
+    onCloseRequest: (result: String?) -> Unit
+) = AwtWindow(
+    create = {
+        object : FileDialog(parent, "Choose a file", LOAD) {
+            override fun setVisible(value: Boolean) {
+                super.setVisible(value)
+                if (value) {
+                    onCloseRequest(file)
+                }
+            }
+        }
+    },
+    dispose = FileDialog::dispose
+)

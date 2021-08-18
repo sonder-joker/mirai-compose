@@ -21,7 +21,7 @@ fun RailTab(
     selected: Boolean = false,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val color by animateColorAsState(if (selected) Color.Green else MaterialTheme.colors.primary)
+    val color by animateColorAsState(if (selected) MaterialTheme.colors.secondary else MaterialTheme.colors.primary)
 
     CompositionLocalProvider(LocalContentColor provides color) {
         Row(

@@ -1,12 +1,16 @@
 package com.youngerhousea.mirai.compose.ui
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.console.viewModel
@@ -36,6 +40,7 @@ fun NavHost(
     HorizontalSplitPane {
         first(minSize = MinFirstSize) {
             NavHostFirst(
+                modifier = Modifier.background(R.Colors.SplitLeft),
                 navigate = state.navigate,
                 onRouteMessage = { hostViewModel.dispatch(HostRoute.Message) },
                 onRoutePlugins = { hostViewModel.dispatch(HostRoute.Plugins) },
@@ -43,7 +48,6 @@ fun NavHost(
                 onRouteAbout = { hostViewModel.dispatch(HostRoute.About) }
             )
         }
-
         second {
             NavHostSecond(state.navigate)
         }
@@ -53,7 +57,7 @@ fun NavHost(
 @Composable
 fun NavHostSecond(hostRoute: HostRoute) {
     when (hostRoute) {
-        HostRoute.About -> About(R.Version.Frontend, R.Version.Backend)
+        HostRoute.About -> About()
         HostRoute.Message -> Message()
         HostRoute.Plugins -> Plugins()
         HostRoute.Setting -> Setting()
@@ -63,6 +67,7 @@ fun NavHostSecond(hostRoute: HostRoute) {
 
 @Composable
 fun NavHostFirst(
+    modifier: Modifier = Modifier,
     navigate: HostRoute,
     onRouteMessage: () -> Unit,
     onRoutePlugins: () -> Unit,
@@ -70,7 +75,7 @@ fun NavHostFirst(
     onRouteAbout: () -> Unit,
 ) {
     Column(
-        Modifier.fillMaxWidth(),
+        modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
     ) {
         NavHostFirstBotMenu()
@@ -105,5 +110,43 @@ fun NavHostFirst(
     }
 }
 
-private val MinFirstSize = 160.dp
+private val MinFirstSize = 170.dp
 
+@Preview
+@Composable
+fun NavHostFirstPreview() {
+    Column(
+        Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
+    ) {
+        RailTab(
+            onClick = {},
+            selected = true
+        ) {
+            Icon(R.Icon.Message, null)
+            Text(R.String.RailTabFirst)
+        }
+        RailTab(
+            onClick = {},
+            selected = false,
+        ) {
+            Icon(R.Icon.Plugins, null)
+            Text(R.String.RailTabSecond)
+        }
+        RailTab(
+            onClick = {},
+            selected = false
+        ) {
+            Icon(R.Icon.Setting, null)
+            Text(R.String.RailTabThird)
+        }
+        RailTab(
+            onClick = {},
+            selected = false
+        ) {
+            Icon(R.Icon.About, null)
+            Text(R.String.RailTabFourth)
+        }
+    }
+}

@@ -2,24 +2,32 @@ package com.youngerhousea.mirai.compose
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Maximize
 import androidx.compose.material.icons.filled.Minimize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import com.youngerhousea.mirai.compose.resource.R
+import java.awt.MouseInfo
+import java.awt.Point
+import java.awt.Window
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionAdapter
 
 @Composable
 fun MiraiComposeWindow(
@@ -45,7 +53,7 @@ fun MiraiComposeWindow(
     onPreviewKeyEvent = onPreviewKeyEvent,
     onKeyEvent = onKeyEvent
 ) {
-    WindowsArea(
+    WindowArea(
         minimizeButton = {
             Button(
                 onClick = {
@@ -107,7 +115,7 @@ fun MiraiComposeDialog(
     onPreviewKeyEvent = onPreviewKeyEvent,
     onKeyEvent = onKeyEvent
 ) {
-    WindowsArea(
+    WindowArea(
         exitButton = {
             Button(
                 onClick = onCloseRequest
@@ -123,45 +131,45 @@ fun MiraiComposeDialog(
 
 
 @Composable
-private inline fun WindowScope.WindowsArea(
+private inline fun WindowScope.WindowArea(
     crossinline minimizeButton: @Composable () -> Unit = {},
     crossinline maximizeButton: @Composable () -> Unit = {},
     crossinline exitButton: @Composable () -> Unit = {},
     draggableAreaHeight: Dp = DialogDraggableHeight,
-    content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
-    Column(Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier.background(color = Color(75, 75, 75))
-                .fillMaxWidth()
-                .height(draggableAreaHeight)
-                .padding(start = DraggableLeftStart, end = DraggableRightStart),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            WindowDraggableArea(
-                modifier = Modifier.weight(1f)
+    Surface(elevation = 1.dp) {
+        Column(Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.background(color = R.Colors.TopAppBar)
+                    .fillMaxWidth()
+                    .height(draggableAreaHeight)
+                    .padding(start = DraggableLeftStart, end = DraggableRightStart),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Don't know why if empty can't drag windows
-                Text(text = "", color = Color.White)
+                WindowDraggableArea(
+                    modifier = Modifier.weight(1f)
+                ) {
+
+                }
+                Row {
+                    minimizeButton()
+                    Spacer(modifier = Modifier.width(DraggableIconSpace))
+                    maximizeButton()
+                    Spacer(modifier = Modifier.width(DraggableIconSpace))
+                    exitButton()
+                }
             }
-            Row {
-                minimizeButton()
-                Spacer(modifier = Modifier.width(DraggableIconSpace))
-                maximizeButton()
-                Spacer(modifier = Modifier.width(DraggableIconSpace))
-                exitButton()
-            }
+            content()
         }
-        content()
     }
 }
-
 
 @Preview
 @Composable
 fun WindowsAreaPreview() {
     Window({}) {
-        WindowsArea {
+        WindowArea {
             Text("Test")
         }
     }
@@ -172,5 +180,57 @@ private val MiraiComposeWindowSize = WindowSize(1280.dp, 768.dp)
 private val DraggableLeftStart = 20.dp
 private val DraggableRightStart = 10.dp
 private val WindowDraggableHeight = 30.dp
-private val DialogDraggableHeight = 10.dp
+private val DialogDraggableHeight = 20.dp
 private val DraggableIconSpace = 5.dp
+
+// remove on future
+@Composable
+fun WindowScope.WindowDraggableArea(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit = {}
+) {
+    val handler = remember { DragHandler(window) }
+
+    Box(
+        modifier = modifier.fillMaxSize().pointerInput(Unit) {
+            forEachGesture {
+                awaitPointerEventScope {
+                    awaitFirstDown()
+                    handler.register()
+                }
+            }
+        }
+    ) {
+        content()
+    }
+}
+
+private class DragHandler(private val window: Window) {
+    private var location = window.location.toComposeOffset()
+    private var pointStart = MouseInfo.getPointerInfo().location.toComposeOffset()
+
+    private val dragListener = object : MouseMotionAdapter() {
+        override fun mouseDragged(event: MouseEvent) = drag()
+    }
+    private val removeListener = object : MouseAdapter() {
+        override fun mouseReleased(event: MouseEvent) {
+            window.removeMouseMotionListener(dragListener)
+            window.removeMouseListener(this)
+        }
+    }
+
+    fun register() {
+        location = window.location.toComposeOffset()
+        pointStart = MouseInfo.getPointerInfo().location.toComposeOffset()
+        window.addMouseListener(removeListener)
+        window.addMouseMotionListener(dragListener)
+    }
+
+    private fun drag() {
+        val point = MouseInfo.getPointerInfo().location.toComposeOffset()
+        val location = location + (point - pointStart)
+        window.setLocation(location.x, location.y)
+    }
+
+    private fun Point.toComposeOffset() = IntOffset(x, y)
+}

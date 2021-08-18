@@ -1,5 +1,6 @@
 package com.youngerhousea.mirai.compose.viewmodel
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.MiraiCompose
@@ -9,30 +10,30 @@ import net.mamoe.mirai.Bot
 
 
 interface Host {
-    val hostState:State<HostState>
+    val hostState: State<HostState>
 
-    fun dispatch(event: Event)
+    fun dispatch(event: HostAction)
 }
 
 
 class HostViewModel : ViewModelScope(), Host {
     override val hostState = mutableStateOf(HostState())
 
-    override fun dispatch(event: Event) {
-        hostState.value = reduce(hostState.value, event)
+    override fun dispatch(action: HostAction) {
+        hostState.value = reduce(hostState.value, action)
     }
 
-    private fun reduce(state: HostState, event: Event): HostState {
-        return when (event) {
-            Event.OpenMenu -> state.copy(menuIsExpand = true)
-            Event.CloseMenu -> state.copy(menuIsExpand = false)
-            Event.OpenLoginDialog -> state.copy(loginDialogIsExpand = true)
-            Event.CloseLoginDialog -> state.copy(loginDialogIsExpand = false)
-            HostRoute.About -> state.copy(navigate = HostRoute.About)
-            HostRoute.Message -> state.copy(navigate = HostRoute.Message)
-            HostRoute.Plugins -> state.copy(navigate = HostRoute.Plugins)
-            HostRoute.Setting -> state.copy(navigate = HostRoute.Setting)
-            is HostRoute.BotMessage -> state.copy(navigate = HostRoute.BotMessage(event.bot))
+    private fun reduce(state: HostState, action: HostAction): HostState {
+        return when (action) {
+            is HostAction.OpenMenu -> state.copy(menuIsExpand = true)
+            is HostAction.CloseMenu -> state.copy(menuIsExpand = false)
+            is HostAction.OpenLoginDialog -> state.copy(loginDialogIsExpand = true)
+            is HostAction.CloseLoginDialog -> state.copy(loginDialogIsExpand = false)
+            is HostRoute.About -> state.copy(navigate = action)
+            is HostRoute.Message -> state.copy(navigate = action)
+            is HostRoute.Plugins -> state.copy(navigate = action)
+            is HostRoute.Setting -> state.copy(navigate = action)
+            is HostRoute.BotMessage -> state.copy(navigate = action)
         }
     }
 
@@ -45,13 +46,14 @@ class HostViewModel : ViewModelScope(), Host {
 }
 
 sealed interface HostRoute {
-    class BotMessage(val bot: Bot) : HostRoute, Event
-    object Message : HostRoute, Event
-    object Setting : HostRoute, Event
-    object About : HostRoute, Event
-    object Plugins : HostRoute, Event
+    class BotMessage(val bot: Bot) : HostRoute, HostAction
+    object Message : HostRoute, HostAction
+    object Setting : HostRoute, HostAction
+    object About : HostRoute, HostAction
+    object Plugins : HostRoute, HostAction
 }
 
+@Immutable
 data class HostState(
     val currentBot: Bot? = null,
     val botList: List<Bot> = listOf(),
@@ -60,9 +62,9 @@ data class HostState(
     val navigate: HostRoute = HostRoute.Message
 )
 
-sealed interface Event {
-    object OpenLoginDialog : Event
-    object CloseLoginDialog : Event
-    object OpenMenu : Event
-    object CloseMenu : Event
+sealed interface HostAction {
+    object OpenLoginDialog : HostAction
+    object CloseLoginDialog : HostAction
+    object OpenMenu : HostAction
+    object CloseMenu : HostAction
 }

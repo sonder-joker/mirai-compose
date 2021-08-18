@@ -1,6 +1,7 @@
 package com.youngerhousea.mirai.compose.viewmodel
 
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.ViewModelScope
@@ -86,13 +87,14 @@ class LoginViewModel : ViewModelScope() {
 }
 
 
-sealed class LoginAction {
-    class InputAccount(val account: String) : LoginAction()
-    class InputPassword(val password: String) : LoginAction()
-    object CancelLogin : LoginAction()
-    object Login : LoginAction()
+sealed interface LoginAction {
+    class InputAccount(val account: String) : LoginAction
+    class InputPassword(val password: String) : LoginAction
+    object CancelLogin : LoginAction
+    object Login : LoginAction
 }
 
+@Immutable
 data class LoginState(
     val account: String = "",
     val password: String = "",

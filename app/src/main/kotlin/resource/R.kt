@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.Extension
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -65,6 +66,11 @@ object R {
         val Add = Icons.Filled.Add
         val Back = Icons.Default.KeyboardArrowLeft
         val Mirai = loadImageBitmap("mirai.png")
+    }
+
+    object Colors {
+        val TopAppBar = Color(0xFF69e2ff)
+        val SplitLeft = Color(0xFF00b0ff)
     }
 }
 

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.login.LoginDialog
-import com.youngerhousea.mirai.compose.viewmodel.Event
+import com.youngerhousea.mirai.compose.viewmodel.HostAction
 import com.youngerhousea.mirai.compose.viewmodel.Host
 import com.youngerhousea.mirai.compose.viewmodel.HostRoute
 import com.youngerhousea.mirai.compose.viewmodel.HostViewModel
@@ -28,16 +28,16 @@ fun NavHostFirstBotMenu(
 
     LoginDialog(
         show = state.loginDialogIsExpand,
-        onCloseRequest = { hostViewModel.dispatch(Event.CloseLoginDialog) }
+        onCloseRequest = { hostViewModel.dispatch(HostAction.CloseLoginDialog) }
     )
 
     NavHostFirstBotMenuContent(
         isExpand = state.menuIsExpand,
         botList = state.botList,
         currentBot = state.currentBot,
-        onAvatarBoxClick = { hostViewModel.dispatch(Event.OpenMenu) },
-        dismissExpandMenu = { hostViewModel.dispatch(Event.CloseMenu) },
-        onAddNewBotButtonClick = { hostViewModel.dispatch(Event.OpenLoginDialog) },
+        onAvatarBoxClick = { hostViewModel.dispatch(HostAction.OpenMenu) },
+        dismissExpandMenu = { hostViewModel.dispatch(HostAction.CloseMenu) },
+        onAddNewBotButtonClick = { hostViewModel.dispatch(HostAction.OpenLoginDialog) },
         onBotItemClick = { hostViewModel.dispatch(HostRoute.BotMessage(it))}
     )
 }

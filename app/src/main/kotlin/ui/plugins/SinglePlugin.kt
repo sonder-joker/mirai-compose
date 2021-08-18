@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.LocalMiraiCompose
 import com.youngerhousea.mirai.compose.console.impl.get
 import com.youngerhousea.mirai.compose.resource.R
+import com.youngerhousea.mirai.compose.ui.EnumTabRowWithContent
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
@@ -69,26 +70,6 @@ fun JvmPlugin(
             PluginTab.Description -> PluginDescription(plugin)
             PluginTab.Data -> PluginDataList(LocalMiraiCompose.current.configStorageForBuiltIns[plugin])
             PluginTab.Command -> PluginCommands(plugin.registeredCommands)
-        }
-    }
-}
-
-
-
-@Composable
-inline fun <reified T : Enum<T>> EnumTabRowWithContent(
-    enum: T,
-    rowModifier: Modifier = Modifier,
-    crossinline onClick: (enumValue: T) -> Unit,
-    crossinline tabContent: @Composable ColumnScope.(enumValue: T) -> Unit
-) {
-    TabRow(enum.ordinal, modifier = rowModifier) {
-        for (current in enumValues<T>()) {
-            Tab(enum == current, onClick = {
-                onClick(current)
-            }, content = {
-                tabContent(current)
-            })
         }
     }
 }

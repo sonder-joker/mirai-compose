@@ -1,6 +1,9 @@
 package com.youngerhousea.mirai.compose
 
+import androidx.compose.desktop.DesktopMaterialTheme
+import androidx.compose.material.Colors
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.youngerhousea.mirai.compose.console.LocalViewModelStore
@@ -75,7 +78,7 @@ private inline fun handExceptionApplication(crossinline content: @Composable App
         }
     }
 
-    application {
+    themeApplication {
         val isException by exceptionWindows.collectAsState()
         val message by exceptionMessage.collectAsState()
         ExceptionWindow(
@@ -87,6 +90,33 @@ private inline fun handExceptionApplication(crossinline content: @Composable App
     }
 }
 
+
+fun themeApplication(
+    content: @Composable ApplicationScope.() -> Unit
+) {
+    application {
+        DesktopMaterialTheme(colors = color) {
+            content()
+        }
+
+    }
+}
+
 val LocalMiraiCompose =
     staticCompositionLocalOf<MiraiComposeImplementation> { error("No MiraiComposeImplementation provided") }
 
+val color = Colors(
+    primary = Color(0xFF00b0ff),
+    primaryVariant = Color(0xFF69e2ff),
+    secondary = Color(0xFF03DAC6),
+    secondaryVariant = Color(0xFF018786),
+    background = Color(0xFFFFFFFF),
+    surface = Color(0xFFFFFFFF),
+    error = Color(0xFFB00020),
+    onPrimary = Color(0xFFFFFFFF),
+    onSecondary = Color(0xFF000000),
+    onBackground = Color(0xFF000000),
+    onSurface = Color(0xFF000000),
+    onError = Color(0xFFFFFFFF),
+    isLight = true
+)

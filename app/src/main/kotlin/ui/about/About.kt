@@ -23,8 +23,6 @@ import java.net.URI
 
 @Composable
 fun About(
-    frontend: String,
-    backend: String
 ) {
     Row(
         Modifier.fillMaxSize(),
@@ -33,8 +31,8 @@ fun About(
     ) {
         Image(R.Image.Mirai, "mirai")
         Column {
-            ClickableUrlText(frontendAnnotatedString(frontend))
-            ClickableUrlText(backendAnnotatedString(backend))
+            ClickableUrlText(frontendAnnotatedString(R.Version.Frontend))
+            ClickableUrlText(backendAnnotatedString(R.Version.Backend))
         }
     }
 }
@@ -88,6 +86,6 @@ fun ClickableUrlText(annotatedString: AnnotatedString) {
 @Preview
 @Composable
 fun AboutPreview() {
-    About(R.Version.Frontend, R.Version.Backend)
+    About()
 }
 
