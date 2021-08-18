@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.youngerhousea.mirai.compose.MiraiComposeDialog
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.viewmodel.LoginAction
@@ -36,7 +37,7 @@ fun LoginDialog(
     visible: Boolean,
     onCloseRequest: () -> Unit
 ) {
-    Dialog(visible = visible, onCloseRequest = onCloseRequest) {
+    MiraiComposeDialog(visible = visible, onCloseRequest = onCloseRequest) {
         Login()
     }
 }
@@ -101,7 +102,7 @@ private fun AccountTextField(
         },
         modifier = Modifier
             .padding(40.dp),
-        label = { Text("Account") },
+        label = { Text(R.String.Login) },
         leadingIcon = { Icon(Icons.Default.AccountCircle, null) },
         isError = isError,
         keyboardOptions = KeyboardOptions(
@@ -126,7 +127,7 @@ private fun PasswordTextField(
         },
         modifier = Modifier
             .padding(40.dp),
-        label = { Text("Password") },
+        label = { Text(R.String.Password) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.VpnKey,

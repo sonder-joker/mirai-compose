@@ -7,13 +7,19 @@ import com.youngerhousea.mirai.compose.console.ViewModelScope
 import com.youngerhousea.mirai.compose.console.impl.doOnFinishAutoLogin
 import net.mamoe.mirai.Bot
 
-class HostViewModel : ViewModelScope() {
-    private val _hostState = mutableStateOf(HostState())
 
-    val hostState: State<HostState> get() = _hostState
+interface Host {
+    val hostState:State<HostState>
 
-    fun dispatch(event: Event) {
-        _hostState.value = reduce(_hostState.value, event)
+    fun dispatch(event: Event)
+}
+
+
+class HostViewModel : ViewModelScope(), Host {
+    override val hostState = mutableStateOf(HostState())
+
+    override fun dispatch(event: Event) {
+        hostState.value = reduce(hostState.value, event)
     }
 
     private fun reduce(state: HostState, event: Event): HostState {
@@ -32,9 +38,10 @@ class HostViewModel : ViewModelScope() {
 
     init {
         MiraiCompose.lifecycle.doOnFinishAutoLogin {
-            _hostState.value = _hostState.value.copy(botList = Bot.instances)
+            hostState.value = hostState.value.copy(botList = Bot.instances)
         }
     }
+
 }
 
 sealed interface HostRoute {

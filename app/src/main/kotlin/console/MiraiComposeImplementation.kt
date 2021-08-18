@@ -18,16 +18,27 @@ import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.MiraiLogger
 import java.time.Instant
 
-
 interface MiraiComposeImplementation :
-    MiraiComposeInternal,
     MiraiConsoleImplementation,
     ViewModelStoreOwner,
     LifecycleOwner {
     override val configStorageForBuiltIns: ReadablePluginConfigStorage
+
     override val configStorageForJvmPluginLoader: ReadablePluginConfigStorage
+
     override val dataStorageForBuiltIns: ReadablePluginDataStorage
+
     override val dataStorageForJvmPluginLoader: ReadablePluginDataStorage
+
+    val JvmPlugin.data: List<PluginData>
+
+    val JvmPlugin.config: List<PluginConfig>
+
+    val loginSolverState: State<LoginSolverState>
+
+    fun dispatch(login: Login)
+
+    fun cancel()
 }
 
 
@@ -56,19 +67,6 @@ interface MiraiCompose : MiraiConsole {
     }
 }
 
-
-// need a more normal way
-interface MiraiComposeInternal {
-    val JvmPlugin.data: List<PluginData>
-
-    val JvmPlugin.config: List<PluginConfig>
-
-    val loginSolverState: State<LoginSolverState>
-
-    fun dispatch(login: Login)
-
-    fun cancel()
-}
 
 sealed class Login {
     class PicCaptcha(val string: String?) : Login()

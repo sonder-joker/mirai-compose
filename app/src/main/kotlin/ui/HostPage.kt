@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.about.About
@@ -33,7 +34,7 @@ fun NavHost(
     val state by hostViewModel.hostState
 
     HorizontalSplitPane {
-        first {
+        first(minSize = MinFirstSize) {
             NavHostFirst(
                 navigate = state.navigate,
                 onRouteMessage = { hostViewModel.dispatch(HostRoute.Message) },
@@ -103,4 +104,6 @@ fun NavHostFirst(
         }
     }
 }
+
+private val MinFirstSize = 160.dp
 

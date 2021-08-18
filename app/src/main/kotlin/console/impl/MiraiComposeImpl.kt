@@ -25,10 +25,10 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.div
 
 /**
- * Abstract mirai compose, this implementation for [MiraiConsoleImplementation] and [MiraiComposeInternal]
+ * Abstract mirai compose, this implementation for [MiraiConsoleImplementation]
  *
  */
-abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation, MiraiComposeInternal {
+abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation {
 
     private val logger by lazy { createLogger("compose") }
 
@@ -67,7 +67,7 @@ abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation, MiraiCompo
     private val unsafeDeviceLoginVerify = CompletableDeferred<String?>()
 
     override fun dispatch(login: Login) {
-        when(login) {
+        when (login) {
             is Login.PicCaptcha -> picCaptcha.complete(login.string)
             is Login.SliderCaptcha -> sliderCaptcha.complete(login.string)
             is Login.UnsafeDevice -> unsafeDeviceLoginVerify.complete(login.string)
@@ -99,7 +99,7 @@ abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation, MiraiCompo
  */
 internal class MiraiComposeImpl(
     override val viewModelStore: ViewModelStore = ViewModelStoreImpl(),
-) : AbstractMiraiComposeImpl(), MiraiComposeImplementation, ViewModelStoreOwner, LifecycleOwner, CoroutineScope {
+) : AbstractMiraiComposeImpl() {
     override val lifecycle: LifecycleRegistry = LifecycleRegistryImpl(WeakReference(this))
 
     private val job = SupervisorJob()

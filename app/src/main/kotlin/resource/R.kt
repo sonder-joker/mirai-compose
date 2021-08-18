@@ -13,9 +13,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.loadSvgPainter
 import androidx.compose.ui.res.loadXmlImageVector
+import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.Density
 import org.xml.sax.InputSource
-import java.io.File
 
 object R {
     object Version {
@@ -46,12 +46,15 @@ object R {
         const val IllPassword = "密码长度最多为16"
         const val UnknownError = "Unknown Reason"
         const val CancelLogin = ""
+
+        const val Login = "Login"
+        const val Password = "Password"
     }
 
     object Image {
-        val Java = loadXmlImageVector(File("ic_java.xml"))
-        val Kotlin = loadXmlImageVector(File("ic_kotlin.xml"))
-        val Mirai = loadXmlImageVector(File("ic_mirai.xml"))
+        val Java = loadXmlImageVector("ic_java.xml")
+        val Kotlin = loadXmlImageVector("ic_kotlin.xml")
+        val Mirai = loadXmlImageVector("ic_mirai.xml")
     }
 
     object Icon {
@@ -61,15 +64,15 @@ object R {
         val About = Icons.Outlined.Forum
         val Add = Icons.Filled.Add
         val Back = Icons.Default.KeyboardArrowLeft
-        val Mirai = loadImageBitmap(File("mirai.png"))
+        val Mirai = loadImageBitmap("mirai.png")
     }
 }
 
-fun loadImageBitmap(file: File): ImageBitmap =
-    file.inputStream().buffered().use(::loadImageBitmap)
+fun loadImageBitmap(path: String): ImageBitmap =
+    useResource(path) { it.buffered().use(::loadImageBitmap) }
 
-fun loadSvgPainter(file: File, density: Density): Painter =
-    file.inputStream().buffered().use { loadSvgPainter(it, density) }
+fun loadSvgPainter(path: String, density: Density = Density(1f)): Painter =
+    useResource(path) { loadSvgPainter(it, density) }
 
-fun loadXmlImageVector(file: File, density: Density = Density(1f)): ImageVector =
-    file.inputStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
+fun loadXmlImageVector(path: String, density: Density = Density(1f)): ImageVector =
+    useResource(path) { stream -> stream.buffered().use { loadXmlImageVector(InputSource(it), density) } }

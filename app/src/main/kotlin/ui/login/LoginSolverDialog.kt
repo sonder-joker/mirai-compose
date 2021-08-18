@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeBitmap
-import androidx.compose.ui.window.Dialog
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageWriter
+import com.youngerhousea.mirai.compose.MiraiComposeDialog
 import com.youngerhousea.mirai.compose.console.LoginSolverState
 import com.youngerhousea.mirai.compose.ui.EmptyBot
 import com.youngerhousea.mirai.compose.viewmodel.skiaImageDecode
@@ -27,7 +27,7 @@ internal inline fun PicCaptchaDialog(
 ) {
     val (picCaptcha, setPicCaptcha) = remember { mutableStateOf<String?>(null) }
 
-    Dialog(onCloseRequest = { onExit(picCaptcha) }) {
+    MiraiComposeDialog(onCloseRequest = { onExit(picCaptcha) }) {
         LoginSolverContent(
             title = "Bot:${loginSolverState.bot.id}",
             tip = "处理图片验证码",
@@ -44,7 +44,7 @@ internal inline fun SliderCaptchaDialog(
     crossinline onExit: (picCaptcha: String?) -> Unit
 ) {
     val (sliderCaptcha, setSliderCaptcha) = remember { mutableStateOf<String?>(null) }
-    Dialog(onCloseRequest = { onExit(sliderCaptcha) }) {
+    MiraiComposeDialog(onCloseRequest = { onExit(sliderCaptcha) }) {
         LoginSolverContent(
             title = "Bot:${EmptyBot.id}",
             tip = "处理滑动验证码",
@@ -61,7 +61,7 @@ internal inline fun UnsafeDeviceLoginVerifyDialog(
     crossinline onExit: (picCaptcha: String?) -> Unit
 ) {
     val (loginVerify, setLoginVerify) = remember { mutableStateOf<String?>(null) }
-    Dialog(onCloseRequest = { onExit(loginVerify) }) {
+    MiraiComposeDialog(onCloseRequest = { onExit(loginVerify) }) {
         LoginSolverContent(
             title = "Bot:${EmptyBot.id}",
             tip = "处理不安全设备验证",
