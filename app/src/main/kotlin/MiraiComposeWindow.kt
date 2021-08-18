@@ -123,10 +123,10 @@ fun MiraiComposeDialog(
 
 
 @Composable
-private fun WindowScope.WindowsArea(
-    minimizeButton: @Composable () -> Unit = {},
-    maximizeButton: @Composable () -> Unit = {},
-    exitButton: @Composable () -> Unit = {},
+private inline fun WindowScope.WindowsArea(
+    crossinline minimizeButton: @Composable () -> Unit = {},
+    crossinline maximizeButton: @Composable () -> Unit = {},
+    crossinline exitButton: @Composable () -> Unit = {},
     draggableAreaHeight: Dp = DialogDraggableHeight,
     content: @Composable () -> Unit
 ) {

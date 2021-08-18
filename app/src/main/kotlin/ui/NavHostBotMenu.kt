@@ -27,7 +27,7 @@ fun NavHostFirstBotMenu(
     val state by hostViewModel.hostState
 
     LoginDialog(
-        visible = state.loginDialogIsExpand,
+        show = state.loginDialogIsExpand,
         onCloseRequest = { hostViewModel.dispatch(Event.CloseLoginDialog) }
     )
 

@@ -24,7 +24,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.youngerhousea.mirai.compose.MiraiComposeDialog
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
@@ -34,12 +33,13 @@ import com.youngerhousea.mirai.compose.viewmodel.LoginViewModel
 
 @Composable
 fun LoginDialog(
-    visible: Boolean,
+    show: Boolean,
     onCloseRequest: () -> Unit
 ) {
-    MiraiComposeDialog(visible = visible, onCloseRequest = onCloseRequest) {
-        Login()
-    }
+    if (show)
+        MiraiComposeDialog(onCloseRequest = onCloseRequest) {
+            Login()
+        }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
