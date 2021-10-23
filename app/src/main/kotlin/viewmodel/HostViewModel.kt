@@ -19,8 +19,8 @@ interface Host {
 class HostViewModel : ViewModelScope(), Host {
     override val hostState = mutableStateOf(HostState())
 
-    override fun dispatch(action: HostAction) {
-        hostState.value = reduce(hostState.value, action)
+    override fun dispatch(event: HostAction) {
+        hostState.value = reduce(hostState.value, event)
     }
 
     private fun reduce(state: HostState, action: HostAction): HostState {

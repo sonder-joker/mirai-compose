@@ -4,15 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.res.loadImageBitmap
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.youngerhousea.mirai.compose.MiraiComposeDialog
 import com.youngerhousea.mirai.compose.console.LoginSolverState
 import com.youngerhousea.mirai.compose.ui.EmptyBot
-import com.youngerhousea.mirai.compose.viewmodel.skiaImageDecode
 import net.mamoe.mirai.utils.LoginSolver
+import java.io.ByteArrayInputStream
 
 
 /***
@@ -31,7 +32,7 @@ internal inline fun PicCaptchaDialog(
         LoginSolverContent(
             title = "Bot:${loginSolverState.bot.id}",
             tip = "处理图片验证码",
-            load = { skiaImageDecode(loginSolverState.data) },
+            load = {  loadImageBitmap(ByteArrayInputStream(loginSolverState.data)) },
             value = picCaptcha,
             onValueChange = setPicCaptcha
         )
@@ -81,5 +82,5 @@ fun QRCodeImageBitmap(
         qrCodeData,
         BarcodeFormat.QR_CODE, qrCodeWidth, qrCodeHeight
     )
-    return MatrixToImageWriter.toBufferedImage(matrix).toComposeBitmap()
+    return MatrixToImageWriter.toBufferedImage(matrix).toComposeImageBitmap()
 }

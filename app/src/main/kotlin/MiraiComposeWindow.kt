@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
@@ -175,7 +176,7 @@ fun WindowsAreaPreview() {
     }
 }
 
-private val MiraiComposeWindowSize = WindowSize(1280.dp, 768.dp)
+private val MiraiComposeWindowSize = DpSize(1280.dp, 768.dp)
 
 private val DraggableLeftStart = 20.dp
 private val DraggableRightStart = 10.dp

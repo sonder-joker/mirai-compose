@@ -3,7 +3,7 @@ package com.youngerhousea.mirai.compose.viewmodel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.loadImageBitmap
 import com.youngerhousea.mirai.compose.console.MiraiCompose
 import com.youngerhousea.mirai.compose.console.ViewModelScope
 import com.youngerhousea.mirai.compose.console.impl.doOnFinishLoading
@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.Mirai
-import org.jetbrains.skija.Image
 
 class BotViewModel(bot: Bot) : ViewModelScope() {
 
@@ -23,13 +22,10 @@ class BotViewModel(bot: Bot) : ViewModelScope() {
     init {
         MiraiCompose.lifecycle.doOnFinishLoading {
              viewModelScope.launch(Dispatchers.IO) {
-                _image.value = skiaImageDecode(Mirai.Http.get(bot.avatarUrl))
+                _image.value = loadImageBitmap(Mirai.Http.get(bot.avatarUrl))
             }
         }
     }
 
 }
 
-
-internal fun skiaImageDecode(byteArray: ByteArray): ImageBitmap =
-    Image.makeFromEncoded(byteArray).asImageBitmap()

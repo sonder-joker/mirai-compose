@@ -71,10 +71,10 @@ compose.desktop {
 
 kotlin {
     sourceSets.all {
-        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.util.ConsoleExperimentalApi")
-        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.utils.MiraiExperimentalApi")
-        languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
-        languageSettings.useExperimentalAnnotation("androidx.compose.foundation.ExperimentalFoundationApi")
+        languageSettings.optIn("net.mamoe.mirai.console.util.ConsoleExperimentalApi")
+        languageSettings.optIn("net.mamoe.mirai.utils.MiraiExperimentalApi")
+        languageSettings.optIn("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
+        languageSettings.optIn("androidx.compose.foundation.ExperimentalFoundationApi")
     }
 }
 

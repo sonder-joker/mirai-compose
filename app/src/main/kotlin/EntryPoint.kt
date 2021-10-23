@@ -2,6 +2,7 @@ package com.youngerhousea.mirai.compose
 
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.material.Colors
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.ApplicationScope
@@ -95,7 +96,7 @@ fun themeApplication(
     content: @Composable ApplicationScope.() -> Unit
 ) {
     application {
-        DesktopMaterialTheme(colors = color) {
+        MaterialTheme(colors = color) {
             content()
         }
 

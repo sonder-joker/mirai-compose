@@ -40,7 +40,7 @@ fun Project.configureKotlinExperimentalUsages() {
         target.languageSettings.run {
             progressiveMode = true
             experimentalAnnotations.forEach { a ->
-                useExperimentalAnnotation(a)
+                optIn(a)
             }
         }
 }

@@ -13,6 +13,8 @@ import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.network.*
 
+
+
 class LoginViewModel : ViewModelScope() {
     private val _state = mutableStateOf(LoginState())
 
