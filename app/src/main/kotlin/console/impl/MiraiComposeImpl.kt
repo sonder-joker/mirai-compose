@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import mirai_compose.app.BuildConfig
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
@@ -17,22 +18,27 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.message.data.Message
-import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.LoginSolver
+import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.MiraiLogger
 import java.lang.ref.WeakReference
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.div
 
+
 /**
- * Abstract mirai compose, this implementation for [MiraiConsoleImplementation]
+ * Create a [MiraiComposeImplementation], this implementation for [MiraiConsoleImplementation],  extend [ViewModelStoreOwner], [LifecycleOwner] and [CoroutineScope]
  *
  */
-abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation {
+internal class MiraiComposeImpl() : MiraiComposeImplementation {
+    override val viewModelStore: ViewModelStore = ViewModelStoreImpl()
 
     private val logger by lazy { createLogger("compose") }
 
-    final override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
+    override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
 
     override val builtInPluginLoaders = listOf(lazy { JvmPluginLoader })
 
@@ -50,7 +56,26 @@ abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation {
 
     override val consoleCommandSender = MiraiConsoleSender(logger)
 
-    override fun createLogger(identity: String?): MiraiLogger = LoggerCreator(identity ?: "Default")
+    @OptIn(MiraiInternalApi::class)
+    override fun createLogger(identity: String?): MiraiLogger =
+        MiraiComposeLogger(identity = identity ?: "Default", output = { content, exception, priority ->
+            val newContent =
+                if (exception != null) (content ?: exception.toString()) + "\n${exception.stackTraceToString()}"
+                else content.toString()
+            val trueContent = "$currentTimeFormatted ${priority.simpleName}/$identity $newContent"
+
+            printForDebug(priority, trueContent)
+            storeInLogStorage(priority, trueContent)
+        })
+
+    private fun storeInLogStorage(priority: LogKind, content: String) {
+        logStorage.value += Log(content, priority)
+    }
+
+    private fun printForDebug(priority: LogKind, content: String) {
+        println("${priority.textColor}${content}${TextColor.RESET}")
+
+    }
 
     override val JvmPlugin.data: List<PluginData>
         get() = if (this is PluginDataHolder) dataStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
@@ -59,6 +84,8 @@ abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation {
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
     override val loginSolverState: MutableState<LoginSolverState> = mutableStateOf(LoginSolverState.Nothing)
+
+    override val logStorage: MutableStateFlow<List<Log>> = MutableStateFlow(listOf())
 
     private val picCaptcha = CompletableDeferred<String?>()
 
@@ -91,15 +118,7 @@ abstract class AbstractMiraiComposeImpl : MiraiComposeImplementation {
                 return unsafeDeviceLoginVerify.await()
             }
         }
-}
 
-/**
- * Create a [MiraiComposeImplementation], extend [ViewModelStoreOwner], [LifecycleOwner] and [CoroutineScope]
- *
- */
-internal class MiraiComposeImpl(
-    override val viewModelStore: ViewModelStore = ViewModelStoreImpl(),
-) : AbstractMiraiComposeImpl() {
     override val lifecycle: LifecycleRegistry = LifecycleRegistryImpl(WeakReference(this))
 
     private val job = SupervisorJob()
@@ -164,11 +183,4 @@ class MiraiConsoleSender(
     }
 }
 
-internal const val ANSI_RESET = "\u001b[0m"
 
-@OptIn(MiraiInternalApi::class)
-internal val LoggerCreator: (identity: String?) -> MiraiLogger = {
-    PlatformLogger(identity = it, output = { line ->
-        println(line + ANSI_RESET)
-    })
-}

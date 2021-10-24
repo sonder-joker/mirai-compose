@@ -34,6 +34,7 @@ class HostViewModel : ViewModelScope(), Host {
             is HostRoute.Plugins -> state.copy(navigate = action)
             is HostRoute.Setting -> state.copy(navigate = action)
             is HostRoute.BotMessage -> state.copy(navigate = action)
+            is HostRoute.ConsoleLog -> state.copy(navigate = action)
         }
     }
 
@@ -51,6 +52,7 @@ sealed interface HostRoute {
     object Setting : HostRoute, HostAction
     object About : HostRoute, HostAction
     object Plugins : HostRoute, HostAction
+    object ConsoleLog : HostRoute, HostAction
 }
 
 @Immutable

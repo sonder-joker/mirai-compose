@@ -1,6 +1,5 @@
 package com.youngerhousea.mirai.compose
 
-import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*

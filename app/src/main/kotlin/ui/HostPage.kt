@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.about.About
+import com.youngerhousea.mirai.compose.ui.log.ConsoleLog
 import com.youngerhousea.mirai.compose.ui.message.BotMessage
 import com.youngerhousea.mirai.compose.ui.message.Message
 import com.youngerhousea.mirai.compose.ui.plugins.Plugins
@@ -45,7 +46,8 @@ fun NavHost(
                 onRouteMessage = { hostViewModel.dispatch(HostRoute.Message) },
                 onRoutePlugins = { hostViewModel.dispatch(HostRoute.Plugins) },
                 onRouteSetting = { hostViewModel.dispatch(HostRoute.Setting) },
-                onRouteAbout = { hostViewModel.dispatch(HostRoute.About) }
+                onRouteAbout = { hostViewModel.dispatch(HostRoute.About) },
+                onRouteConsoleLog = { hostViewModel.dispatch(HostRoute.ConsoleLog) }
             )
         }
         second {
@@ -57,11 +59,12 @@ fun NavHost(
 @Composable
 fun NavHostSecond(hostRoute: HostRoute) {
     when (hostRoute) {
-        HostRoute.About -> About()
-        HostRoute.Message -> Message()
-        HostRoute.Plugins -> Plugins()
-        HostRoute.Setting -> Setting()
+        is HostRoute.About -> About()
+        is HostRoute.Message -> Message()
+        is HostRoute.Plugins -> Plugins()
+        is HostRoute.Setting -> Setting()
         is HostRoute.BotMessage -> BotMessage()
+        is HostRoute.ConsoleLog -> ConsoleLog()
     }
 }
 
@@ -73,6 +76,7 @@ fun NavHostFirst(
     onRoutePlugins: () -> Unit,
     onRouteSetting: () -> Unit,
     onRouteAbout: () -> Unit,
+    onRouteConsoleLog: () -> Unit,
 ) {
     Column(
         modifier.fillMaxSize(),
@@ -106,6 +110,13 @@ fun NavHostFirst(
         ) {
             Icon(R.Icon.About, null)
             Text(R.String.RailTabFourth)
+        }
+        RailTab(
+            onClick = onRouteConsoleLog,
+            selected = navigate == HostRoute.ConsoleLog
+        ) {
+            Icon(R.Icon.ConsoleLog, null)
+            Text(R.String.RailTabFive)
         }
     }
 }

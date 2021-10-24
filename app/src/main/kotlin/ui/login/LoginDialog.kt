@@ -16,9 +16,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -27,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.MiraiComposeDialog
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
+import com.youngerhousea.mirai.compose.ui.log.onPreviewEnterDown
+import com.youngerhousea.mirai.compose.viewmodel.Login
 import com.youngerhousea.mirai.compose.viewmodel.LoginAction
 import com.youngerhousea.mirai.compose.viewmodel.LoginViewModel
 
@@ -44,17 +43,15 @@ fun LoginDialog(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun Login(loginViewModel: LoginViewModel = viewModel { LoginViewModel() }) {
+fun Login(loginViewModel: Login = viewModel { LoginViewModel() }) {
 
     val data by loginViewModel.state
 
-    Scaffold(scaffoldState = rememberScaffoldState(snackbarHostState = data.host), modifier = Modifier.onKeyEvent {
-        if (it.key == Key.Enter) {
+    Scaffold(
+        scaffoldState = rememberScaffoldState(snackbarHostState = data.host),
+        modifier = Modifier.onPreviewEnterDown {
             loginViewModel.dispatch(LoginAction.Login)
-            return@onKeyEvent true
-        }
-        false
-    }) {
+        }) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,

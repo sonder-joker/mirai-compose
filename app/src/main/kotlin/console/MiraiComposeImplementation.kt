@@ -1,10 +1,8 @@
 package com.youngerhousea.mirai.compose.console
 
 import androidx.compose.runtime.State
-import com.youngerhousea.mirai.compose.console.impl.Lifecycle
-import com.youngerhousea.mirai.compose.console.impl.LifecycleOwner
-import com.youngerhousea.mirai.compose.console.impl.ReadablePluginConfigStorage
-import com.youngerhousea.mirai.compose.console.impl.ReadablePluginDataStorage
+import com.youngerhousea.mirai.compose.console.impl.*
+import kotlinx.coroutines.flow.StateFlow
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation
@@ -36,6 +34,8 @@ interface MiraiComposeImplementation :
 
     val loginSolverState: State<LoginSolverState>
 
+    val logStorage: StateFlow<List<Log>>
+
     fun dispatch(login: Login)
 
     fun cancel()
@@ -56,6 +56,8 @@ private object MiraiComposeBridge : MiraiCompose,
         get() = MiraiConsole.pluginCenter
 
     override val version: SemVersion get() = MiraiConsole.version
+
+
 }
 
 interface MiraiCompose : MiraiConsole {

@@ -2,6 +2,7 @@ package com.youngerhousea.mirai.compose.viewmodel
 
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.ViewModelScope
@@ -14,17 +15,20 @@ import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.network.*
 
 
+interface Login {
+    val state: State<LoginState>
 
-class LoginViewModel : ViewModelScope() {
-    private val _state = mutableStateOf(LoginState())
+    fun dispatch(loginAction: LoginAction);
+}
 
-    val state: State<LoginState> get() = _state
+class LoginViewModel : Login, ViewModelScope() {
+    override val state: MutableState<LoginState> = mutableStateOf(LoginState())
 
     lateinit var loginJob: Job
 
-    fun dispatch(loginAction: LoginAction) {
+    override fun dispatch(loginAction: LoginAction) {
         viewModelScope.launch {
-            _state.value = reduce(_state.value, loginAction)
+            state.value = reduce(state.value, loginAction)
         }
     }
 

@@ -3,10 +3,8 @@ package com.youngerhousea.mirai.compose.resource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.Extension
-import androidx.compose.material.icons.outlined.Forum
-import androidx.compose.material.icons.outlined.Message
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
@@ -31,6 +29,7 @@ object R {
         const val RailTabSecond = "Plugin"
         const val RailTabThird = "Setting"
         const val RailTabFourth = "About"
+        const val RailTabFive = "ConsoleLog"
         const val EditSuccess = "Success"
         const val EditFailure = "Failure"
 
@@ -59,6 +58,8 @@ object R {
     }
 
     object Icon {
+        val Search = Icons.Default.Search
+        val ConsoleLog = Icons.Outlined.Description
         val Message = Icons.Outlined.Message
         val Plugins = Icons.Outlined.Extension
         val Setting = Icons.Outlined.Settings
@@ -69,6 +70,7 @@ object R {
     }
 
     object Colors {
+        val SearchText = Color.Yellow
         val TopAppBar = Color(0xFF69e2ff)
         val SplitLeft = Color(0xFF00b0ff)
     }
