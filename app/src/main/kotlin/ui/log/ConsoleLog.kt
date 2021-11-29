@@ -10,8 +10,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -23,13 +21,12 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.LocalMiraiCompose
 import com.youngerhousea.mirai.compose.console.impl.Log
-import com.youngerhousea.mirai.compose.console.impl.MiraiComposeImpl
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.viewmodel.ConsoleLog
 import com.youngerhousea.mirai.compose.viewmodel.ConsoleLogAction
 import com.youngerhousea.mirai.compose.viewmodel.ConsoleLogViewModel
-import java.util.regex.PatternSyntaxException
+import java.util.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -137,48 +134,44 @@ private fun Log.annotatedString(
 ): AnnotatedString {
     val builder = AnnotatedString.Builder()
     if (searchText.isEmpty())
-        builder.append(
-            AnnotatedString(
-                message,
-                spanStyle = SpanStyle(
-                    color = kind.color
-                ),
+        return with(builder) {
+            append(
+                AnnotatedString(
+                    message,
+                    spanStyle = SpanStyle(
+                        color = kind.color
+                    ),
+                )
             )
-        )
+            toAnnotatedString()
+        }
     else
-        try {
-            message.split("((?<=${searchText})|(?=${searchText}))".toRegex()).forEach {
-                if (it == searchText)
-                    builder.append(
+        return with(builder) {
+            val tok = StringTokenizer(message, searchText, true)
+            while (tok.hasMoreTokens()) {
+                val next = tok.nextToken()
+                if (next == searchText) {
+                    append(
                         AnnotatedString(
-                            it,
+                            next,
                             spanStyle = SpanStyle(
-                                R.Colors.SearchText
+                                color = R.Colors.SearchText
                             ),
                         )
                     )
-                else
-                    builder.append(
+                } else {
+                    append(
                         AnnotatedString(
-                            it,
+                            next,
                             spanStyle = SpanStyle(
                                 kind.color
                             ),
                         )
                     )
+                }
             }
-        } catch (e: PatternSyntaxException) {
-            builder.append(
-                AnnotatedString(
-                    message,
-                    spanStyle = SpanStyle(
-                        kind.color
-                    ),
-                )
-            )
+            toAnnotatedString()
         }
-
-    return builder.toAnnotatedString()
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
