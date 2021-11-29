@@ -17,8 +17,9 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
     implementation(compose.uiTooling)
-    implementation(compose.desktop.components.splitPane)
 
+    @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+    implementation(compose.desktop.components.splitPane)
     implementation(libs.zxing.core)
     implementation(libs.zxing.se)
 
@@ -32,7 +33,8 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation(kotlin("test"))
 
-    testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4"))
+    @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+    testImplementation(compose.uiTestJUnit4)
 }
 
 buildConfig {
