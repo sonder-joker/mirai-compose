@@ -41,24 +41,23 @@ private inline fun miraiComposeApplication(crossinline content: @Composable Appl
     }
 }
 
-@Suppress("UnnecessaryVariable")
 @Composable
 private fun LoginSolverDialog() {
     val observeLoginSolverState by LocalMiraiCompose.current.loginSolverState
-    when (val loginSolverState = observeLoginSolverState) {
+    when (observeLoginSolverState) {
         is LoginSolverState.Nothing -> {
         }
         is LoginSolverState.PicCaptcha ->
-            PicCaptchaDialog(loginSolverState) {
+            PicCaptchaDialog(observeLoginSolverState as LoginSolverState.PicCaptcha) {
                 LocalMiraiCompose.current.dispatch(Login.PicCaptcha(it))
             }
         is LoginSolverState.SliderCaptcha -> {
-            SliderCaptchaDialog(loginSolverState) {
+            SliderCaptchaDialog(observeLoginSolverState as LoginSolverState.SliderCaptcha) {
                 LocalMiraiCompose.current.dispatch(Login.SliderCaptcha(it))
             }
         }
         is LoginSolverState.UnsafeDevice -> {
-            UnsafeDeviceLoginVerifyDialog(loginSolverState) {
+            UnsafeDeviceLoginVerifyDialog(observeLoginSolverState as LoginSolverState.UnsafeDevice) {
                 LocalMiraiCompose.current.dispatch(Login.UnsafeDevice(it))
             }
         }
