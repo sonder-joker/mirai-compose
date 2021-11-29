@@ -6,10 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Maximize
@@ -40,6 +37,7 @@ fun MiraiComposeWindow(
 ) = Window(
     onCloseRequest = onCloseRequest,
     state = state,
+    title = "MiraiCompose",
     visible = visible,
     icon = null,
     undecorated = true,
@@ -55,21 +53,24 @@ fun MiraiComposeWindow(
             Button(
                 onClick = {
                     state.isMinimized = true
-                }
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
                 Icon(Icons.Default.Minimize, null)
             }
         },
         maximizeButton = {
             Button(
-                onClick = state::onMaximizeButtonClick
+                onClick = state::onMaximizeButtonClick,
+                colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
                 Icon(Icons.Default.Maximize, null)
             }
         },
         exitButton = {
             Button(
-                onClick = onCloseRequest
+                onClick = onCloseRequest,
+                colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
                 Icon(Icons.Default.Close, null)
             }
@@ -108,7 +109,7 @@ fun MiraiComposeDialog(
     visible = visible,
     title = title,
     icon = icon,
-    undecorated = false,
+    undecorated = true,
     resizable = true,
     enabled = enabled,
     focusable = focusable,
@@ -118,6 +119,7 @@ fun MiraiComposeDialog(
     WindowArea(
         exitButton = {
             Button(
+                colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar),
                 onClick = onCloseRequest
             ) {
                 Icon(Icons.Default.Close, null)
@@ -144,7 +146,7 @@ private inline fun WindowScope.WindowArea(
                 modifier = Modifier.background(color = R.Colors.TopAppBar)
                     .fillMaxWidth()
                     .height(draggableAreaHeight)
-                    .padding(end = DraggableRightStart),
+                    .padding(horizontal = DraggableRightStart),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WindowDraggableArea(
@@ -156,7 +158,6 @@ private inline fun WindowScope.WindowArea(
                             onClick = {}
                         )
                 ) {
-
                 }
                 Row {
                     minimizeButton()

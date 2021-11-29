@@ -23,13 +23,13 @@ object R {
     }
 
     object String {
-        const val BotMenuExit = ""
-        const val BotMenuAdd = ""
+        const val BotMenuExit = "退出"
+        const val BotMenuAdd = "添加"
         const val RailTabFirst = "Message"
         const val RailTabSecond = "Plugin"
         const val RailTabThird = "Setting"
         const val RailTabFourth = "About"
-        const val RailTabFive = "ConsoleLog"
+        const val RailTabFive = "Log"
         const val EditSuccess = "Success"
         const val EditFailure = "Failure"
 
@@ -71,8 +71,8 @@ object R {
 
     object Colors {
         val SearchText = Color.Yellow
-        val TopAppBar = Color(0xFF69e2ff)
-        val SplitLeft = Color(0xFF00b0ff)
+        val TopAppBar = Color(235, 235, 235)
+        val SplitLeft = Color(245, 245, 245)
     }
 }
 

@@ -61,21 +61,27 @@ fun Login(loginViewModel: Login = viewModel { LoginViewModel() }) {
                 R.Image.Mirai,
                 contentDescription = null,
                 modifier = Modifier
+                    .weight(1f)
                     .padding(5.dp)
             )
             AccountTextField(
+                modifier = Modifier.weight(1f),
                 account = data.account,
                 onAccountTextChange = {
                     loginViewModel.dispatch(LoginAction.InputAccount(it))
                 },
             )
             PasswordTextField(
+                modifier = Modifier.weight(1f),
                 password = data.password,
                 onPasswordTextChange = {
                     loginViewModel.dispatch(LoginAction.InputPassword(it))
                 },
             )
             LoginButton(
+                modifier = Modifier.height(100.dp)
+                    .aspectRatio(2f)
+                    .padding(24.dp),
                 onClick = { loginViewModel.dispatch(LoginAction.Login) },
                 isLoading = data.isLoading
             )
@@ -87,6 +93,7 @@ fun Login(loginViewModel: Login = viewModel { LoginViewModel() }) {
 
 @Composable
 private fun AccountTextField(
+    modifier: Modifier = Modifier,
     account: String,
     onAccountTextChange: (String) -> Unit,
 ) {
@@ -97,8 +104,7 @@ private fun AccountTextField(
             isError = !it.matches("^[0-9]{0,15}$".toRegex())
             onAccountTextChange(it)
         },
-        modifier = Modifier
-            .padding(40.dp),
+        modifier = modifier,
         label = { Text(R.String.Login) },
         leadingIcon = { Icon(Icons.Default.AccountCircle, null) },
         isError = isError,
@@ -112,6 +118,7 @@ private fun AccountTextField(
 
 @Composable
 private fun PasswordTextField(
+    modifier: Modifier = Modifier,
     password: String,
     onPasswordTextChange: (String) -> Unit,
 ) {
@@ -122,8 +129,7 @@ private fun PasswordTextField(
         onValueChange = {
             onPasswordTextChange(it)
         },
-        modifier = Modifier
-            .padding(40.dp),
+        modifier = modifier,
         label = { Text(R.String.Password) },
         leadingIcon = {
             Icon(
@@ -156,14 +162,12 @@ private fun PasswordTextField(
 
 @Composable
 private fun LoginButton(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     isLoading: Boolean
 ) = Button(
     onClick = onClick,
-    modifier = Modifier
-        .requiredHeight(100.dp)
-        .aspectRatio(2f)
-        .padding(24.dp),
+    modifier = modifier
 ) {
     if (isLoading)
         HorizontalDottedProgressBar()
