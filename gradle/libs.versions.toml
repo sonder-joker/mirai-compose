@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.5.31"
-compose-jb = "1.0.0-rc5"
+compose-jb = "1.0.0"
 buildconfig = "3.0.2"
 mirai = "2.9.0-M1"
 yamlkt = "0.10.2"
