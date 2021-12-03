@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -75,11 +76,13 @@ private fun backendAnnotatedString(backEnd: String) = remember(backEnd) {
 
 @Composable
 fun ClickableUrlText(annotatedString: AnnotatedString) {
-    ClickableText(annotatedString) { offset ->
-        annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset).firstOrNull()
-            ?.let { annotation ->
-                Desktop.getDesktop().browse(URI(annotation.item))
-            }
+    SelectionContainer {
+        ClickableText(annotatedString) { offset ->
+            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset).firstOrNull()
+                ?.let { annotation ->
+                    Desktop.getDesktop().browse(URI(annotation.item))
+                }
+        }
     }
 }
 
