@@ -9,15 +9,13 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
-import com.youngerhousea.mirai.compose.console.LocalViewModelStore
-import com.youngerhousea.mirai.compose.console.Login
-import com.youngerhousea.mirai.compose.console.LoginSolverState
-import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
+import com.youngerhousea.mirai.compose.console.*
 import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.ui.HostPage
 import com.youngerhousea.mirai.compose.ui.login.PicCaptchaDialog
 import com.youngerhousea.mirai.compose.ui.login.SliderCaptchaDialog
 import com.youngerhousea.mirai.compose.ui.login.UnsafeDeviceLoginVerifyDialog
+import com.youngerhousea.mirai.compose.viewmodel.LoginSolverViewModel
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 
@@ -41,23 +39,24 @@ private fun miraiComposeApplication(content: @Composable ApplicationScope.() -> 
 }
 
 @Composable
-private fun LoginSolverDialog() {
-    val observeLoginSolverState by MiraiCompose.loginSolverState
+private fun LoginSolverDialog(loginSolverViewModel: LoginSolverViewModel = viewModel { LoginSolverViewModel() }) {
+    val observeLoginSolverState by loginSolverViewModel.state
+
     when (observeLoginSolverState) {
         is LoginSolverState.Nothing -> {
         }
         is LoginSolverState.PicCaptcha ->
             PicCaptchaDialog(observeLoginSolverState as LoginSolverState.PicCaptcha) {
-                MiraiCompose.dispatch(Login.PicCaptcha(it))
+                loginSolverViewModel.dispatch(Login.PicCaptcha(it))
             }
         is LoginSolverState.SliderCaptcha -> {
             SliderCaptchaDialog(observeLoginSolverState as LoginSolverState.SliderCaptcha) {
-                MiraiCompose.dispatch(Login.SliderCaptcha(it))
+                loginSolverViewModel.dispatch(Login.SliderCaptcha(it))
             }
         }
         is LoginSolverState.UnsafeDevice -> {
             UnsafeDeviceLoginVerifyDialog(observeLoginSolverState as LoginSolverState.UnsafeDevice) {
-                MiraiCompose.dispatch(Login.UnsafeDevice(it))
+                loginSolverViewModel.dispatch(Login.UnsafeDevice(it))
             }
         }
     }
