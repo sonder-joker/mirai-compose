@@ -1,20 +1,16 @@
 package com.youngerhousea.mirai.compose.console
 
 import androidx.compose.runtime.State
-import com.youngerhousea.mirai.compose.console.impl.*
+import com.youngerhousea.mirai.compose.console.impl.LifecycleOwner
+import com.youngerhousea.mirai.compose.console.impl.Log
+import com.youngerhousea.mirai.compose.console.impl.ReadablePluginConfigStorage
+import com.youngerhousea.mirai.compose.console.impl.ReadablePluginDataStorage
 import kotlinx.coroutines.flow.StateFlow
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
-import net.mamoe.mirai.console.plugin.center.PluginCenter
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
-import net.mamoe.mirai.console.util.ConsoleExperimentalApi
-import net.mamoe.mirai.console.util.ConsoleInternalApi
-import net.mamoe.mirai.console.util.SemVersion
-import net.mamoe.mirai.utils.MiraiLogger
-import java.time.Instant
 
 interface MiraiComposeImplementation :
     MiraiConsoleImplementation,
@@ -40,35 +36,6 @@ interface MiraiComposeImplementation :
 
     fun cancel()
 }
-
-
-private object MiraiComposeBridge : MiraiCompose,
-    MiraiComposeImplementation by (MiraiConsoleImplementation.getInstance() as MiraiComposeImplementation) {
-
-    override val buildDate: Instant get() = MiraiConsole.buildDate
-
-    @ConsoleInternalApi
-    override val mainLogger: MiraiLogger
-        get() = MiraiConsole.mainLogger
-
-    @ConsoleExperimentalApi
-    override val pluginCenter: PluginCenter
-        get() = MiraiConsole.pluginCenter
-
-    override val version: SemVersion get() = MiraiConsole.version
-
-
-}
-
-interface MiraiCompose : MiraiConsole {
-    //TODO: May shouldn't call it in viewModel directly?
-    val lifecycle: Lifecycle
-
-    companion object INSTANCE : MiraiCompose, MiraiConsole by MiraiComposeBridge {
-        override val lifecycle: Lifecycle get() = MiraiComposeBridge.lifecycle
-    }
-}
-
 
 sealed class Login {
     class PicCaptcha(val string: String?) : Login()

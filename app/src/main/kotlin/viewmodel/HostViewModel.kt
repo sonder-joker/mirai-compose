@@ -3,8 +3,8 @@ package com.youngerhousea.mirai.compose.viewmodel
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import com.youngerhousea.mirai.compose.console.MiraiCompose
 import com.youngerhousea.mirai.compose.console.ViewModelScope
+import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.console.impl.doOnFinishAutoLogin
 import net.mamoe.mirai.Bot
 

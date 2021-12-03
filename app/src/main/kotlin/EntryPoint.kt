@@ -2,7 +2,10 @@ package com.youngerhousea.mirai.compose
 
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
@@ -10,7 +13,7 @@ import com.youngerhousea.mirai.compose.console.LocalViewModelStore
 import com.youngerhousea.mirai.compose.console.Login
 import com.youngerhousea.mirai.compose.console.LoginSolverState
 import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
-import com.youngerhousea.mirai.compose.console.impl.MiraiComposeImpl
+import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.ui.HostPage
 import com.youngerhousea.mirai.compose.ui.login.PicCaptchaDialog
 import com.youngerhousea.mirai.compose.ui.login.SliderCaptchaDialog
@@ -24,12 +27,12 @@ fun main() = miraiComposeApplication {
     }
 }
 
-private inline fun miraiComposeApplication(crossinline content: @Composable ApplicationScope.() -> Unit) {
-    val compose = MiraiComposeImpl()
-    compose.start()
+@OptIn(ConsoleFrontEndImplementation::class)
+private fun miraiComposeApplication(content: @Composable ApplicationScope.() -> Unit) {
+    MiraiCompose.start()
     themeApplication {
-        CompositionLocalProvider(LocalMiraiCompose provides compose) {
-            CompositionLocalProvider(LocalViewModelStore provides compose.viewModelStore) {
+        CompositionLocalProvider(LocalMiraiCompose provides MiraiCompose) {
+            CompositionLocalProvider(LocalViewModelStore provides MiraiCompose.viewModelStore) {
                 LoginSolverDialog()
                 content()
             }
@@ -39,22 +42,22 @@ private inline fun miraiComposeApplication(crossinline content: @Composable Appl
 
 @Composable
 private fun LoginSolverDialog() {
-    val observeLoginSolverState by LocalMiraiCompose.current.loginSolverState
+    val observeLoginSolverState by MiraiCompose.loginSolverState
     when (observeLoginSolverState) {
         is LoginSolverState.Nothing -> {
         }
         is LoginSolverState.PicCaptcha ->
             PicCaptchaDialog(observeLoginSolverState as LoginSolverState.PicCaptcha) {
-                LocalMiraiCompose.current.dispatch(Login.PicCaptcha(it))
+                MiraiCompose.dispatch(Login.PicCaptcha(it))
             }
         is LoginSolverState.SliderCaptcha -> {
             SliderCaptchaDialog(observeLoginSolverState as LoginSolverState.SliderCaptcha) {
-                LocalMiraiCompose.current.dispatch(Login.SliderCaptcha(it))
+                MiraiCompose.dispatch(Login.SliderCaptcha(it))
             }
         }
         is LoginSolverState.UnsafeDevice -> {
             UnsafeDeviceLoginVerifyDialog(observeLoginSolverState as LoginSolverState.UnsafeDevice) {
-                LocalMiraiCompose.current.dispatch(Login.UnsafeDevice(it))
+                MiraiCompose.dispatch(Login.UnsafeDevice(it))
             }
         }
     }

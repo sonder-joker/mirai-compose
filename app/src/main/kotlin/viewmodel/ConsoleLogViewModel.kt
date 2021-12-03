@@ -3,9 +3,9 @@ package com.youngerhousea.mirai.compose.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import com.youngerhousea.mirai.compose.console.MiraiCompose
 import com.youngerhousea.mirai.compose.console.ViewModelScope
 import kotlinx.coroutines.launch
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.descriptor.AbstractCommandValueParameter
 import net.mamoe.mirai.console.command.descriptor.CommandReceiverParameter
@@ -47,7 +47,7 @@ sealed interface ConsoleLogAction {
 }
 
 class ConsoleLogViewModel @OptIn(ConsoleInternalApi::class) constructor(
-    private val logger: MiraiLogger = MiraiCompose.mainLogger,
+    private val logger: MiraiLogger = MiraiConsole.mainLogger,
 ) : ConsoleLog, ViewModelScope() {
 
     override fun dispatch(action: ConsoleLogAction) {

@@ -33,7 +33,9 @@ import kotlin.io.path.div
  * Create a [MiraiComposeImplementation], this implementation for [MiraiConsoleImplementation],  extend [ViewModelStoreOwner], [LifecycleOwner] and [CoroutineScope]
  *
  */
-internal class MiraiComposeImpl() : MiraiComposeImplementation {
+val MiraiCompose: MiraiComposeImplementation get() = MiraiComposeImpl
+
+internal object MiraiComposeImpl : MiraiComposeImplementation {
     override val viewModelStore: ViewModelStore = ViewModelStoreImpl()
 
     private val logger by lazy { createLogger("compose") }
