@@ -32,7 +32,6 @@ import java.util.*
 @Composable
 fun ConsoleLog(consoleLog: ConsoleLog = viewModel { ConsoleLogViewModel() }) {
     val state by consoleLog.state
-    // TODO: Maybe we can not do.
     val log by LocalMiraiCompose.current.logStorage.collectAsState()
 
     Scaffold(
@@ -109,7 +108,7 @@ internal fun LogBox(
 
     Box(modifier) {
         LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
-            items(renderLog) { adaptiveLog ->
+            items(renderLog, key = { log -> log.text }) { adaptiveLog ->
                 SelectionContainer {
                     Text(adaptiveLog)
                 }

@@ -1,12 +1,11 @@
 package com.youngerhousea.mirai.compose.console.impl
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import com.youngerhousea.mirai.compose.console.*
+import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
+import com.youngerhousea.mirai.compose.console.ViewModelStore
+import com.youngerhousea.mirai.compose.console.ViewModelStoreOwner
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import mirai_compose.app.BuildConfig
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
@@ -19,7 +18,6 @@ import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLogger
 import java.lang.ref.WeakReference
@@ -85,45 +83,13 @@ internal object MiraiComposeImpl : MiraiComposeImplementation {
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
-    override val loginSolverState: MutableState<LoginSolverState> = mutableStateOf(LoginSolverState.Nothing)
 
     override val logStorage: MutableStateFlow<List<Log>> = MutableStateFlow(listOf())
 
-    private val picCaptcha = CompletableDeferred<String?>()
-
-    private val sliderCaptcha = CompletableDeferred<String?>()
-
-    private val unsafeDeviceLoginVerify = CompletableDeferred<String?>()
-
-    override fun dispatch(login: Login) {
-        when (login) {
-            is Login.PicCaptcha -> picCaptcha.complete(login.string)
-            is Login.SliderCaptcha -> sliderCaptcha.complete(login.string)
-            is Login.UnsafeDevice -> unsafeDeviceLoginVerify.complete(login.string)
-        }
-    }
-
-    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginSolver =
-        object : LoginSolver() {
-            override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? {
-                loginSolverState.value = LoginSolverState.PicCaptcha(bot, data)
-                return picCaptcha.await()
-            }
-
-            override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? {
-                loginSolverState.value = LoginSolverState.SliderCaptcha(bot, url)
-                return sliderCaptcha.await()
-            }
-
-            override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? {
-                loginSolverState.value = LoginSolverState.UnsafeDevice(bot, url)
-                return unsafeDeviceLoginVerify.await()
-            }
-        }
+    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
+        error("Mirai Compose can't call this way")
 
     override val lifecycle: LifecycleRegistry = LifecycleRegistryImpl(WeakReference(this))
-
-    private val job = SupervisorJob()
 
     override val coroutineContext: CoroutineContext =
         CoroutineName("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -132,7 +98,7 @@ internal object MiraiComposeImpl : MiraiComposeImplementation {
             }
             val coroutineName = coroutineContext[CoroutineName]?.name ?: "<unnamed>"
             MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
-        } + job
+        } + SupervisorJob()
 
     override fun prePhase(phase: String) {
         when (phase) {
@@ -184,5 +150,3 @@ class MiraiConsoleSender(
         sendMessage(message.toString())
     }
 }
-
-

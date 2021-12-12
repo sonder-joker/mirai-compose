@@ -4,18 +4,14 @@ import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
-import com.youngerhousea.mirai.compose.console.*
+import com.youngerhousea.mirai.compose.console.LocalViewModelStore
+import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
 import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.ui.HostPage
-import com.youngerhousea.mirai.compose.ui.login.PicCaptchaDialog
-import com.youngerhousea.mirai.compose.ui.login.SliderCaptchaDialog
-import com.youngerhousea.mirai.compose.ui.login.UnsafeDeviceLoginVerifyDialog
-import com.youngerhousea.mirai.compose.viewmodel.LoginSolverViewModel
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 
@@ -26,37 +22,12 @@ fun main() = miraiComposeApplication {
 }
 
 @OptIn(ConsoleFrontEndImplementation::class)
-private fun miraiComposeApplication(content: @Composable ApplicationScope.() -> Unit) {
+fun miraiComposeApplication(content: @Composable ApplicationScope.() -> Unit) {
     MiraiCompose.start()
     themeApplication {
         CompositionLocalProvider(LocalMiraiCompose provides MiraiCompose) {
             CompositionLocalProvider(LocalViewModelStore provides MiraiCompose.viewModelStore) {
-                LoginSolverDialog()
                 content()
-            }
-        }
-    }
-}
-
-@Composable
-private fun LoginSolverDialog(loginSolverViewModel: LoginSolverViewModel = viewModel { LoginSolverViewModel() }) {
-    val observeLoginSolverState by loginSolverViewModel.state
-
-    when (observeLoginSolverState) {
-        is LoginSolverState.Nothing -> {
-        }
-        is LoginSolverState.PicCaptcha ->
-            PicCaptchaDialog(observeLoginSolverState as LoginSolverState.PicCaptcha) {
-                loginSolverViewModel.dispatch(Login.PicCaptcha(it))
-            }
-        is LoginSolverState.SliderCaptcha -> {
-            SliderCaptchaDialog(observeLoginSolverState as LoginSolverState.SliderCaptcha) {
-                loginSolverViewModel.dispatch(Login.SliderCaptcha(it))
-            }
-        }
-        is LoginSolverState.UnsafeDevice -> {
-            UnsafeDeviceLoginVerifyDialog(observeLoginSolverState as LoginSolverState.UnsafeDevice) {
-                loginSolverViewModel.dispatch(Login.UnsafeDevice(it))
             }
         }
     }

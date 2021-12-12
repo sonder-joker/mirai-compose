@@ -21,6 +21,7 @@ import com.youngerhousea.mirai.compose.ui.message.BotMessage
 import com.youngerhousea.mirai.compose.ui.message.Message
 import com.youngerhousea.mirai.compose.ui.plugins.Plugins
 import com.youngerhousea.mirai.compose.ui.setting.Setting
+import com.youngerhousea.mirai.compose.viewmodel.Host
 import com.youngerhousea.mirai.compose.viewmodel.HostRoute
 import com.youngerhousea.mirai.compose.viewmodel.HostViewModel
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
@@ -34,7 +35,7 @@ fun HostPage() {
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 fun NavHost(
-    hostViewModel: HostViewModel = viewModel { HostViewModel() }
+    hostViewModel: Host = viewModel { HostViewModel() }
 ) {
     val state by hostViewModel.hostState
 

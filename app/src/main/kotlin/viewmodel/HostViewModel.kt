@@ -6,7 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.ViewModelScope
 import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.console.impl.doOnFinishAutoLogin
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.events.BotOnlineEvent
 
 
 interface Host {
@@ -33,7 +36,7 @@ class HostViewModel : ViewModelScope(), Host {
             is HostRoute.Message -> state.copy(navigate = action)
             is HostRoute.Plugins -> state.copy(navigate = action)
             is HostRoute.Setting -> state.copy(navigate = action)
-            is HostRoute.BotMessage -> state.copy(navigate = action)
+            is HostRoute.BotMessage -> state.copy(currentBot = action.bot)
             is HostRoute.ConsoleLog -> state.copy(navigate = action)
         }
     }
@@ -41,6 +44,11 @@ class HostViewModel : ViewModelScope(), Host {
     init {
         MiraiCompose.lifecycle.doOnFinishAutoLogin {
             hostState.value = hostState.value.copy(botList = Bot.instances)
+        }
+        viewModelScope.launch {
+            GlobalEventChannel.subscribeAlways<BotOnlineEvent> { event ->
+                hostState.value = hostState.value.copy(botList = hostState.value.botList + event.bot, currentBot = event.bot)
+            }
         }
     }
 
@@ -70,3 +78,6 @@ sealed interface HostAction {
     object OpenMenu : HostAction
     object CloseMenu : HostAction
 }
+
+
+

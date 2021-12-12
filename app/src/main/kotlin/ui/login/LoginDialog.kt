@@ -12,82 +12,155 @@ import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.youngerhousea.mirai.compose.MiraiComposeDialog
+import com.youngerhousea.mirai.compose.console.LoginSolverState
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.log.onPreviewEnterDown
-import com.youngerhousea.mirai.compose.viewmodel.Login
-import com.youngerhousea.mirai.compose.viewmodel.LoginAction
-import com.youngerhousea.mirai.compose.viewmodel.LoginViewModel
-
+import com.youngerhousea.mirai.compose.viewmodel.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayInputStream
+import java.io.IOException
 
 @Composable
 fun LoginDialog(
     show: Boolean,
-    onCloseRequest: () -> Unit
+    onCloseRequest: () -> Unit,
+    loginViewModel: Login = viewModel { LoginViewModel() },
+    hostViewModel: Host = viewModel { HostViewModel() }
 ) {
-    if (show)
-        MiraiComposeDialog(onCloseRequest = onCloseRequest) {
-            Login()
-        }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun Login(loginViewModel: Login = viewModel { LoginViewModel() }) {
-
     val data by loginViewModel.state
 
-    Scaffold(
-        scaffoldState = rememberScaffoldState(snackbarHostState = data.host),
-        modifier = Modifier.onPreviewEnterDown {
-            loginViewModel.dispatch(LoginAction.Login)
-        }) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Image(
-                R.Image.Mirai,
-                contentDescription = null,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(5.dp)
-            )
-            AccountTextField(
-                modifier = Modifier.weight(1f),
-                account = data.account,
-                onAccountTextChange = {
-                    loginViewModel.dispatch(LoginAction.InputAccount(it))
-                },
-            )
-            PasswordTextField(
-                modifier = Modifier.weight(1f),
-                password = data.password,
-                onPasswordTextChange = {
-                    loginViewModel.dispatch(LoginAction.InputPassword(it))
-                },
-            )
-            LoginButton(
-                modifier = Modifier.height(100.dp)
-                    .aspectRatio(2f)
-                    .padding(24.dp),
-                onClick = { loginViewModel.dispatch(LoginAction.Login) },
-                isLoading = data.isLoading
-            )
+    if(data.success) {
+        LaunchedEffect(Unit) {
+            hostViewModel.dispatch(HostAction.CloseLoginDialog)
         }
     }
 
+    if (show)
+        MiraiComposeDialog(onCloseRequest = {
+            loginViewModel.dispatch(LoginAction.CancelLogin)
+            onCloseRequest()
+        }) {
+            when (val solver = data.solver) {
+                LoginSolverState.Nothing -> {
+                    Scaffold(
+                        scaffoldState = rememberScaffoldState(snackbarHostState = data.host),
+                        modifier = Modifier.onPreviewEnterDown {
+                            loginViewModel.dispatch(LoginAction.TryLogin)
+                        }) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Image(
+                                R.Image.Mirai,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(5.dp)
+                            )
+                            AccountTextField(
+                                modifier = Modifier.weight(1f),
+                                account = data.account,
+                                onAccountTextChange = {
+                                    loginViewModel.dispatch(LoginAction.InputAccount(it))
+                                },
+                            )
+                            PasswordTextField(
+                                modifier = Modifier.weight(1f),
+                                password = data.password,
+                                onPasswordTextChange = {
+                                    loginViewModel.dispatch(LoginAction.InputPassword(it))
+                                },
+                            )
+                            LoginButton(
+                                modifier = Modifier.height(100.dp)
+                                    .aspectRatio(2f)
+                                    .padding(24.dp),
+                                onClick = { loginViewModel.dispatch(LoginAction.TryLogin) },
+                                isLoading = data.isLoading
+                            )
+                        }
+                    }
+                }
+                is LoginSolverState.PicCaptcha -> {
+                    LoginSolverContent(
+                        title = "Bot:${solver.bot.id}",
+                        tip = "处理图片验证码",
+                        load = { loadImageBitmap(ByteArrayInputStream(solver.data)) },
+                        value = data.captcha,
+                        onValueChange = { loginViewModel.dispatch(LoginAction.Update(it)) },
+                        onFinish = {
+                            loginViewModel.dispatch(LoginAction.Solve)
+                        },
+                        refresh = {
+                            loginViewModel.dispatch(LoginAction.Refresh)
+                        },
+                        exit = {
+                            loginViewModel.dispatch(LoginAction.Exit)
+                        }
+                    )
+
+                }
+                is LoginSolverState.SliderCaptcha -> {
+                    LoginSolverContent(
+                        title = "Bot:${solver.bot.id}",
+                        tip = "处理滑动验证码",
+                        value = data.slider,
+                        onValueChange = { loginViewModel.dispatch(LoginAction.Update(it)) },
+                        load = {
+                            QRCodeImage(solver.url, qrCodeHeight = 200, qrCodeWidth = 200)
+                        },
+                        onFinish = {
+                            loginViewModel.dispatch(LoginAction.Solve)
+                        },
+                        refresh = {
+                            loginViewModel.dispatch(LoginAction.Refresh)
+                        },
+                        exit = {
+                            loginViewModel.dispatch(LoginAction.Exit)
+                        }
+                    )
+                }
+                is LoginSolverState.UnsafeDevice -> {
+                    LoginSolverContent(
+                        title = "Bot:${solver.bot.id}",
+                        tip = "处理Unsafe验证码",
+                        value = data.unsafe,
+                        onValueChange = { loginViewModel.dispatch(LoginAction.Update(it)) },
+                        load = { Text(solver.url) },
+                        onFinish = {
+                            loginViewModel.dispatch(LoginAction.Solve)
+                        },
+                        refresh = {
+                            loginViewModel.dispatch(LoginAction.Refresh)
+                        },
+                        exit = {
+                            loginViewModel.dispatch(LoginAction.Exit)
+                        }
+                    )
+                }
+            }
+        }
 }
 
 
@@ -221,5 +294,53 @@ private fun HorizontalDottedProgressBar() {
                 )
             }
         }
+    }
+}
+
+
+@Composable
+fun QRCodeImage(
+    qrCodeData: String, qrCodeHeight: Int, qrCodeWidth: Int
+) {
+    AsyncImage(
+        load = {
+            val matrix = MultiFormatWriter().encode(
+                qrCodeData,
+                BarcodeFormat.QR_CODE, qrCodeWidth, qrCodeHeight
+            )
+            return@AsyncImage MatrixToImageWriter.toBufferedImage(matrix).toComposeImageBitmap()
+        },
+        painterFor = { remember { BitmapPainter(it) } },
+        contentDescription = null,
+        modifier = Modifier.size(200.dp)
+    )
+}
+
+@Composable
+fun <T> AsyncImage(
+    load: suspend () -> T,
+    painterFor: @Composable (T) -> Painter,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
+) {
+    val image: T? by produceState<T?>(null) {
+        value = withContext(Dispatchers.IO) {
+            try {
+                load()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    if (image != null) {
+        Image(
+            painter = painterFor(image!!),
+            contentDescription = contentDescription,
+            contentScale = contentScale,
+            modifier = modifier
+        )
     }
 }
