@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 #
-#  ╢кт╢╢ЗбК╣дй╧сцйэ GNU AFFERO GENERAL PUBLIC LICENSE version 3 пМ©иж╓╣дт╪йЬ, ©ирттзртоба╢╫сур╣╫╦цпМ©иж╓.
+#  Ф╜╓Ф╨░Д╩ёГ═│Г └Д╫©Г■╗Е▐≈ GNU AFFERO GENERAL PUBLIC LICENSE version 3 Х╝╦Е▐╞Х╞│Г └Г╨╕Ф²÷, Е▐╞Д╩╔Е°╗Д╩╔Д╦▀И⌠╬Ф▌╔Ф┴╬Е┬╟Х╞╔Х╝╦Е▐╞Х╞│.
 #  Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found through the following link.
 #
 #  https://github.com/mamoe/mirai/blob/master/LICENSE
