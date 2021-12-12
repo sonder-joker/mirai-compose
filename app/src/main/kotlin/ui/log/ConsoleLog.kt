@@ -108,7 +108,7 @@ internal fun LogBox(
 
     Box(modifier) {
         LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
-            items(renderLog, key = { log -> log.text }) { adaptiveLog ->
+            items(renderLog) { adaptiveLog ->
                 SelectionContainer {
                     Text(adaptiveLog)
                 }
