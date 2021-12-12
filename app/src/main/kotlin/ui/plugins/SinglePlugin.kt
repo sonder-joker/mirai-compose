@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.mirai.compose.LocalMiraiCompose
+import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.console.impl.get
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.EnumTabRowWithContent
@@ -68,7 +68,7 @@ fun JvmPlugin(
 
         when (pluginTab) {
             PluginTab.Description -> PluginDescription(plugin)
-            PluginTab.Data -> PluginDataList(LocalMiraiCompose.current.configStorageForBuiltIns[plugin])
+            PluginTab.Data -> PluginDataList(MiraiCompose.configStorageForBuiltIns[plugin])
             PluginTab.Command -> PluginCommands(plugin.registeredCommands)
         }
     }
