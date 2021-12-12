@@ -14,14 +14,17 @@ Mirai 是一个在全平台下运行，提供 QQ 协议支持的高效率机器�
 </div>
 
 # mirai-compose
+[![GitHub release (latest SemVer including pre-release)](https://img.shields.io/github/v/release/sonder-joker/mirai-compose?include_prereleases)](https://github.com/sonder-joker/mirai-compose/releases)  
 
-基于[compose-jb](https://github.com/jetbrains/compose-jb)  实现的[mirai-console](https://github.com/mamoe/mirai-console)
-前端
-目前正处于测试阶段.
+## 这是什么？
+这是一个基于[compose-jb](https://github.com/jetbrains/compose-jb) ，实现的[mirai-console](https://github.com/mamoe/mirai-console)
+前端。
 
-## 使用
+## 他稳定吗？
+目前还是属于不稳定但能够使用的阶段，欢迎各位来提issue和feature。
 
-### 1. 下载本体
-可以在[release页面](https://github.com/sonder-joker/mirai-compose/releases)下载最新版的，符合当前操作系统的程序(目前的版本为[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/sonder-joker/mirai-compose?include_prereleases)](https://github.com/sonder-joker/mirai-compose/releases))
-### 2. 运行
-运行Miraicompose.exe文件
+## 如何下载？
+可以在[右侧的release页面](https://github.com/sonder-joker/mirai-compose/releases) 下载符合当前操作系统的版本。
+
+## 如何使用？
+直接安装即可，功能详见[文档](docs/FEATURES.md)
