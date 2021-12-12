@@ -19,8 +19,8 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
-import com.youngerhousea.mirai.compose.LocalMiraiCompose
 import com.youngerhousea.mirai.compose.console.impl.Log
+import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.viewmodel.ConsoleLog
@@ -32,7 +32,7 @@ import java.util.*
 @Composable
 fun ConsoleLog(consoleLog: ConsoleLog = viewModel { ConsoleLogViewModel() }) {
     val state by consoleLog.state
-    val log by LocalMiraiCompose.current.logStorage.collectAsState()
+    val log by MiraiCompose.logStorage.collectAsState()
 
     Scaffold(
         modifier = Modifier.onPreviewCtrlFDown { consoleLog.dispatch(ConsoleLogAction.SetSearchBar) },

@@ -1,8 +1,6 @@
 package com.youngerhousea.mirai.compose.console.impl
 
 import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
-import com.youngerhousea.mirai.compose.console.ViewModelStore
-import com.youngerhousea.mirai.compose.console.ViewModelStoreOwner
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import mirai_compose.app.BuildConfig
@@ -28,13 +26,12 @@ import kotlin.io.path.div
 
 
 /**
- * Create a [MiraiComposeImplementation], this implementation for [MiraiConsoleImplementation],  extend [ViewModelStoreOwner], [LifecycleOwner] and [CoroutineScope]
+ * Create a [MiraiComposeImplementation], this implementation for [MiraiConsoleImplementation],  extend [LifecycleOwner] and [CoroutineScope]
  *
  */
 val MiraiCompose: MiraiComposeImplementation get() = MiraiComposeImpl
 
 internal object MiraiComposeImpl : MiraiComposeImplementation {
-    override val viewModelStore: ViewModelStore = ViewModelStoreImpl()
 
     private val logger by lazy { createLogger("compose") }
 
@@ -121,7 +118,6 @@ internal object MiraiComposeImpl : MiraiComposeImplementation {
 
     override fun cancel() {
         lifecycle.onDestroy()
-        viewModelStore.clean()
         cancel("Normal Exit")
     }
 }

@@ -12,7 +12,6 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 interface MiraiComposeImplementation :
     MiraiConsoleImplementation,
-    ViewModelStoreOwner,
     LifecycleOwner {
     override val configStorageForBuiltIns: ReadablePluginConfigStorage
 

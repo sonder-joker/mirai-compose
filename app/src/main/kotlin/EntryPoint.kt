@@ -3,13 +3,10 @@ package com.youngerhousea.mirai.compose
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
-import com.youngerhousea.mirai.compose.console.LocalViewModelStore
-import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
 import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.ui.HostPage
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
@@ -23,11 +20,12 @@ fun main() = miraiComposeApplication {
 
 @OptIn(ConsoleFrontEndImplementation::class)
 fun miraiComposeApplication(content: @Composable ApplicationScope.() -> Unit) {
-    MiraiCompose.start()
     themeApplication {
-        CompositionLocalProvider(LocalMiraiCompose provides MiraiCompose) {
-            CompositionLocalProvider(LocalViewModelStore provides MiraiCompose.viewModelStore) {
-                content()
+        content()
+        DisposableEffect(Unit) {
+            MiraiCompose.start()
+            onDispose {
+                MiraiCompose.cancel()
             }
         }
     }
@@ -43,8 +41,6 @@ fun themeApplication(
     }
 }
 
-val LocalMiraiCompose =
-    staticCompositionLocalOf<MiraiComposeImplementation> { error("No MiraiComposeImplementation provided") }
 
 val color = Colors(
     primary = Color(0xFF00b0ff),

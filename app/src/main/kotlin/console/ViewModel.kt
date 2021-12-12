@@ -2,6 +2,7 @@ package com.youngerhousea.mirai.compose.console
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.youngerhousea.mirai.compose.console.impl.ViewModelStoreImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -26,10 +27,6 @@ interface ViewModelStore {
     fun clean()
 }
 
-interface ViewModelStoreOwner {
-    val viewModelStore: ViewModelStore
-}
-
 inline fun <reified T : ViewModel> ViewModelStore.get(): T? {
     return get(T::class) as T?
 }
@@ -42,7 +39,7 @@ inline fun <reified T : ViewModel> ViewModelStore.getOrCreate(key: Any, crossinl
     return get(key) as? T ?: factory().apply { put(key, this) }
 }
 
-val LocalViewModelStore = staticCompositionLocalOf<ViewModelStore> { error("ViewModel Store not provide") }
+val LocalViewModelStore = staticCompositionLocalOf<ViewModelStore> { ViewModelStoreImpl() }
 
 @Composable
 inline fun <reified T : ViewModel> viewModel(): T? {
