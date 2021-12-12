@@ -107,9 +107,9 @@ internal fun LogBox(
     val renderLog = remember(logs, searchText) { logs.map { it.annotatedString(searchText) } }
 
     Box(modifier) {
-        LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
-            items(renderLog) { adaptiveLog ->
-                SelectionContainer {
+        SelectionContainer {
+            LazyColumn(state = lazyListState, modifier = Modifier.animateContentSize()) {
+                items(renderLog) { adaptiveLog ->
                     Text(adaptiveLog)
                 }
             }
