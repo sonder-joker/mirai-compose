@@ -27,4 +27,7 @@ Mirai 是一个在全平台下运行，提供 QQ 协议支持的高效率机器�
 可以在[右侧的release页面](https://github.com/sonder-joker/mirai-compose/releases) 下载符合当前操作系统的版本。
 
 ## 如何使用？
-直接安装即可，功能详见[文档](docs/FEATURES.md)
+直接安装即可，功能详见[文档](docs/FEATURES.md)。
+
+## 局限
+由于compose-jb并不提供32位环境，使用32位的MiraiNative会造成意想不到的结果。
