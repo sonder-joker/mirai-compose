@@ -12,7 +12,9 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 fun main() = application {
     MaterialTheme(colors = color) {
         MiraiComposeWindow(onLoaded = {
-            MiraiCompose.start()
+            Thread {
+                MiraiCompose.start()
+            }.start()
         }, onCloseRequest = {
             MiraiCompose.cancel()
             exitApplication()

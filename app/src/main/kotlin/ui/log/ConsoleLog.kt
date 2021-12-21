@@ -10,7 +10,10 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,7 +35,7 @@ import java.util.*
 @Composable
 fun ConsoleLog(consoleLog: ConsoleLog = viewModel { ConsoleLogViewModel() }) {
     val state by consoleLog.state
-    val log by MiraiCompose.logStorage.collectAsState()
+    val log by MiraiCompose.logStorage
 
     Scaffold(
         modifier = Modifier.onPreviewCtrlFDown { consoleLog.dispatch(ConsoleLogAction.SetSearchBar) },

@@ -1,14 +1,16 @@
 package com.youngerhousea.mirai.compose.console.impl
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
 import com.youngerhousea.mirai.compose.console.getOrCreate
 import com.youngerhousea.mirai.compose.console.viewModelStoreImpl
+import com.youngerhousea.mirai.compose.viewmodel.LoginAction
 import com.youngerhousea.mirai.compose.viewmodel.LoginViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
 import mirai_compose.app.BuildConfig
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
@@ -29,7 +31,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.div
-
 
 /**
  * Create a [MiraiComposeImplementation], this implementation for [MiraiConsoleImplementation]
@@ -86,11 +87,14 @@ internal class MiraiComposeImpl : MiraiComposeImplementation {
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
-    override val logStorage: MutableStateFlow<List<Log>> = MutableStateFlow(listOf())
+    override val logStorage: MutableState<List<Log>> = mutableStateOf(listOf())
 
     override val loginState = viewModelStoreImpl.getOrCreate { LoginViewModel() }
 
-    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginSolver = loginState.solver
+    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginSolver {
+        loginState.dispatch(LoginAction.Open)
+        return loginState.solver
+    }
 
     override val coroutineContext: CoroutineContext =
         CoroutineName("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
