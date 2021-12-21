@@ -33,73 +33,27 @@ import com.youngerhousea.mirai.compose.console.LoginSolverState
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.log.onPreviewEnterDown
-import com.youngerhousea.mirai.compose.viewmodel.*
+import com.youngerhousea.mirai.compose.viewmodel.Login
+import com.youngerhousea.mirai.compose.viewmodel.LoginAction
+import com.youngerhousea.mirai.compose.viewmodel.LoginViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
 import java.io.IOException
 
+
 @Composable
-fun LoginDialog(
-    show: Boolean,
-    onCloseRequest: () -> Unit,
-    loginViewModel: Login = viewModel { LoginViewModel() },
-    hostViewModel: Host = viewModel { HostViewModel() }
-) {
+fun LoginDialog(loginViewModel: Login = viewModel { LoginViewModel() }) {
     val data by loginViewModel.state
 
-    if(data.success) {
-        LaunchedEffect(Unit) {
-            hostViewModel.dispatch(HostAction.CloseLoginDialog)
-        }
-    }
-
-    if (show)
+    if (data.isOpen)
         MiraiComposeDialog(onCloseRequest = {
-            loginViewModel.dispatch(LoginAction.CancelLogin)
-            onCloseRequest()
+            loginViewModel.dispatch(LoginAction.Close)
         }) {
             when (val solver = data.solver) {
                 LoginSolverState.Nothing -> {
-                    Scaffold(
-                        scaffoldState = rememberScaffoldState(snackbarHostState = data.host),
-                        modifier = Modifier.onPreviewEnterDown {
-                            loginViewModel.dispatch(LoginAction.TryLogin)
-                        }) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Image(
-                                R.Image.Mirai,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(5.dp)
-                            )
-                            AccountTextField(
-                                modifier = Modifier.weight(1f),
-                                account = data.account,
-                                onAccountTextChange = {
-                                    loginViewModel.dispatch(LoginAction.InputAccount(it))
-                                },
-                            )
-                            PasswordTextField(
-                                modifier = Modifier.weight(1f),
-                                password = data.password,
-                                onPasswordTextChange = {
-                                    loginViewModel.dispatch(LoginAction.InputPassword(it))
-                                },
-                            )
-                            LoginButton(
-                                modifier = Modifier.height(100.dp)
-                                    .aspectRatio(2f)
-                                    .padding(24.dp),
-                                onClick = { loginViewModel.dispatch(LoginAction.TryLogin) },
-                                isLoading = data.isLoading
-                            )
-                        }
+                    LoginInterface(isLoading = data.isLoading, data.host) { account, password ->
+                        loginViewModel.dispatch(LoginAction.TryLogin(account, password))
                     }
                 }
                 is LoginSolverState.PicCaptcha -> {
@@ -161,6 +115,53 @@ fun LoginDialog(
                 }
             }
         }
+}
+
+@Composable
+fun LoginInterface(
+    isLoading: Boolean,
+    snackbarHostState: SnackbarHostState,
+    onLogin: (String, String) -> Unit
+) {
+    val (account, setAccount) = remember { mutableStateOf("") }
+    val (password, setPassword) = remember { mutableStateOf("") }
+
+    Scaffold(
+        scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
+        modifier = Modifier.onPreviewEnterDown {
+            onLogin(account, password)
+        }) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Image(
+                R.Image.Mirai,
+                contentDescription = null,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(5.dp)
+            )
+            AccountTextField(
+                modifier = Modifier.weight(1f),
+                account = account,
+                onAccountTextChange = setAccount,
+            )
+            PasswordTextField(
+                modifier = Modifier.weight(1f),
+                password = password,
+                onPasswordTextChange = setPassword,
+            )
+            LoginButton(
+                modifier = Modifier.height(100.dp)
+                    .aspectRatio(2f)
+                    .padding(24.dp),
+                onClick = { onLogin(account, password) },
+                isLoading = isLoading
+            )
+        }
+    }
 }
 
 

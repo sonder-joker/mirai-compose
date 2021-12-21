@@ -1,9 +1,9 @@
 package com.youngerhousea.mirai.compose.console
 
-import com.youngerhousea.mirai.compose.console.impl.LifecycleOwner
 import com.youngerhousea.mirai.compose.console.impl.Log
 import com.youngerhousea.mirai.compose.console.impl.ReadablePluginConfigStorage
 import com.youngerhousea.mirai.compose.console.impl.ReadablePluginDataStorage
+import com.youngerhousea.mirai.compose.viewmodel.Login
 import kotlinx.coroutines.flow.StateFlow
 import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.data.PluginConfig
@@ -11,8 +11,7 @@ import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 
 interface MiraiComposeImplementation :
-    MiraiConsoleImplementation,
-    LifecycleOwner {
+    MiraiConsoleImplementation {
     override val configStorageForBuiltIns: ReadablePluginConfigStorage
 
     override val configStorageForJvmPluginLoader: ReadablePluginConfigStorage
@@ -27,6 +26,6 @@ interface MiraiComposeImplementation :
 
     val logStorage: StateFlow<List<Log>>
 
-    fun cancel()
+    val loginState: Login
 }
 

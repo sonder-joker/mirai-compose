@@ -1,7 +1,13 @@
 package com.youngerhousea.mirai.compose.console.impl
 
 import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
-import kotlinx.coroutines.*
+import com.youngerhousea.mirai.compose.console.getOrCreate
+import com.youngerhousea.mirai.compose.console.viewModelStoreImpl
+import com.youngerhousea.mirai.compose.viewmodel.LoginViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import mirai_compose.app.BuildConfig
 import net.mamoe.mirai.console.MiraiConsole
@@ -16,9 +22,9 @@ import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLogger
-import java.lang.ref.WeakReference
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.coroutines.CoroutineContext
@@ -80,13 +86,11 @@ internal class MiraiComposeImpl : MiraiComposeImplementation {
     override val JvmPlugin.config: List<PluginConfig>
         get() = if (this is PluginDataHolder) configStorageForJvmPluginLoader[this] else error("Plugin is Not Holder!")
 
-
     override val logStorage: MutableStateFlow<List<Log>> = MutableStateFlow(listOf())
 
-    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration) =
-        error("Mirai Compose can't call this way")
+    override val loginState = viewModelStoreImpl.getOrCreate { LoginViewModel() }
 
-    override val lifecycle: LifecycleRegistry = LifecycleRegistryImpl(WeakReference(this))
+    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginSolver = loginState.solver
 
     override val coroutineContext: CoroutineContext =
         CoroutineName("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -97,29 +101,6 @@ internal class MiraiComposeImpl : MiraiComposeImplementation {
             MiraiConsole.mainLogger.error("Exception in coroutine $coroutineName", throwable)
         } + SupervisorJob()
 
-    override fun prePhase(phase: String) {
-        when (phase) {
-            "setup logger controller" -> {
-                lifecycle.onEnterLoading()
-            }
-        }
-    }
-
-    override fun postPhase(phase: String) {
-        when (phase) {
-            "auto-login bots" -> {
-                lifecycle.onFinishAutoLogin()
-            }
-            "finally post" -> {
-                lifecycle.onFinishLoading()
-            }
-        }
-    }
-
-    override fun cancel() {
-        lifecycle.onDestroy()
-        cancel("Normal Exit")
-    }
 }
 
 object MiraiComposeDescription : MiraiConsoleFrontEndDescription {

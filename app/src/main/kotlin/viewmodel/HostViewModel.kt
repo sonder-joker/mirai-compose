@@ -28,8 +28,6 @@ class HostViewModel : ViewModelScope(), Host {
         return when (action) {
             is HostAction.OpenMenu -> state.copy(menuIsExpand = true)
             is HostAction.CloseMenu -> state.copy(menuIsExpand = false)
-            is HostAction.OpenLoginDialog -> state.copy(loginDialogIsExpand = true, menuIsExpand = false)
-            is HostAction.CloseLoginDialog -> state.copy(loginDialogIsExpand = false, menuIsExpand = false)
             is HostRoute.About -> state.copy(navigate = action)
             is HostRoute.Message -> state.copy(navigate = action)
             is HostRoute.Plugins -> state.copy(navigate = action)
@@ -63,13 +61,10 @@ data class HostState(
     val currentBot: Bot? = null,
     val botList: List<Bot> = listOf(),
     val menuIsExpand: Boolean = false,
-    val loginDialogIsExpand: Boolean = false,
     val navigate: HostRoute = HostRoute.Message
 )
 
 sealed interface HostAction {
-    object OpenLoginDialog : HostAction
-    object CloseLoginDialog : HostAction
     object OpenMenu : HostAction
     object CloseMenu : HostAction
 }

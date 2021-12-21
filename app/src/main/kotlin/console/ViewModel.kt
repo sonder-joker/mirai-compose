@@ -39,7 +39,11 @@ inline fun <reified T : ViewModel> ViewModelStore.getOrCreate(key: Any, crossinl
     return get(key) as? T ?: factory().apply { put(key, this) }
 }
 
-val LocalViewModelStore = staticCompositionLocalOf<ViewModelStore> { ViewModelStoreImpl() }
+internal val viewModelStoreImpl = ViewModelStoreImpl()
+
+val LocalViewModelStore = staticCompositionLocalOf<ViewModelStore> {
+    viewModelStoreImpl
+}
 
 @Composable
 inline fun <reified T : ViewModel> viewModel(): T? {

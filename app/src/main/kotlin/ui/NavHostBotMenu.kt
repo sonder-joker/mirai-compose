@@ -13,23 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
-import com.youngerhousea.mirai.compose.ui.login.LoginDialog
-import com.youngerhousea.mirai.compose.viewmodel.Host
-import com.youngerhousea.mirai.compose.viewmodel.HostAction
-import com.youngerhousea.mirai.compose.viewmodel.HostRoute
-import com.youngerhousea.mirai.compose.viewmodel.HostViewModel
+import com.youngerhousea.mirai.compose.viewmodel.*
 import net.mamoe.mirai.Bot
 
 @Composable
 fun NavHostFirstBotMenu(
-    hostViewModel: Host = viewModel { HostViewModel() }
+    hostViewModel: Host = viewModel { HostViewModel() },
+    loginViewModel: Login = viewModel { LoginViewModel() }
 ) {
     val state by hostViewModel.hostState
-
-    LoginDialog(
-        show = state.loginDialogIsExpand,
-        onCloseRequest = { hostViewModel.dispatch(HostAction.CloseLoginDialog) }
-    )
 
     NavHostFirstBotMenuContent(
         isExpand = state.menuIsExpand,
@@ -37,7 +29,9 @@ fun NavHostFirstBotMenu(
         currentBot = state.currentBot,
         onAvatarBoxClick = { hostViewModel.dispatch(HostAction.OpenMenu) },
         dismissExpandMenu = { hostViewModel.dispatch(HostAction.CloseMenu) },
-        onAddNewBotButtonClick = { hostViewModel.dispatch(HostAction.OpenLoginDialog) },
+        onAddNewBotButtonClick = {
+            loginViewModel.dispatch(LoginAction.Open)
+        },
         onBotItemClick = { hostViewModel.dispatch(HostRoute.BotMessage(it)) }
     )
 }

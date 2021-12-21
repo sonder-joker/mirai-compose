@@ -1,5 +1,6 @@
 package com.youngerhousea.mirai.compose.resource
 
+import androidx.compose.material.Colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -74,11 +75,31 @@ object R {
         val TopAppBar = Color(235, 235, 235)
         val SplitLeft = Color(245, 245, 245)
     }
+
 }
+
+
+val color = Colors(
+    primary = Color(0xFF00b0ff),
+    primaryVariant = Color(0xFF69e2ff),
+    secondary = Color(0xFF03DAC6),
+    secondaryVariant = Color(0xFF018786),
+    background = Color(0xFFFFFFFF),
+    surface = Color(0xFFFFFFFF),
+    error = Color(0xFFB00020),
+    onPrimary = Color(0xFFFFFFFF),
+    onSecondary = Color(0xFF000000),
+    onBackground = Color(0xFF000000),
+    onSurface = Color(0xFF000000),
+    onError = Color(0xFFFFFFFF),
+    isLight = true
+)
+
 
 fun loadImageBitmap(path: String): ImageBitmap =
     useResource(path) { it.buffered().use(::loadImageBitmap) }
 
+@Suppress("unused")
 fun loadSvgPainter(path: String, density: Density = Density(1f)): Painter =
     useResource(path) { loadSvgPainter(it, density) }
 

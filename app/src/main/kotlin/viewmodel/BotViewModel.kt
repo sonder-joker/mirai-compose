@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import com.youngerhousea.mirai.compose.console.ViewModelScope
-import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
-import com.youngerhousea.mirai.compose.console.impl.doOnFinishLoading
 import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,10 +18,8 @@ class BotViewModel(bot: Bot) : ViewModelScope() {
     val avatar: State<ImageBitmap> get() = _image
 
     init {
-        MiraiCompose.lifecycle.doOnFinishLoading {
-             viewModelScope.launch(Dispatchers.IO) {
-                _image.value = loadImageBitmap(Mirai.Http.get(bot.avatarUrl))
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            _image.value = loadImageBitmap(Mirai.Http.get(bot.avatarUrl))
         }
     }
 

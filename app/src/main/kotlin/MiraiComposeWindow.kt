@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.Dp
@@ -25,30 +26,18 @@ import com.youngerhousea.mirai.compose.resource.R
 
 @Composable
 fun MiraiComposeWindow(
-    onLoaded:() -> Unit,
+    onLoaded: () -> Unit,
     onCloseRequest: () -> Unit,
     state: WindowState = rememberWindowState(size = MiraiComposeWindowSize),
-    visible: Boolean = true,
-    enabled: Boolean = true,
-    focusable: Boolean = true,
-    alwaysOnTop: Boolean = false,
-    onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
-    onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable WindowScope.() -> Unit,
 ) = Window(
     onLoaded = onLoaded,
     onCloseRequest = onCloseRequest,
     state = state,
     title = "MiraiCompose",
-    visible = visible,
-    icon = null,
+    icon = BitmapPainter(R.Icon.Mirai),
     undecorated = true,
     resizable = true,
-    enabled = enabled,
-    focusable = focusable,
-    alwaysOnTop = alwaysOnTop,
-    onPreviewKeyEvent = onPreviewKeyEvent,
-    onKeyEvent = onKeyEvent
 ) {
     WindowArea(
         minimizeButton = {
