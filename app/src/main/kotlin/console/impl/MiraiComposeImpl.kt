@@ -26,12 +26,12 @@ import kotlin.io.path.div
 
 
 /**
- * Create a [MiraiComposeImplementation], this implementation for [MiraiConsoleImplementation],  extend [LifecycleOwner] and [CoroutineScope]
+ * Create a [MiraiComposeImplementation], this implementation for [MiraiConsoleImplementation]
  *
  */
-val MiraiCompose: MiraiComposeImplementation get() = MiraiComposeImpl
+val MiraiCompose: MiraiComposeImplementation by lazy { MiraiComposeImpl() }
 
-internal object MiraiComposeImpl : MiraiComposeImplementation {
+internal class MiraiComposeImpl : MiraiComposeImplementation {
 
     private val logger by lazy { createLogger("compose") }
 

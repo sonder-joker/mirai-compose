@@ -25,6 +25,7 @@ import com.youngerhousea.mirai.compose.resource.R
 
 @Composable
 fun MiraiComposeWindow(
+    onLoaded:() -> Unit,
     onCloseRequest: () -> Unit,
     state: WindowState = rememberWindowState(size = MiraiComposeWindowSize),
     visible: Boolean = true,
@@ -35,6 +36,7 @@ fun MiraiComposeWindow(
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable WindowScope.() -> Unit,
 ) = Window(
+    onLoaded = onLoaded,
     onCloseRequest = onCloseRequest,
     state = state,
     title = "MiraiCompose",

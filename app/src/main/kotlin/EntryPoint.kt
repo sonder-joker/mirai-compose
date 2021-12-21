@@ -2,41 +2,21 @@ package com.youngerhousea.mirai.compose
 
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.ui.HostPage
-import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 
-fun main() = miraiComposeApplication {
-    MiraiComposeWindow(onCloseRequest = ::exitApplication) {
-        HostPage()
-    }
-}
-
-@OptIn(ConsoleFrontEndImplementation::class)
-fun miraiComposeApplication(content: @Composable ApplicationScope.() -> Unit) {
-    themeApplication {
-        content()
-        DisposableEffect(Unit) {
+fun main() = application {
+    MaterialTheme(colors = color) {
+        MiraiComposeWindow(onLoaded = {
             MiraiCompose.start()
-            onDispose {
-                MiraiCompose.cancel()
-            }
-        }
-    }
-}
-
-fun themeApplication(
-    content: @Composable ApplicationScope.() -> Unit
-) {
-    application {
-        MaterialTheme(colors = color) {
-            content()
+        }, onCloseRequest = {
+            MiraiCompose.cancel()
+            exitApplication()
+        }) {
+            HostPage()
         }
     }
 }

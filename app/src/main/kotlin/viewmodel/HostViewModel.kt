@@ -4,8 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.ViewModelScope
-import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
-import com.youngerhousea.mirai.compose.console.impl.doOnFinishAutoLogin
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.GlobalEventChannel
@@ -42,9 +40,6 @@ class HostViewModel : ViewModelScope(), Host {
     }
 
     init {
-        MiraiCompose.lifecycle.doOnFinishAutoLogin {
-            hostState.value = hostState.value.copy(botList = Bot.instances)
-        }
         viewModelScope.launch {
             GlobalEventChannel.subscribeAlways<BotOnlineEvent> { event ->
                 hostState.value = hostState.value.copy(botList = hostState.value.botList + event.bot, currentBot = event.bot)
