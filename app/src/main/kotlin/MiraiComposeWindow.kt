@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Maximize
-import androidx.compose.material.icons.filled.Minimize
+import androidx.compose.material.icons.filled.CloseFullscreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,6 +21,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.youngerhousea.mirai.compose.resource.R
+import com.youngerhousea.mirai.compose.ui.closeIcon
+import com.youngerhousea.mirai.compose.ui.maxIcon
+import com.youngerhousea.mirai.compose.ui.minIcon
 
 @Composable
 fun MiraiComposeWindow(
@@ -47,7 +48,7 @@ fun MiraiComposeWindow(
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
-                Icon(Icons.Default.Minimize, null)
+                Icon(minIcon(24f), null)
             }
         },
         maximizeButton = {
@@ -55,7 +56,12 @@ fun MiraiComposeWindow(
                 onClick = state::onMaximizeButtonClick,
                 colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
-                Icon(Icons.Default.Maximize, null)
+                when (state.placement) {
+                    WindowPlacement.Maximized,
+                    WindowPlacement.Fullscreen -> Icon(Icons.Default.CloseFullscreen, null)
+                    WindowPlacement.Floating -> Icon(maxIcon(24f), null)
+                }
+
             }
         },
         exitButton = {
@@ -63,7 +69,7 @@ fun MiraiComposeWindow(
                 onClick = onCloseRequest,
                 colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
-                Icon(Icons.Default.Close, null)
+                Icon(closeIcon(20f, 19f), null)
             }
         },
         onBarDoubleClick = state::onMaximizeButtonClick,
@@ -113,7 +119,7 @@ fun MiraiComposeDialog(
                 colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar),
                 onClick = onCloseRequest
             ) {
-                Icon(Icons.Default.Close, null)
+                Icon(closeIcon(19f), null)
             }
         },
     ) {
