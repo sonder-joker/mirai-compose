@@ -70,7 +70,7 @@ jobs:
       - name: Sync to mirai forum
         uses: sebastianpopp/ftp-action@releases/v2
         with:
-          server: ${{ secrets.ftp_server }}
-          username: ${{ secrets.ftp_account }}
+          host: ${{ secrets.ftp_server }}
+          user: ${{ secrets.ftp_account }}
           password: ${{ secrets.ftp_password }}
           localDir: ${{ steps.download.outputs.download-path }}
