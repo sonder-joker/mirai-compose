@@ -74,3 +74,4 @@ jobs:
           username: ${{ secrets.ftp_account }}
           password: ${{ secrets.ftp_password }}
           localDir: ${{ steps.download.outputs.download-path }}
+          options: "--delete"
