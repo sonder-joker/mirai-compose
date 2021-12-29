@@ -48,7 +48,7 @@ fun MiraiComposeWindow(
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
-                Icon(minIcon(24f), null)
+                Icon(minIcon(), null)
             }
         },
         maximizeButton = {
@@ -59,7 +59,7 @@ fun MiraiComposeWindow(
                 when (state.placement) {
                     WindowPlacement.Maximized,
                     WindowPlacement.Fullscreen -> Icon(Icons.Default.CloseFullscreen, null)
-                    WindowPlacement.Floating -> Icon(maxIcon(24f), null)
+                    WindowPlacement.Floating -> Icon(maxIcon(), null)
                 }
 
             }
@@ -69,7 +69,7 @@ fun MiraiComposeWindow(
                 onClick = onCloseRequest,
                 colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
-                Icon(closeIcon(20f, 19f), null)
+                Icon(closeIcon(12f), null)
             }
         },
         onBarDoubleClick = state::onMaximizeButtonClick,
@@ -119,7 +119,7 @@ fun MiraiComposeDialog(
                 onClick = onCloseRequest,
                 colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
-                Icon(closeIcon(20f, 19f), null)
+                Icon(closeIcon(50f), null)
             }
         },
     ) {
