@@ -7,6 +7,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 
 
@@ -14,13 +16,12 @@ import androidx.compose.ui.Alignment
 fun LoginSolverContent(
     title: String,
     tip: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    onFinish: () -> Unit,
+    onFinish: (String) -> Unit,
     load: @Composable () -> Unit,
     refresh: () -> Unit,
     exit: () -> Unit
 ) {
+    val (innerContent, setInnerContent) = remember(tip, title) { mutableStateOf("") }
     Scaffold(
         topBar = {
             Text(title)
@@ -32,11 +33,11 @@ fun LoginSolverContent(
             Text(tip)
             load()
             TextField(
-                value = value,
-                onValueChange = onValueChange
+                value = innerContent,
+                onValueChange = setInnerContent
             )
             Row {
-                Button(onFinish) {
+                Button({onFinish(innerContent)}) {
                     Text("Finish")
                 }
                 Button(refresh) {

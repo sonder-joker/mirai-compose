@@ -1,7 +1,5 @@
 package com.youngerhousea.mirai.compose.ui
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -12,70 +10,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.text.font.FontWeight
-import com.youngerhousea.mirai.compose.console.viewModel
-import com.youngerhousea.mirai.compose.viewmodel.BotViewModel
+import com.youngerhousea.mirai.compose.ui.login.AsyncImage
+import io.ktor.client.request.*
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.*
-import net.mamoe.mirai.event.EventChannel
-import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.MiraiLogger
-import kotlin.coroutines.CoroutineContext
-
-object EmptyBot : Bot {
-    override val asFriend: Friend
-        get() = error("Not yet implemented")
-    override val asStranger: Stranger
-        get() = error("Not yet implemented")
-    override val configuration: BotConfiguration
-        get() = error("Not yet implemented")
-    override val coroutineContext: CoroutineContext
-        get() = error("Not yet implemented")
-    override val eventChannel: EventChannel<BotEvent>
-        get() = error("Not yet implemented")
-    override val friends: ContactList<Friend>
-        get() = error("Not yet implemented")
-    override val groups: ContactList<Group>
-        get() = error("Not yet implemented")
-    override val id: Long = 123456789
-    override val isOnline: Boolean
-        get() = error("Not yet implemented")
-    override val logger: MiraiLogger
-        get() = error("Not yet implemented")
-    override val nick: String = "No Login"
-
-    override val otherClients: ContactList<OtherClient>
-        get() = error("Not yet implemented")
-    override val strangers: ContactList<Stranger>
-        get() = error("Not yet implemented")
-
-    override fun close(cause: Throwable?) {
-        error("Not yet implemented")
-    }
-
-    override suspend fun login() {
-        error("Not yet implemented")
-    }
-
-}
-
-@Composable
-fun EmptyBotItem() {
-    BotContent(
-        avatar = ImageBitmap(200, 200),
-        nick = "NoLogin",
-        id = "Unknown"
-    )
-}
+import net.mamoe.mirai.Mirai
 
 @Composable
 fun BotItem(
     bot: Bot,
-    botViewModel: BotViewModel = viewModel(bot) { BotViewModel(bot) }
 ) {
     BotContent(
-        avatar = botViewModel.avatar.value,
+        avatar = {
+            AsyncImage(load = {
+                loadImageBitmap(Mirai.Http.get(bot.avatarUrl))
+            }, painterFor = {
+                BitmapPainter(it)
+            }, null)
+        },
         nick = bot.run {
             try {
                 nick
@@ -88,9 +42,21 @@ fun BotItem(
 }
 
 @Composable
+fun EmptyBotItem() {
+    BotContent(
+        avatar = {
+            ImageBitmap(200, 200)
+        },
+        nick = "NoLogin",
+        id = "Unknown"
+    )
+}
+
+
+@Composable
 fun BotContent(
     modifier: Modifier = Modifier,
-    avatar: ImageBitmap,
+    avatar: @Composable () -> Unit,
     nick: String,
     id: String
 ) {
@@ -108,7 +74,7 @@ fun BotContent(
             shape = CircleShape,
             color = Color(0xff979595),
         ) {
-            Image(avatar, null)
+            avatar()
         }
         Column(
             Modifier
@@ -121,20 +87,4 @@ fun BotContent(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun BotContentPreview() {
-    BotContent(
-        avatar = ImageBitmap(200, 200),
-        nick = "test",
-        id = "123456789"
-    )
-}
-
-@Preview
-@Composable
-fun EmptyBotItemPreview() {
-    EmptyBotItem()
 }

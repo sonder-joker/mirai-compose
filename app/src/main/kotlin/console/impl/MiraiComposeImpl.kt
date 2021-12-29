@@ -3,10 +3,8 @@ package com.youngerhousea.mirai.compose.console.impl
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.youngerhousea.mirai.compose.console.MiraiComposeImplementation
-import com.youngerhousea.mirai.compose.console.getOrCreate
-import com.youngerhousea.mirai.compose.console.viewModelStoreImpl
-import com.youngerhousea.mirai.compose.viewmodel.LoginAction
-import com.youngerhousea.mirai.compose.viewmodel.LoginViewModel
+import com.youngerhousea.mirai.compose.console.MiraiComposeLoginSolver
+import com.youngerhousea.mirai.compose.console.Solver
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -38,9 +36,9 @@ import kotlin.io.path.div
  */
 val MiraiCompose: MiraiComposeImplementation by lazy { MiraiComposeImpl() }
 
-internal class MiraiComposeImpl : MiraiComposeImplementation {
+internal class MiraiComposeImpl : MiraiComposeImplementation, Solver by MiraiComposeLoginSolver {
 
-    private val logger by lazy { createLogger("compose") }
+    override val composeLogger: MiraiLogger by lazy { createLogger("compose") }
 
     override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
 
@@ -58,7 +56,7 @@ internal class MiraiComposeImpl : MiraiComposeImplementation {
 
     override val consoleInput: ConsoleInput = MiraiComposeInput
 
-    override val consoleCommandSender = MiraiConsoleSender(logger)
+    override val consoleCommandSender = MiraiConsoleSender(composeLogger)
 
     @OptIn(MiraiInternalApi::class)
     override fun createLogger(identity: String?): MiraiLogger =
@@ -78,7 +76,6 @@ internal class MiraiComposeImpl : MiraiComposeImplementation {
 
     private fun printForDebug(priority: LogKind, content: String) {
         println("${priority.textColor}${content}${TextColor.RESET}")
-
     }
 
     override val JvmPlugin.data: List<PluginData>
@@ -89,12 +86,7 @@ internal class MiraiComposeImpl : MiraiComposeImplementation {
 
     override val logStorage: MutableState<List<Log>> = mutableStateOf(listOf())
 
-    override val loginState = viewModelStoreImpl.getOrCreate { LoginViewModel() }
-
-    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginSolver {
-        loginState.dispatch(LoginAction.Open)
-        return loginState.solver
-    }
+    override fun createLoginSolver(requesterBot: Long, configuration: BotConfiguration): LoginSolver = MiraiComposeLoginSolver
 
     override val coroutineContext: CoroutineContext =
         CoroutineName("MiraiCompose") + CoroutineExceptionHandler { coroutineContext, throwable ->

@@ -22,7 +22,6 @@ import com.youngerhousea.mirai.compose.ui.message.Message
 import com.youngerhousea.mirai.compose.ui.plugins.Plugins
 import com.youngerhousea.mirai.compose.ui.setting.Setting
 import com.youngerhousea.mirai.compose.viewmodel.Host
-import com.youngerhousea.mirai.compose.viewmodel.HostRoute
 import com.youngerhousea.mirai.compose.viewmodel.HostViewModel
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
@@ -44,11 +43,11 @@ fun NavHost(
             NavHostFirst(
                 modifier = Modifier.background(R.Colors.SplitLeft),
                 navigate = state.navigate,
-                onRouteMessage = { hostViewModel.dispatch(HostRoute.Message) },
-                onRoutePlugins = { hostViewModel.dispatch(HostRoute.Plugins) },
-                onRouteSetting = { hostViewModel.dispatch(HostRoute.Setting) },
-                onRouteAbout = { hostViewModel.dispatch(HostRoute.About) },
-                onRouteConsoleLog = { hostViewModel.dispatch(HostRoute.ConsoleLog) }
+                onRouteMessage = { hostViewModel.dispatch(Host.Route.Message) },
+                onRoutePlugins = { hostViewModel.dispatch(Host.Route.Plugins) },
+                onRouteSetting = { hostViewModel.dispatch(Host.Route.Setting) },
+                onRouteAbout = { hostViewModel.dispatch(Host.Route.About) },
+                onRouteConsoleLog = { hostViewModel.dispatch(Host.Route.ConsoleLog) }
             )
         }
         second {
@@ -58,21 +57,21 @@ fun NavHost(
 }
 
 @Composable
-fun NavHostSecond(hostRoute: HostRoute) {
+fun NavHostSecond(hostRoute: Host.Route) {
     when (hostRoute) {
-        is HostRoute.About -> About()
-        is HostRoute.Message -> Message()
-        is HostRoute.Plugins -> Plugins()
-        is HostRoute.Setting -> Setting()
-        is HostRoute.BotMessage -> BotMessage()
-        is HostRoute.ConsoleLog -> ConsoleLog()
+        is Host.Route.About -> About()
+        is Host.Route.Message -> Message()
+        is Host.Route.Plugins -> Plugins()
+        is Host.Route.Setting -> Setting()
+        is Host.Route.BotMessage -> BotMessage()
+        is Host.Route.ConsoleLog -> ConsoleLog()
     }
 }
 
 @Composable
 fun NavHostFirst(
     modifier: Modifier = Modifier,
-    navigate: HostRoute,
+    navigate: Host.Route,
     onRouteMessage: () -> Unit,
     onRoutePlugins: () -> Unit,
     onRouteSetting: () -> Unit,
@@ -86,35 +85,35 @@ fun NavHostFirst(
         NavHostFirstBotMenu()
         RailTab(
             onClick = onRouteMessage,
-            selected = navigate == HostRoute.Message
+            selected = navigate == Host.Route.Message
         ) {
             Icon(R.Icon.Message, null)
             Text(R.String.RailTabFirst)
         }
         RailTab(
             onClick = onRoutePlugins,
-            selected = navigate == HostRoute.Plugins,
+            selected = navigate == Host.Route.Plugins,
         ) {
             Icon(R.Icon.Plugins, null)
             Text(R.String.RailTabSecond)
         }
         RailTab(
             onClick = onRouteSetting,
-            selected = navigate == HostRoute.Setting
+            selected = navigate == Host.Route.Setting
         ) {
             Icon(R.Icon.Setting, null)
             Text(R.String.RailTabThird)
         }
         RailTab(
             onClick = onRouteAbout,
-            selected = navigate == HostRoute.About
+            selected = navigate == Host.Route.About
         ) {
             Icon(R.Icon.About, null)
             Text(R.String.RailTabFourth)
         }
         RailTab(
             onClick = onRouteConsoleLog,
-            selected = navigate == HostRoute.ConsoleLog
+            selected = navigate == Host.Route.ConsoleLog
         ) {
             Icon(R.Icon.ConsoleLog, null)
             Text(R.String.RailTabFive)

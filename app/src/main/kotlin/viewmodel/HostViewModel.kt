@@ -13,61 +13,69 @@ import net.mamoe.mirai.event.events.BotOnlineEvent
 interface Host {
     val hostState: State<HostState>
 
-    fun dispatch(event: HostAction)
+    fun dispatch(event: Action)
+
+    sealed interface Route {
+        class BotMessage(val bot: Bot) : Route, Action
+        object Message : Route, Action
+        object Setting : Route, Action
+        object About : Route, Action
+        object Plugins : Route, Action
+        object ConsoleLog : Route, Action
+    }
+
+    @Immutable
+    data class HostState(
+        val currentBot: Bot? = null,
+        val botList: List<Bot> = listOf(),
+        val menuExpand: Boolean = false,
+        val navigate: Route = Route.Message,
+        val dialogExpand: Boolean = false
+    )
+
+    sealed interface Action {
+        object OpenMenu : Action
+        object CloseMenu : Action
+        object OpenLoginDialog : Action
+        object CloseLoginDialog : Action
+    }
 }
 
 
 class HostViewModel : ViewModelScope(), Host {
-    override val hostState = mutableStateOf(HostState())
+    override val hostState = mutableStateOf(Host.HostState())
 
-    override fun dispatch(event: HostAction) {
+    override fun dispatch(event: Host.Action) {
         hostState.value = reduce(hostState.value, event)
     }
 
-    private fun reduce(state: HostState, action: HostAction): HostState {
+    private fun reduce(state: Host.HostState, action: Host.Action): Host.HostState {
         return when (action) {
-            is HostAction.OpenMenu -> state.copy(menuIsExpand = true)
-            is HostAction.CloseMenu -> state.copy(menuIsExpand = false)
-            is HostRoute.About -> state.copy(navigate = action)
-            is HostRoute.Message -> state.copy(navigate = action)
-            is HostRoute.Plugins -> state.copy(navigate = action)
-            is HostRoute.Setting -> state.copy(navigate = action)
-            is HostRoute.BotMessage -> state.copy(currentBot = action.bot)
-            is HostRoute.ConsoleLog -> state.copy(navigate = action)
+            Host.Action.CloseLoginDialog -> state.copy(dialogExpand = false)
+            Host.Action.OpenLoginDialog -> state.copy(dialogExpand = true)
+            is Host.Action.OpenMenu -> state.copy(menuExpand = true)
+            is Host.Action.CloseMenu -> state.copy(menuExpand = false)
+            is Host.Route.About -> state.copy(navigate = action)
+            is Host.Route.Message -> state.copy(navigate = action)
+            is Host.Route.Plugins -> state.copy(navigate = action)
+            is Host.Route.Setting -> state.copy(navigate = action)
+            is Host.Route.BotMessage -> state.copy(currentBot = action.bot)
+            is Host.Route.ConsoleLog -> state.copy(navigate = action)
         }
     }
 
     init {
         viewModelScope.launch {
             GlobalEventChannel.subscribeAlways<BotOnlineEvent> { event ->
-                hostState.value = hostState.value.copy(botList = hostState.value.botList + event.bot, currentBot = event.bot)
+                hostState.value =
+                    hostState.value.copy(botList = hostState.value.botList + event.bot, currentBot = event.bot)
             }
         }
     }
 
 }
 
-sealed interface HostRoute {
-    class BotMessage(val bot: Bot) : HostRoute, HostAction
-    object Message : HostRoute, HostAction
-    object Setting : HostRoute, HostAction
-    object About : HostRoute, HostAction
-    object Plugins : HostRoute, HostAction
-    object ConsoleLog : HostRoute, HostAction
-}
 
-@Immutable
-data class HostState(
-    val currentBot: Bot? = null,
-    val botList: List<Bot> = listOf(),
-    val menuIsExpand: Boolean = false,
-    val navigate: HostRoute = HostRoute.Message
-)
-
-sealed interface HostAction {
-    object OpenMenu : HostAction
-    object CloseMenu : HostAction
-}
 
 
 

@@ -116,10 +116,10 @@ fun MiraiComposeDialog(
     WindowArea(
         exitButton = {
             Button(
-                colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar),
-                onClick = onCloseRequest
+                onClick = onCloseRequest,
+                colors = ButtonDefaults.buttonColors(backgroundColor = R.Colors.TopAppBar)
             ) {
-                Icon(closeIcon(19f), null)
+                Icon(closeIcon(20f, 19f), null)
             }
         },
     ) {

@@ -1,6 +1,5 @@
 package com.youngerhousea.mirai.compose.ui
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu
@@ -11,29 +10,39 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.youngerhousea.mirai.compose.MiraiComposeDialog
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
-import com.youngerhousea.mirai.compose.viewmodel.*
+import com.youngerhousea.mirai.compose.ui.login.LoginInterface
+import com.youngerhousea.mirai.compose.viewmodel.Host
+import com.youngerhousea.mirai.compose.viewmodel.HostViewModel
 import net.mamoe.mirai.Bot
 
 @Composable
 fun NavHostFirstBotMenu(
     hostViewModel: Host = viewModel { HostViewModel() },
-    loginViewModel: Login = viewModel { LoginViewModel() }
 ) {
     val state by hostViewModel.hostState
 
     NavHostFirstBotMenuContent(
-        isExpand = state.menuIsExpand,
+        isExpand = state.menuExpand,
         botList = state.botList,
         currentBot = state.currentBot,
-        onAvatarBoxClick = { hostViewModel.dispatch(HostAction.OpenMenu) },
-        dismissExpandMenu = { hostViewModel.dispatch(HostAction.CloseMenu) },
+        onAvatarBoxClick = { hostViewModel.dispatch(Host.Action.OpenMenu) },
+        dismissExpandMenu = { hostViewModel.dispatch(Host.Action.CloseMenu) },
         onAddNewBotButtonClick = {
-            loginViewModel.dispatch(LoginAction.Open)
+            hostViewModel.dispatch(Host.Action.CloseMenu)
+            hostViewModel.dispatch(Host.Action.OpenLoginDialog)
         },
-        onBotItemClick = { hostViewModel.dispatch(HostRoute.BotMessage(it)) }
+        onBotItemClick = { hostViewModel.dispatch(Host.Route.BotMessage(it)) }
     )
+    if(state.dialogExpand) {
+        MiraiComposeDialog({
+            hostViewModel.dispatch(Host.Action.CloseLoginDialog)
+        }) {
+            LoginInterface()
+        }
+    }
 }
 
 @Composable
@@ -78,18 +87,4 @@ fun NavHostFirstBotMenuContent(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun NavHostFirstBotMenuPreview() {
-    NavHostFirstBotMenuContent(
-        isExpand = false,
-        botList = listOf(EmptyBot, EmptyBot),
-        currentBot = null,
-        onAvatarBoxClick = {},
-        dismissExpandMenu = {},
-        onAddNewBotButtonClick = {},
-        onBotItemClick = {}
-    )
 }
