@@ -51,20 +51,3 @@ fun LoginSolverContent(
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun LoginSolverContentPreview() {
-//    LoginSolverContent(
-//        "Bot:1234567890",
-//        tip = "tip",
-//        load = { QRCodeImage("test", qrCodeHeight = 200, qrCodeWidth = 200) },
-//        value = "test",
-//        onValueChange = {},
-//        onFinish = {
-//
-//        },
-//
-//    )
-//}

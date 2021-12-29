@@ -15,18 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.MultiFormatWriter
-import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.youngerhousea.mirai.compose.console.UICannotFinish
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.ui.log.onPreviewEnterDown
@@ -260,25 +255,6 @@ private fun HorizontalDottedProgressBar() {
             }
         }
     }
-}
-
-
-@Composable
-fun QRCodeImage(
-    qrCodeData: String, qrCodeHeight: Int, qrCodeWidth: Int
-) {
-    AsyncImage(
-        load = {
-            val matrix = MultiFormatWriter().encode(
-                qrCodeData,
-                BarcodeFormat.QR_CODE, qrCodeWidth, qrCodeHeight
-            )
-            return@AsyncImage MatrixToImageWriter.toBufferedImage(matrix).toComposeImageBitmap()
-        },
-        painterFor = { remember { BitmapPainter(it) } },
-        contentDescription = null,
-        modifier = Modifier.size(200.dp)
-    )
 }
 
 @Composable

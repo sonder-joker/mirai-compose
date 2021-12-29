@@ -1,5 +1,6 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.ExperimentalComposeLibrary
 
 plugins {
     kotlin("jvm")
@@ -18,10 +19,8 @@ dependencies {
     implementation(compose.materialIconsExtended)
     implementation(compose.uiTooling)
 
-    @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+    @OptIn(ExperimentalComposeLibrary::class)
     implementation(compose.desktop.components.splitPane)
-    implementation(libs.zxing.core)
-    implementation(libs.zxing.se)
 
     implementation(kotlin("stdlib"))
     implementation(kotlin("stdlib-common"))
@@ -33,7 +32,7 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation(kotlin("test"))
 
-    @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+    @OptIn(ExperimentalComposeLibrary::class)
     testImplementation(compose.uiTestJUnit4)
 }
 
