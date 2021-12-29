@@ -28,8 +28,7 @@ inline fun <reified T : Enum<T>> EnumTabRowWithContent(
     }
 }
 
-//from Icons.kt and default size is 24
-fun closeIcon(size: Float, viewport: Float = size) =
+fun closeIcon(size: Float = 24f, viewport: Float = 24f) =
     ImageVector.Builder(
         name = "",
         defaultWidth = size.dp,
@@ -37,22 +36,22 @@ fun closeIcon(size: Float, viewport: Float = size) =
         viewportWidth = viewport,
         viewportHeight = viewport
     ).materialPath {
-        moveToRelative(19.0f, 6.41f)
-        lineTo(17.59f, 5.0f)
-        lineTo(12.0f, 10.59f)
-        lineTo(6.41f, 5.0f)
-        lineTo(5.0f, 6.41f)
-        lineTo(10.59f, 12.0f)
-        lineTo(5.0f, 17.59f)
-        lineTo(6.41f, 19.0f)
-        lineTo(12.0f, 13.41f)
-        lineTo(17.59f, 19.0f)
-        lineTo(19.0f, 17.59f)
-        lineTo(13.41f, 12.0f)
-        close()
+        moveTo(12f, 10f)
+        lineTo(2f, 0f)
+        lineTo(0f, 2f)
+        lineTo(10f, 12f)
+        lineTo(0f, 22f)
+        lineTo(2f, 24f)
+        lineTo(12f, 14f)
+        lineTo(22f, 24f)
+        lineTo(24f, 22f)
+        lineTo(14f, 12f)
+        lineTo(24f, 2f)
+        lineTo(22f, 0f)
+        lineTo(12f, 10f)
     }.build()
 
-fun minIcon(size: Float, viewport: Float = size) =
+fun minIcon(size: Float = 24f, viewport: Float = 24f) =
     ImageVector.Builder(
         name = "",
         defaultWidth = size.dp,
@@ -60,15 +59,14 @@ fun minIcon(size: Float, viewport: Float = size) =
         viewportWidth = viewport,
         viewportHeight = viewport
     ).materialPath {
-        moveTo(2f, 10.5f)
-        horizontalLineTo(22f)
-        verticalLineTo(14f)
-        horizontalLineTo(2f)
-        verticalLineTo(10.5f)
+        moveTo(2f, 14f)
+        lineTo(22f, 14f)
+        lineTo(22f, 10f)
+        lineTo(2f, 10f)
         close()
     }.build()
 
-fun maxIcon(size: Float, viewport: Float = size) =
+fun maxIcon(size: Float = 24f, viewport: Float = 24f) =
     ImageVector.Builder(
         name = "",
         defaultWidth = size.dp,
