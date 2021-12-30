@@ -87,16 +87,13 @@ fun ConsoleLog(consoleLog: ConsoleLog = viewModel { ConsoleLogViewModel() }) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun Modifier.onPreviewCtrlFDown(action: () -> Unit): Modifier = onPreviewKeyEvent {
-    if (it.isCtrlFDown) {
+    if (it.isCtrlPressed && it.key == Key.F && it.type == KeyEventType.KeyDown) {
         action()
         true
     } else false
 }
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal val KeyEvent.isCtrlFDown
-    get() = (key == Key.CtrlLeft || key == Key.CtrlRight) && type == KeyEventType.KeyDown && type == KeyEventType.KeyDown
 
 @Composable
 internal fun LogBox(
