@@ -35,8 +35,8 @@ import java.io.IOException
 
 @Composable
 fun LoginInterface() {
-    val (account, setAccount) = remember { mutableStateOf("") }
-    val (password, setPassword) = remember { mutableStateOf("") }
+    var account by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     val host = remember { SnackbarHostState() }
     var loadingState by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -105,12 +105,12 @@ fun LoginInterface() {
             AccountTextField(
                 modifier = Modifier.weight(1f),
                 account = account,
-                onAccountTextChange = setAccount,
+                onAccountTextChange = { account = it },
             )
             PasswordTextField(
                 modifier = Modifier.weight(1f),
                 password = password,
-                onPasswordTextChange = setPassword,
+                onPasswordTextChange = { password = it },
             )
             LoginButton(
                 modifier = Modifier.height(100.dp)
