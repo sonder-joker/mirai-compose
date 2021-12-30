@@ -11,7 +11,7 @@ import net.mamoe.mirai.event.events.BotOnlineEvent
 
 
 interface Host {
-    val hostState: State<HostState>
+    val state: State<InnerState>
 
     fun dispatch(event: Action)
 
@@ -25,7 +25,7 @@ interface Host {
     }
 
     @Immutable
-    data class HostState(
+    data class InnerState(
         val currentBot: Bot? = null,
         val botList: List<Bot> = listOf(),
         val menuExpand: Boolean = false,
@@ -43,13 +43,13 @@ interface Host {
 
 
 class HostViewModel : ViewModelScope(), Host {
-    override val hostState = mutableStateOf(Host.HostState())
+    override val state = mutableStateOf(Host.InnerState())
 
     override fun dispatch(event: Host.Action) {
-        hostState.value = reduce(hostState.value, event)
+        state.value = reduce(state.value, event)
     }
 
-    private fun reduce(state: Host.HostState, action: Host.Action): Host.HostState {
+    private fun reduce(state: Host.InnerState, action: Host.Action): Host.InnerState {
         return when (action) {
             Host.Action.CloseLoginDialog -> state.copy(dialogExpand = false)
             Host.Action.OpenLoginDialog -> state.copy(dialogExpand = true)
@@ -67,8 +67,8 @@ class HostViewModel : ViewModelScope(), Host {
     init {
         viewModelScope.launch {
             GlobalEventChannel.subscribeAlways<BotOnlineEvent> { event ->
-                hostState.value =
-                    hostState.value.copy(botList = hostState.value.botList + event.bot, currentBot = event.bot)
+                state.value =
+                    state.value.copy(botList = state.value.botList + event.bot, currentBot = event.bot)
             }
         }
     }

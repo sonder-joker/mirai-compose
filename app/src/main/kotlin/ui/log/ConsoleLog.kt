@@ -27,7 +27,6 @@ import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.console.viewModel
 import com.youngerhousea.mirai.compose.resource.R
 import com.youngerhousea.mirai.compose.viewmodel.ConsoleLog
-import com.youngerhousea.mirai.compose.viewmodel.ConsoleLogAction
 import com.youngerhousea.mirai.compose.viewmodel.ConsoleLogViewModel
 import java.util.*
 
@@ -38,12 +37,12 @@ fun ConsoleLog(consoleLog: ConsoleLog = viewModel { ConsoleLogViewModel() }) {
     val log by MiraiCompose.logStorage
 
     Scaffold(
-        modifier = Modifier.onPreviewCtrlFDown { consoleLog.dispatch(ConsoleLogAction.SetSearchBar) },
+        modifier = Modifier.onPreviewCtrlFDown { consoleLog.dispatch(ConsoleLog.Action.SetSearchBar) },
         topBar = {
             if (state.searchBarVisible)
                 TextField(
                     value = state.searchContent,
-                    onValueChange = { consoleLog.dispatch(ConsoleLogAction.UpdateSearchContent(it)) },
+                    onValueChange = { consoleLog.dispatch(ConsoleLog.Action.UpdateSearchContent(it)) },
                     leadingIcon = { Icon(R.Icon.Search, null) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -74,12 +73,12 @@ fun ConsoleLog(consoleLog: ConsoleLog = viewModel { ConsoleLogViewModel() }) {
                 command = state.currentCommand,
                 onCommandChange = { commandContent ->
                     consoleLog.dispatch(
-                        ConsoleLogAction.UpdateCurrentCommand(
+                        ConsoleLog.Action.UpdateCurrentCommand(
                             commandContent
                         )
                     )
                 },
-                onClick = { consoleLog.dispatch(ConsoleLogAction.EnterCommand) },
+                onClick = { consoleLog.dispatch(ConsoleLog.Action.EnterCommand) },
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 40.dp),

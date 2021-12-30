@@ -28,48 +28,48 @@ import kotlin.reflect.full.isSubclassOf
  */
 interface ConsoleLog {
 
-    val state: State<ConsoleLogState>
+    val state: State<InnerState>
 
-    fun dispatch(action: ConsoleLogAction)
+    fun dispatch(action: Action)
+
+    sealed interface Action {
+        class UpdateSearchContent(val content: String) : Action
+        class UpdateCurrentCommand(val content: String) : Action
+        object EnterCommand : Action
+        object SetSearchBar : Action
+    }
+
+    data class InnerState(
+        val searchContent: String = "",
+        val currentCommand: String = "",
+        val searchBarVisible: Boolean = false
+    )
 }
 
-data class ConsoleLogState(
-    val searchContent: String = "",
-    val currentCommand: String = "",
-    val searchBarVisible: Boolean = false
-)
 
-sealed interface ConsoleLogAction {
-    class UpdateSearchContent(val content: String) : ConsoleLogAction
-    class UpdateCurrentCommand(val content: String) : ConsoleLogAction
-    object EnterCommand : ConsoleLogAction
-    object SetSearchBar : ConsoleLogAction
-}
 
 class ConsoleLogViewModel @OptIn(ConsoleInternalApi::class) constructor(
     private val logger: MiraiLogger = MiraiConsole.mainLogger,
 ) : ConsoleLog, ViewModelScope() {
+    override val state: MutableState<ConsoleLog.InnerState> = mutableStateOf(ConsoleLog.InnerState())
 
-    override fun dispatch(action: ConsoleLogAction) {
+    override fun dispatch(action: ConsoleLog.Action) {
         viewModelScope.launch {
             state.value = reduce(state.value, action)
         }
-
     }
 
-    private suspend fun reduce(value: ConsoleLogState, action: ConsoleLogAction): ConsoleLogState {
+    private suspend fun reduce(value: ConsoleLog.InnerState, action: ConsoleLog.Action): ConsoleLog.InnerState {
         return when (action) {
-            is ConsoleLogAction.UpdateSearchContent -> value.copy(searchContent = action.content)
-            is ConsoleLogAction.UpdateCurrentCommand -> value.copy(currentCommand = action.content)
-            is ConsoleLogAction.EnterCommand -> {
+            is ConsoleLog.Action.UpdateSearchContent -> value.copy(searchContent = action.content)
+            is ConsoleLog.Action.UpdateCurrentCommand -> value.copy(currentCommand = action.content)
+            is ConsoleLog.Action.EnterCommand -> {
                 SolveCommandResult(value.currentCommand, logger)
                 return value.copy(currentCommand = "")
             }
-            is ConsoleLogAction.SetSearchBar -> value.copy(searchBarVisible = !value.searchBarVisible)
+            is ConsoleLog.Action.SetSearchBar -> value.copy(searchBarVisible = !value.searchBarVisible)
         }
     }
-
-    override val state: MutableState<ConsoleLogState> = mutableStateOf(ConsoleLogState())
 
 }
 
@@ -84,7 +84,6 @@ class ConsoleLogViewModel @OptIn(ConsoleInternalApi::class) constructor(
 //        else -> ""
 //    }
 //}
-
 
 @OptIn(ExperimentalCommandDescriptors::class)
 private suspend fun SolveCommandResult(
