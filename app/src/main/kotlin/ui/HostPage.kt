@@ -36,7 +36,7 @@ fun HostPage() {
 fun NavHost(
     hostViewModel: Host = viewModel { HostViewModel() }
 ) {
-    val state by hostViewModel.hostState
+    val state by hostViewModel.state
 
     HorizontalSplitPane {
         first(minSize = MinFirstSize) {

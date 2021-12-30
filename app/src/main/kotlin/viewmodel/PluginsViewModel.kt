@@ -6,42 +6,44 @@ import com.youngerhousea.mirai.compose.console.ViewModelScope
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.plugin.Plugin
 
-class PluginsViewModel : ViewModelScope() {
-    private val _state = mutableStateOf(PluginsState())
+interface Plugins {
 
-    val state: State<PluginsState> get() = _state
+    val state: State<InnerState>
 
-    fun dispatch(action: PluginAction) {
+    fun dispatch(action: Action)
+
+    sealed interface Route {
+        object List : Route, Action
+        class Single(val plugin: Plugin) : Route, Action
+    }
+
+    sealed interface Action {
+        class LoadingPlugin(val pluginName: String) : Action
+        object OpenFileChooser : Action
+    }
+
+
+    data class InnerState(
+        val navigate: Route = Route.List,
+        val isFileChooserVisible: Boolean = false
+    )
+}
+
+class PluginsViewModel : Plugins, ViewModelScope() {
+    override val state = mutableStateOf(Plugins.InnerState())
+
+    override fun dispatch(action: Plugins.Action) {
         viewModelScope.launch {
-            _state.value = reduce(action, _state.value)
+            state.value = reduce(action, state.value)
         }
     }
 
-    private fun reduce(action: PluginAction, state: PluginsState): PluginsState {
+    private fun reduce(action: Plugins.Action, state: Plugins.InnerState): Plugins.InnerState {
         return when (action) {
-            is PluginsRoute.List -> state.copy(navigate = action)
-            is PluginsRoute.Single -> state.copy(navigate = action)
-            is PluginAction.LoadingPlugin -> {
-                state
-            }
-            is PluginAction.OpenFileChooser -> {
-                state.copy(isFileChooserVisible = true)
-            }
+            is Plugins.Route.List -> state.copy(navigate = action)
+            is Plugins.Route.Single -> state.copy(navigate = action)
+            is Plugins.Action.LoadingPlugin -> state
+            is Plugins.Action.OpenFileChooser -> state.copy(isFileChooserVisible = true)
         }
     }
 }
-
-sealed interface PluginsRoute {
-    object List : PluginsRoute, PluginAction
-    class Single(val plugin: Plugin) : PluginsRoute, PluginAction
-}
-
-sealed interface PluginAction {
-    class LoadingPlugin(val pluginName: String) : PluginAction
-    object OpenFileChooser : PluginAction
-}
-
-data class PluginsState(
-    val navigate: PluginsRoute = PluginsRoute.List,
-    val isFileChooserVisible: Boolean = false
-)

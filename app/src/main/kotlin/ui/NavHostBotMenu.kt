@@ -22,7 +22,7 @@ import net.mamoe.mirai.Bot
 fun NavHostFirstBotMenu(
     hostViewModel: Host = viewModel { HostViewModel() },
 ) {
-    val state by hostViewModel.hostState
+    val state by hostViewModel.state
 
     NavHostFirstBotMenuContent(
         isExpand = state.menuExpand,

@@ -4,15 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.AwtWindow
 import com.youngerhousea.mirai.compose.console.viewModel
-import com.youngerhousea.mirai.compose.viewmodel.PluginsRoute
+import com.youngerhousea.mirai.compose.viewmodel.Plugins
 import com.youngerhousea.mirai.compose.viewmodel.PluginsViewModel
 import net.mamoe.mirai.console.plugin.PluginManager
 import java.awt.FileDialog
 import java.awt.Frame
 
 @Composable
-fun Plugins(pluginsViewModel: PluginsViewModel = viewModel { PluginsViewModel() }) {
-    val state by pluginsViewModel.state
+fun Plugins(plugins: Plugins = viewModel { PluginsViewModel() }) {
+    val state by plugins.state
 
     if(state.isFileChooserVisible) {
         FileDialog {
@@ -21,15 +21,15 @@ fun Plugins(pluginsViewModel: PluginsViewModel = viewModel { PluginsViewModel() 
     }
 
     when (val route = state.navigate) {
-        PluginsRoute.List ->
+        Plugins.Route.List ->
             PluginList(
                 plugins = PluginManager.plugins,
-                onPluginClick = { pluginsViewModel.dispatch(PluginsRoute.Single(it)) },
+                onPluginClick = { plugins.dispatch(Plugins.Route.Single(it)) },
             )
-        is PluginsRoute.Single ->
+        is Plugins.Route.Single ->
             SinglePlugin(
                 plugin = route.plugin,
-                onExit = { pluginsViewModel.dispatch(PluginsRoute.List) }
+                onExit = { plugins.dispatch(Plugins.Route.List) }
             )
 
     }
