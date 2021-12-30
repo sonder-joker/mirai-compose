@@ -1,6 +1,7 @@
 package com.youngerhousea.mirai.compose
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
@@ -43,7 +44,11 @@ fun main() = application {
                         load = {
                             when (kind) {
                                 Solver.Kind.Pic -> Image(loadImageBitmap(ByteArrayInputStream(data.toByteArray())), null)
-                                Solver.Kind.Slider, Solver.Kind.Unsafe -> Text(data)
+                                Solver.Kind.Slider, Solver.Kind.Unsafe -> {
+                                    SelectionContainer {
+                                        Text(data)
+                                    }
+                                }
                             }
                         },
                         onFinish = { MiraiCompose.dispatch(Solver.Action.CompleteVerify(it)) },
