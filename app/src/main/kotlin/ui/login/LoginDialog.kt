@@ -43,9 +43,10 @@ fun LoginInterface() {
 
     fun onLogin() {
         scope.launch {
+            val bot = MiraiConsole.addBot(account.toLong(), password)
             try {
                 loadingState = true
-                MiraiConsole.addBot(account.toLong(), password).login()
+                bot.login()
             } catch (e: Exception) {
                 when (e) {
                     is WrongPasswordException ->
@@ -79,6 +80,7 @@ fun LoginInterface() {
                         host.showSnackbar(e.message ?: R.String.UnknownError)
                     }
                 }
+                bot.close()
             } finally {
                 loadingState = false
             }
@@ -88,7 +90,7 @@ fun LoginInterface() {
     Scaffold(
         scaffoldState = rememberScaffoldState(snackbarHostState = host),
         modifier = Modifier.onPreviewEnterDown {
-
+            onLogin()
         }) {
         Column(
             verticalArrangement = Arrangement.Center,
