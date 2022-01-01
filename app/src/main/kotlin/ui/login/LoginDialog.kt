@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.console.UICannotFinish
 import com.youngerhousea.mirai.compose.resource.R
+import com.youngerhousea.mirai.compose.ui.EnumTabRowWithContent
 import com.youngerhousea.mirai.compose.ui.log.onPreviewEnterDown
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
@@ -31,19 +32,23 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.network.*
+import net.mamoe.mirai.utils.BotConfiguration
 import java.io.IOException
 
 @Composable
 fun LoginInterface() {
     var account by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var protocol by remember { mutableStateOf(BotConfiguration.MiraiProtocol.ANDROID_PHONE) }
     val host = remember { SnackbarHostState() }
     var loadingState by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     fun onLogin() {
         scope.launch {
-            val bot = MiraiConsole.addBot(account.toLong(), password)
+            val bot = MiraiConsole.addBot(account.toLong(), password) {
+                this.protocol = protocol
+            }
             try {
                 loadingState = true
                 bot.login()
@@ -114,6 +119,11 @@ fun LoginInterface() {
                 password = password,
                 onPasswordTextChange = { password = it },
             )
+
+            CheckProtocol(protocol) {
+                protocol = it
+            }
+
             LoginButton(
                 modifier = Modifier.height(100.dp)
                     .aspectRatio(2f)
@@ -193,6 +203,17 @@ private fun PasswordTextField(
         ),
         singleLine = true
     )
+}
+
+
+@Composable
+private fun CheckProtocol(
+    protocol: BotConfiguration.MiraiProtocol,
+    onProtocolChange: (BotConfiguration.MiraiProtocol) -> Unit
+) {
+    EnumTabRowWithContent(protocol, onClick = onProtocolChange) {
+        Text(protocol.name)
+    }
 }
 
 @Composable
