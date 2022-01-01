@@ -22,12 +22,13 @@ import java.util.concurrent.Executors
 
 private val ConsoleThread = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-fun main() = application {
+fun main(extraAction: () -> Unit) = application {
     val scope = rememberCoroutineScope()
     MaterialTheme(colors = color) {
         MiraiComposeWindow(onLoaded = {
             scope.launch(ConsoleThread) {
                 MiraiCompose.start()
+                extraAction()
             }
         }, onCloseRequest = {
             MiraiCompose.cancel()
@@ -43,7 +44,10 @@ fun main() = application {
                         tip = title,
                         load = {
                             when (kind) {
-                                Solver.Kind.Pic -> Image(loadImageBitmap(ByteArrayInputStream(data.toByteArray())), null)
+                                Solver.Kind.Pic -> Image(
+                                    loadImageBitmap(ByteArrayInputStream(data.toByteArray())),
+                                    null
+                                )
                                 Solver.Kind.Slider, Solver.Kind.Unsafe -> {
                                     SelectionContainer {
                                         Text(data)
@@ -60,5 +64,6 @@ fun main() = application {
             HostPage()
         }
     }
+
 }
 
