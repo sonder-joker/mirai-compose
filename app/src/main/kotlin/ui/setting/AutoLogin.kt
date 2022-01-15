@@ -1,20 +1,20 @@
 package com.youngerhousea.mirai.compose.ui.setting
-
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.youngerhousea.mirai.compose.model.LoginCredential
-import com.youngerhousea.mirai.compose.resource.R
-import com.youngerhousea.mirai.compose.ui.EnumTabRowWithContent
+//
+//import androidx.compose.animation.AnimatedVisibility
+//import androidx.compose.animation.ExperimentalAnimationApi
+//import androidx.compose.desktop.ui.tooling.preview.Preview
+//import androidx.compose.foundation.clickable
+//import androidx.compose.foundation.layout.*
+//import androidx.compose.material.*
+//import androidx.compose.runtime.Composable
+//import androidx.compose.runtime.mutableStateListOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.ui.Alignment
+//import androidx.compose.ui.Modifier
+//import androidx.compose.ui.unit.dp
+//import com.youngerhousea.mirai.compose.model.LoginCredential
+//import com.youngerhousea.mirai.compose.resource.R
+//import com.youngerhousea.mirai.compose.ui.EnumTabRowWithContent
 
 // IR ERROR need repair after
 //@OptIn(ExperimentalAnimationApi::class)

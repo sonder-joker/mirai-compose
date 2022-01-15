@@ -91,7 +91,7 @@ fun WindowState.onMaximizeButtonClick() {
 @Composable
 fun MiraiComposeDialog(
     onCloseRequest: () -> Unit,
-    state: DialogState = rememberDialogState(),
+    state: DialogState = rememberDialogState(size = DpSize(642.dp, 376.dp)),
     visible: Boolean = true,
     title: String = "Dialog",
     icon: Painter? = null,

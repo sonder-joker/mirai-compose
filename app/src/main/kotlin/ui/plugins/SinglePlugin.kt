@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.youngerhousea.mirai.compose.console.impl.MiraiCompose
 import com.youngerhousea.mirai.compose.console.impl.get
 import com.youngerhousea.mirai.compose.resource.R
-import com.youngerhousea.mirai.compose.ui.EnumTabRowWithContent
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.Command
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.registeredCommands
@@ -62,8 +61,14 @@ fun JvmPlugin(
     Column {
         val (pluginTab, setPluginTab) = rememberSaveable(plugin) { mutableStateOf(PluginTab.Data) }
 
-        EnumTabRowWithContent(pluginTab, onClick = setPluginTab) { enum ->
-            Text(enum.name)
+        TabRow(pluginTab.ordinal) {
+            for (current in enumValues<PluginTab>()) {
+                Tab(pluginTab == current, onClick = {
+                    setPluginTab(current)
+                }, content = {
+                    Text(current.name)
+                })
+            }
         }
 
         when (pluginTab) {

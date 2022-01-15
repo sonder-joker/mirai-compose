@@ -3,28 +3,30 @@ package com.youngerhousea.mirai.compose.ui.login
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.RemoveRedEye
-import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.youngerhousea.mirai.compose.console.UICannotFinish
 import com.youngerhousea.mirai.compose.resource.R
-import com.youngerhousea.mirai.compose.ui.EnumTabRowWithContent
 import com.youngerhousea.mirai.compose.ui.log.onPreviewEnterDown
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
@@ -120,7 +122,7 @@ fun LoginInterface() {
                 onPasswordTextChange = { password = it },
             )
 
-            CheckProtocol(protocol) {
+            CheckProtocol(modifier = Modifier.weight(1f), protocol) {
                 protocol = it
             }
 
@@ -208,11 +210,51 @@ private fun PasswordTextField(
 
 @Composable
 private fun CheckProtocol(
+    modifier: Modifier,
     protocol: BotConfiguration.MiraiProtocol,
     onProtocolChange: (BotConfiguration.MiraiProtocol) -> Unit
 ) {
-    EnumTabRowWithContent(protocol, onClick = onProtocolChange) {
-        Text(protocol.name)
+    var expanded by remember { mutableStateOf(false) }
+    val suggestions = enumValues<BotConfiguration.MiraiProtocol>()
+
+    var textFieldSize by remember { mutableStateOf(Size.Zero) }
+
+    val icon = if (expanded)
+        Icons.Filled.ArrowDropUp
+    else
+        Icons.Filled.ArrowDropDown
+
+    Column(modifier = modifier.padding(vertical = 5.dp)) {
+        OutlinedTextField(
+            value = protocol.name,
+            onValueChange = { onProtocolChange(enumValueOf(it)) },
+            modifier = Modifier
+                .fillMaxWidth(fraction = 0.4f)
+                .onGloballyPositioned { coordinates ->
+                    //This value is used to assign to the DropDown the same width
+                    textFieldSize = coordinates.size.toSize()
+                },
+            readOnly = true,
+            trailingIcon = {
+                Icon(icon, null,
+                    Modifier.clickable { expanded = !expanded })
+            }
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+        ) {
+            suggestions.forEach { label ->
+                DropdownMenuItem(onClick = {
+                    onProtocolChange(label)
+                    expanded = false
+                }) {
+                    Text(text = label.name)
+                }
+            }
+        }
     }
 }
 
