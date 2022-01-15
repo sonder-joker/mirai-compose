@@ -68,10 +68,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync to mirai forum
-        uses: sebastianpopp/ftp-action@releases/v2
+        uses: SamKirkland/FTP-Deploy-Action@4.2.0
         with:
-          host: ${{ secrets.ftp_server }}
-          user: ${{ secrets.ftp_account }}
+          server: ${{ secrets.ftp_server }}
+          username: ${{ secrets.ftp_account }}
           password: ${{ secrets.ftp_password }}
-          localDir: ${{ steps.download.outputs.download-path }}
+          local-dir: ${{ steps.download.outputs.download-path }}
+          protocol: ftp
           options: "--delete"
