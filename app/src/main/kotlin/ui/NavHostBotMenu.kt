@@ -36,7 +36,7 @@ fun NavHostFirstBotMenu(
         },
         onBotItemClick = { hostViewModel.dispatch(Host.Route.BotMessage(it)) }
     )
-    if(state.dialogExpand) {
+    if (state.dialogExpand) {
         MiraiComposeDialog({
             hostViewModel.dispatch(Host.Action.CloseLoginDialog)
         }) {
