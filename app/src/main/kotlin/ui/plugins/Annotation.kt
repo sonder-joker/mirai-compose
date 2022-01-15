@@ -10,8 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -52,25 +50,6 @@ private inline val Plugin.annotatedInfo: AnnotatedString
         toAnnotatedString()
     }
 
-private inline val Plugin.annotatedKind: AnnotatedString
-    get() = buildAnnotatedString {
-        pushStyle(SpanStyle(fontSize = 13.sp))
-        append(
-            when (this@annotatedKind) {
-                is JavaPlugin -> {
-                    "Java"
-                }
-                is KotlinPlugin -> {
-                    "Kotlin"
-                }
-                else -> {
-                    "Help"
-                }
-            }
-        )
-        toAnnotatedString()
-    }
-
 private val Plugin.languageIcon: ImageVector
     get() =
         when (this) {
@@ -107,7 +86,6 @@ internal fun PluginDescription(plugin: Plugin, modifier: Modifier = Modifier) {
         Spacer(Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(plugin.languageIcon, null)
-            Text(plugin.annotatedKind)
         }
     }
 }
