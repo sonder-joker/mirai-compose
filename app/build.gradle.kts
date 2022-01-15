@@ -46,7 +46,7 @@ compose.desktop {
     application {
         mainClass = MiraiCompose.mainClass
         nativeDistributions {
-            modules(*jdkModules)
+            includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
 
             packageName = MiraiCompose.name
