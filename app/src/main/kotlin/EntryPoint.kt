@@ -22,7 +22,11 @@ import java.util.concurrent.Executors
 
 private val ConsoleThread = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-fun main(extraAction: () -> Unit) = application {
+fun main() {
+    startApplication {}
+}
+
+fun startApplication(extraAction: () -> Unit) = application {
     val scope = rememberCoroutineScope()
     MaterialTheme(colors = color) {
         MiraiComposeWindow(onLoaded = {

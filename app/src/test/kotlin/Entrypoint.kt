@@ -8,7 +8,7 @@ class EntrypointTest{
 
     @Test
     fun start() {
-        main {
+        startApplication {
             TestPlugin.load()
             TestPlugin.enable()
         }
