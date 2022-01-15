@@ -45,6 +45,7 @@ buildConfig {
 compose.desktop {
     application {
         mainClass = MiraiCompose.mainClass
+        jvmArgs += "-Dmirai.slider.captcha.supported"
         nativeDistributions {
             includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
