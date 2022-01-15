@@ -14,7 +14,8 @@ Mirai 是一个在全平台下运行，提供 QQ 协议支持的高效率机器�
 </div>
 
 # mirai-compose
-[![GitHub release (latest SemVer including pre-release)](https://img.shields.io/github/v/release/sonder-joker/mirai-compose?include_prereleases)](https://github.com/sonder-joker/mirai-compose/releases)  
+[![GitHub release (latest SemVer including pre-release)](https://img.shields.io/github/v/release/sonder-joker/mirai-compose?include_prereleases)](https://github.com/sonder-joker/mirai-compose/releases)
+![QQ Group](https://img.shields.io/badge/交流群-1004268447-informational?style=flat-square&logo=tencent-qq)
 
 ## 这是什么？
 这是一个基于[compose-jb](https://github.com/jetbrains/compose-jb) ，实现的[mirai-console](https://github.com/mamoe/mirai-console)
