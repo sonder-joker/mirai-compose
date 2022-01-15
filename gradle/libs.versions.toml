@@ -2,7 +2,7 @@
 kotlin = "1.6.10"
 compose-jb = "1.0.1"
 buildconfig = "3.0.2"
-mirai = "2.9.0"
+mirai = "2.9.2"
 yamlkt = "0.10.2"
 json = "1.3.2"
 junit = "4.13"
