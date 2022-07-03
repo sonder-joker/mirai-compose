@@ -3,9 +3,9 @@ package com.youngerhousea.mirai.compose.ui.plugins
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -46,7 +46,7 @@ fun PluginList(
         }
     ) {
         LazyVerticalGrid(
-            cells = GridCells.Adaptive(300.dp),
+            columns = GridCells.Adaptive(300.dp),
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(20.dp)
         ) {

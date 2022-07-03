@@ -13,6 +13,7 @@ import mirai_compose.app.BuildConfig
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.command.CommandManager
 import net.mamoe.mirai.console.data.PluginConfig
 import net.mamoe.mirai.console.data.PluginData
 import net.mamoe.mirai.console.data.PluginDataHolder
@@ -44,7 +45,11 @@ internal class MiraiComposeImpl : MiraiComposeImplementation, Solver by MiraiCom
 
     override val builtInPluginLoaders = listOf(lazy { JvmPluginLoader })
 
+    override val commandManager: CommandManager by lazy { backendAccess.createDefaultCommandManager(coroutineContext) }
+
     override val frontEndDescription = MiraiComposeDescription
+
+    override val jvmPluginLoader: JvmPluginLoader by lazy { backendAccess.createDefaultJvmPluginLoader(coroutineContext) }
 
     override val dataStorageForJvmPluginLoader = ReadablePluginDataStorage(rootPath / "data")
 
@@ -57,6 +62,14 @@ internal class MiraiComposeImpl : MiraiComposeImplementation, Solver by MiraiCom
     override val consoleInput: ConsoleInput = MiraiComposeInput
 
     override val consoleCommandSender = MiraiConsoleSender(composeLogger)
+
+    override val consoleDataScope: MiraiConsoleImplementation.ConsoleDataScope by lazy {
+             MiraiConsoleImplementation.ConsoleDataScope.createDefault(
+                 coroutineContext,
+                 dataStorageForBuiltIns,
+                 configStorageForBuiltIns
+                    )
+         }
 
     @OptIn(MiraiInternalApi::class)
     override fun createLogger(identity: String?): MiraiLogger =
